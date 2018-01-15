@@ -2,24 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/Jeffail/gabs"
-  packages = ["."]
-  revision = "2a3aa15961d5fee6047b8151b67ac2f08ba2c48c"
-  version = "1.0"
-
-[[projects]]
-  branch = "dev"
-  name = "github.com/celeo/getin-backend"
-  packages = ["shared"]
-  revision = "7358c872da299dc5b287635418225cd03902a678"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/celeo/goesi"
-  packages = ["."]
-  revision = "4eebd5f19dcd3a8fb7f8a705e8ce6fd969514f94"
-
-[[projects]]
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
@@ -78,12 +60,6 @@
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   revision = "b4575eea38cca1123ec2dc90c26529b5c5acfcff"
-
-[[projects]]
-  name = "github.com/op/go-logging"
-  packages = ["."]
-  revision = "b2cb9fa56473e98db8caba80237377e83fe44db5"
-  version = "v1"
 
 [[projects]]
   name = "github.com/pelletier/go-toml"
@@ -154,6 +130,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "15d18d84db42cc9dfbc868ec393edad854af84f2260b65cfd24397abd8bfad87"
+  inputs-digest = "097ae5b7e1dd98ab3568b71fa36283b4fd97de5a1a02583f5e1e22c6ccf7d050"
   solver-name = "gps-cdcl"
   solver-version = 1

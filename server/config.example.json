@@ -1,6 +1,0 @@
-{
-    "jwt_secret": "super-secret",
-    "database": {
-        "path": "data.db"
-    }
-}

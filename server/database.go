@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
 )
 
 func database() *sqlx.DB {
-	db, err := sqlx.Connect("sqlite3", viper.GetString("database.path"))
+	db, err := sqlx.Connect("postgres", os.Getenv("DATABASE"))
 	if err != nil {
 		panic("Could not open database")
 	}
@@ -15,10 +16,15 @@ func database() *sqlx.DB {
 
 const schemaCreateTables = `
 CREATE TABLE IF NOT EXISTS user (
-
+	id bigserial PRIMARY KEY,
+	name varchar,
+	password varchar
 );
 
 CREATE TABLE IF NOT EXISTS post (
-
+	id bigserial PRIMARY KEY,
+	user_id bigserial,
+	date varchar,
+	content varchar
 );
 `

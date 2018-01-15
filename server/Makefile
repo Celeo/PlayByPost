@@ -8,3 +8,6 @@ build:
 
 clean:
 	@go clean
+
+deploy:
+	@cd .. && git subtree push --prefix server heroku master
