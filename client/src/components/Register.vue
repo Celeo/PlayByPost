@@ -25,6 +25,8 @@
             v-model="email"
           )
         v-btn(@click="submit" :disabled="!isValid || isLoading" color="primary") Submit
+        span.grey--text(v-if="isLoading") Loading...
+        v-alert.mt-3(type="error" :value="true" v-if="error") An error occurred with registration.
 </template>
 
 <script>

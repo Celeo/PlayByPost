@@ -29,3 +29,18 @@ func TestCreateUUID(t *testing.T) {
 		t.Errorf("Hash returned from createUUID is empty")
 	}
 }
+
+func TestCheckHashAgainstPassword(t *testing.T) {
+	raw := "test"
+	hashed, e := createPasswordHash(raw)
+	if e != nil {
+		t.Errorf("Error returned from createPasswordHash(): " + e.Error())
+	}
+	m, err := checkHashAgainstPassword(hashed, raw)
+	if err != nil {
+		t.Errorf("Error in checkHashAgainstPassword(): " + e.Error())
+	}
+	if !m {
+		t.Errorf("Passwords do not match")
+	}
+}

@@ -37,11 +37,13 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  if (['login', 'logout', 'register'].indexOf(to.name) === -1) {
-    if (!store.getters.isLoggedIn) {
-      next({ name: 'login' })
-      return
-    }
+  if (to.name === 'logout' && !store.getters.isLoggedIn) {
+    next({ name: 'posts' })
+    return
+  }
+  if (to.name === 'login' && store.getters.isLoggedIn) {
+    next({ name: 'posts' })
+    return
   }
   next()
 })

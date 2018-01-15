@@ -23,7 +23,7 @@ Vue.config.SERVER_URL = url
 
 const token = window.localStorage.getItem('token')
 if (token) {
-  store.commit('LOG_IN', token)
+  store.commit('LOG_IN', JSON.parse(token))
 }
 
 /* eslint-disable no-new */

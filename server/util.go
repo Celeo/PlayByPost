@@ -21,16 +21,16 @@ func timestamp() string {
 }
 
 func createPasswordHash(raw string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(raw), 0)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(raw), 0)
 	if err != nil {
 		return "", err
 	}
-	return string(hash), nil
+	return string(hashed), nil
 }
 
 func checkHashAgainstPassword(hashed, raw string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(raw))
-	return err != nil, err
+	return err == nil, err
 }
 
 func createUUID() (string, error) {
@@ -46,6 +46,9 @@ func createSession(u user) (string, error) {
 	defer db.Close()
 	uuid, err := createUUID()
 	if err != nil {
+		return "", err
+	}
+	if _, err := db.Exec(queryDeleteSessionsForUser, u.ID); err != nil {
 		return "", err
 	}
 	if _, err := db.Exec(queryCreateSession, u.ID, uuid); err != nil {

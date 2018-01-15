@@ -45,6 +45,12 @@ type session struct {
 	UUID   string `db:"uuid" json:"uuid"`
 }
 
+type roll struct {
+	ID     int    `json:"id"`
+	PostID int    `db:"post_id" json:"postID"`
+	Roll   string `json:"roll"`
+}
+
 const queryCreateTables = `
 CREATE TABLE IF NOT EXISTS "user" (
 	id bigserial PRIMARY KEY,
@@ -65,13 +71,21 @@ CREATE TABLE IF NOT EXISTS "session" (
 	user_id bigserial PRIMARY KEY REFERENCES "user" (id) NOT NULL,
 	uuid char(36) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "roll" (
+	id bigserial PRIMARY KEY,
+	post_id bigserial REFERENCES "post" (id) NOT NULL,
+	roll varchar NOT NULL
+);
 `
 const querySelectSessionByUUID = `SELECT * FROM "session" WHERE uuid=$1`
 const querySelectUserByID = `SELECT * FROM "user" WHERE id=$1`
 const querySelectUserByName = `SELECT * FROM "user" WHERE name=$1`
 const querySelectPosts = `SELECT * FROM "post"`
+const queryselectUsers = `SELECT * FROM "user"`
 const queryCreateUser = `INSERT INTO "user" (name, password, email) VALUES ($1, $2, $3)`
 const queryCreateSession = `INSERT INTO "session" VALUES ($1, $2)`
+const queryDeleteSessionsForUser = `DELETE FROM "session" WHERE user_id=$1`
 const queryCreatePost = `INSERT INTO "post" (user_id, date, content) VALUES ($1, $2, $3)`
 const queryEditPost = `UPDATE "post" SET content=? WHERE id=$1`
 

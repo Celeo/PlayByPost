@@ -4,9 +4,9 @@
       v-toolbar-title Play By Post
       v-spacer
       v-toolbar-items
+        v-btn(flat :exact="true" :to="{ name: 'posts' }") Posts
         v-btn(flat :exact="true" :to="{name: 'login'}" v-if="!loggedIn") Log in
         v-btn(flat :exact="true" :to="{name: 'register'}" v-if="!loggedIn") Register
-        v-btn(flat :exact="true" :to="{ name: 'posts' }" v-if="loggedIn") Posts
         v-btn(flat :exact="true" :to="{name: 'logout'}" v-if="loggedIn") Log out
     v-content
       v-container

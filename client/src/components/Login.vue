@@ -16,6 +16,8 @@
             required
           )
         v-btn(@click="submit" :disabled="!isValid || isLoading" color="primary") Submit
+        span.grey--text(v-if="isLoading") Loading...
+        v-alert.mt-3.black--text(type="warning" :value="true" v-if="error") Login unsuccessful
 </template>
 
 <script>

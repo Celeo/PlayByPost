@@ -35,7 +35,12 @@ func viewRegister(c *gin.Context) {
 	}
 	db := database()
 	defer db.Close()
-	_, err := db.Exec(queryCreateUser, data.Name, data.Password, data.Email)
+	hashedPassword, err := createPasswordHash(data.Password)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	_, err = db.Exec(queryCreateUser, data.Name, hashedPassword, data.Email)
 	if err != nil {
 		abortError(c, err)
 		return
@@ -102,13 +107,37 @@ func viewLogin(c *gin.Context) {
 
 func viewPosts(c *gin.Context) {
 	posts := []post{}
+	users := []user{}
+	userMap := make(map[int]user)
+	type returnPost struct {
+		ID      int    `json:"id"`
+		Name    string `json:"name"`
+		Date    string `json:"date"`
+		Content string `json:"content"`
+	}
+	retVal := []returnPost{}
 	db := database()
 	defer db.Close()
 	if err := db.Select(&posts, querySelectPosts); err != nil {
 		abortError(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, posts)
+	if err := db.Select(&users, queryselectUsers); err != nil {
+		abortError(c, err)
+		return
+	}
+	for _, u := range users {
+		userMap[u.ID] = u
+	}
+	for _, p := range posts {
+		retVal = append(retVal, returnPost{
+			ID:      p.ID,
+			Name:    userMap[p.UserID].Name,
+			Date:    p.Date,
+			Content: p.Content,
+		})
+	}
+	c.JSON(http.StatusOK, retVal)
 }
 
 func viewCreatePost(c *gin.Context) {

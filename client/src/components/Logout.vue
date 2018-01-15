@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h1.display-3 Logging out ...
+    h1.display-2 Logging out ...
 </template>
 
 <script>

@@ -22,7 +22,7 @@ func main() {
 	r.GET("/", viewIndex)
 	r.POST("/login", viewLogin)
 	r.POST("/register", viewRegister)
-	r.GET("/post", middlewareLoggedIn(), viewPosts)
+	r.GET("/post", viewPosts)
 	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
 	r.PUT("/post", middlewareLoggedIn(), viewEditPost)
 
