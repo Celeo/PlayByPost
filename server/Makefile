@@ -1,7 +1,7 @@
 all: run
 
 run: build
-	@./server
+	@DATABASE_URL='user=postgres password=postgres host=localhost port=5432 dbname=playbypost sslmode=disable' ./server
 
 build:
 	@go build

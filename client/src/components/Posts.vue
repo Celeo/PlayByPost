@@ -1,6 +1,5 @@
 <template lang="pug">
   div
-    h3.display-1.mt-1.mb-2 Posts
     v-card.elevation-3(light v-for="post in posts" :key="post.id")
       v-card-title(primary-title)
         a(:href="'#' + post.id").mr-1.not-link
