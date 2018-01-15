@@ -20,6 +20,12 @@
   revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
+  name = "github.com/itsjamie/gin-cors"
+  packages = ["."]
+  revision = "97b4a9da79331dfa2b6d35f4cdd1e50f5148859c"
+  version = "1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
   packages = [".","reflectx"]
@@ -76,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6553995841194c7bbeabef5e74f621480534bf9960d7fa67becd463d87c2f4ca"
+  inputs-digest = "878fb46516d39b1666064c5ea00b2f669b0a70f3ba0683784979d22e1da99f26"
   solver-name = "gps-cdcl"
   solver-version = 1

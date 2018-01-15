@@ -22,24 +22,23 @@ export default {
   },
   data() {
     return {
-      newContent: '', // this.$store.getters.posts[0].content,
+      newContent: '',
       toolbar: [
         ['bold', 'italic'],
         [{ list: 'bullet' }],
         [{ color: ['blue'] }, 'clean']
-      ]
+      ],
+      posts: [],
+      isLoading: true,
+      error: null
     }
   },
   methods: {
     save() {
-      console.log('save')
       // TODO
     }
   },
   computed: {
-    posts() {
-      return this.$store.getters.posts
-    },
     hasWrittenContent() {
       return this.newContent.length > 0 && this.newContent !== '<p><br></p>'
     }

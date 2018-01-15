@@ -24,3 +24,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/nu7hatch/gouuid"
+
+[[constraint]]
+  name = "github.com/itsjamie/gin-cors"
+  version = "1.0.0"

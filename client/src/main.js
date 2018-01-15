@@ -21,6 +21,11 @@ if (process.env.NODE_ENV === 'development') {
 }
 Vue.config.SERVER_URL = url
 
+const token = window.localStorage.getItem('token')
+if (token) {
+  store.commit('LOG_IN', token)
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

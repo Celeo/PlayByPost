@@ -1,51 +1,37 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import rawData from '@/rawData'
 
 Vue.use(Vuex)
 
 const state = {
   name: null,
-  token: null,
-  posts: rawData.posts
+  uuid: null
 }
 
 const mutations = {
   LOG_IN(state, payload) {
-    const { token, tokenData } = payload
-    state.token = token
-    state.name = tokenData.name
+    const { uuid, name } = payload
+    state.uuid = uuid
+    state.name = name
   },
 
   LOG_OUT(state) {
-    state.token = null
+    state.uuid = null
     state.name = null
-  },
-
-  NEW_POST(state, payload) {
-    // TODO
-  },
-
-  EDIT_POST(state, payload) {
-    // TODO
   }
 }
 
 const getters = {
   isLoggedIn(state) {
-    return true // TODO
+    return !!state.uuid && !!state.name
   },
 
-  token(state) {
-    return state.token
+  uuid(state) {
+    return state.uuid
   },
 
   name(state) {
     return state.name
-  },
-
-  posts(state) {
-    return state.posts
   }
 }
 

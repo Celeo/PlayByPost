@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	uuid "github.com/nu7hatch/gouuid"
+	"github.com/nu7hatch/gouuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func databaseError(c *gin.Context, err error) {
+func abortError(c *gin.Context, err error) {
 	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 		"message": "Could not access database",
 		"error":   err.Error(),
@@ -28,7 +28,7 @@ func createPasswordHash(raw string) (string, error) {
 	return string(hash), nil
 }
 
-func checkPasswordAgainstHash(raw, hashed string) (bool, error) {
+func checkHashAgainstPassword(hashed, raw string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(raw))
 	return err != nil, err
 }
@@ -39,4 +39,17 @@ func createUUID() (string, error) {
 		return "", err
 	}
 	return u4.String(), err
+}
+
+func createSession(u user) (string, error) {
+	db := database()
+	defer db.Close()
+	uuid, err := createUUID()
+	if err != nil {
+		return "", err
+	}
+	if _, err := db.Exec(queryCreateSession, u.ID, uuid); err != nil {
+		return "", err
+	}
+	return uuid, nil
 }

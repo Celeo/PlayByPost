@@ -2,7 +2,7 @@
   div
     v-container
       v-flex(xs6 offset-xs3)
-        h1.display-3 Login
+        h1.display-2.mb-4 Login
         v-form
           v-text-field(
             label="Name"
@@ -15,21 +15,21 @@
             type="password"
             required
           )
-          v-text-field(
-            label="Email"
-            v-model="email"
-          )
-        v-btn(@click="submit" :disabled="!isValid" color="primary") Submit
+        v-btn(@click="submit" :disabled="!isValid || isLoading" color="primary") Submit
 </template>
 
 <script>
+import Vue from 'vue'
+import axios from 'axios'
+
 export default {
   data() {
     return {
       name: '',
       password: '',
-      email: '',
-      valid: false
+      valid: false,
+      isLoading: false,
+      error: false
     }
   },
   computed: {
@@ -39,8 +39,22 @@ export default {
   },
   methods: {
     async submit() {
-      console.log('submit')
-      // TODO
+      this.isLoading = true
+      const data = { name: this.name, password: this.password }
+      try {
+        const response = await axios.post(`${Vue.config.SERVER_URL}login`, data)
+        const { name, uuid } = response.data
+        const payload = { name, uuid }
+        this.$store.commit('LOG_IN', payload)
+        window.localStorage.setItem('token', JSON.stringify(payload))
+        this.$router.push({ name: 'posts' })
+        this.error = false
+      } catch (err) {
+        console.error(err)
+        this.error = true
+      } finally {
+        this.isLoading = false
+      }
     }
   }
 }

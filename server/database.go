@@ -8,7 +8,11 @@ import (
 )
 
 func database() *sqlx.DB {
-	db, err := sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		databaseURL = "user=postgres password=postgres host=localhost port=5432 dbname=playbypost sslmode=disable"
+	}
+	db, err := sqlx.Connect("postgres", databaseURL)
 	if err != nil {
 		panic(err)
 	}
@@ -22,9 +26,11 @@ func createTables() {
 }
 
 type user struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Password string `json:"-"`
+	ID             int    `json:"id"`
+	Name           string `json:"name"`
+	Password       string `json:"-"`
+	Email          string `json:"email"`
+	NotifyOnUpdate bool   `json:"notifyOnUpdate"`
 }
 
 type post struct {
@@ -44,7 +50,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 	id bigserial PRIMARY KEY,
 	name varchar NOT NULL,
 	password varchar NOT NULL,
-	email varchar,
+	email varchar NOT NULL DEFAULT '',
 	notifyOnUpdate boolean NOT NULL DEFAULT false
 );
 
@@ -60,11 +66,27 @@ CREATE TABLE IF NOT EXISTS "session" (
 	uuid char(36) NOT NULL
 );
 `
-const querySelectSessionByUUID = `SELECT * FROM "session" WHERE uuid=?`
-const querySelectUserByID = `SELECT * FROM "user" WHERE id=?`
-const querySelectUserByName = `SELECT * FROM "user" WHERE name=?`
+const querySelectSessionByUUID = `SELECT * FROM "session" WHERE uuid=$1`
+const querySelectUserByID = `SELECT * FROM "user" WHERE id=$1`
+const querySelectUserByName = `SELECT * FROM "user" WHERE name=$1`
 const querySelectPosts = `SELECT * FROM "post"`
-const queryCreateUser = `INSERT INTO "user" (name, password, email) VALUES (?, ?, ?)`
-const queryCreateSession = `INSERT INTO "session" VALUES (?, ?)`
-const queryCreatePost = `INSERT INTO "post" (user_id, date, content) VALUES (?, ?, ?)`
-const queryEditPost = `UPDATE "post" SET content=? WHERE id=?`
+const queryCreateUser = `INSERT INTO "user" (name, password, email) VALUES ($1, $2, $3)`
+const queryCreateSession = `INSERT INTO "session" VALUES ($1, $2)`
+const queryCreatePost = `INSERT INTO "post" (user_id, date, content) VALUES ($1, $2, $3)`
+const queryEditPost = `UPDATE "post" SET content=? WHERE id=$1`
+
+func getUserByID(id int) (user, error) {
+	db := database()
+	defer db.Close()
+	u := user{}
+	err := db.Get(&u, querySelectUserByID, id)
+	return u, err
+}
+
+func getUserByName(name string) (user, error) {
+	db := database()
+	defer db.Close()
+	u := user{}
+	err := db.Get(&u, querySelectUserByName, name)
+	return u, err
+}

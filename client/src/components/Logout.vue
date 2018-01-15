@@ -7,7 +7,7 @@
 export default {
   created() {
     this.$store.commit('LOG_OUT')
-    window.sessionStorage.removeItem('token')
+    window.localStorage.removeItem('token')
     setInterval(() => {
       window.location.href = '/'
     }, 2000)
