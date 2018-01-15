@@ -15,7 +15,8 @@ let url = ''
 if (process.env.NODE_ENV === 'development') {
   url = 'http://localhost:5000/'
 } else {
-  url = window.location.origin + '/api/'
+  import config from './config'
+  url = config.server_url
 }
 Vue.config.SERVER_URL = url
 

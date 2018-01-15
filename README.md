@@ -15,5 +15,7 @@ This command is more complicated than the standard git push that you've probably
 Heroku isn't in the root level. As such, only that level, the ./server directory, is pushed to Heroku. You'll also want to set the GIN_MODE envrionment
 variable to "release" with `heroku config:get GIN_MODE --app [app name]`.
 
+Copy ./client/config.example.json to ./client/config.json and put the URL of the Heroku app (run `heroku open`) into that file.
+
 You'll also need to setup a Surge app. Navigate into the ./client directory, run `yarn build` or `npm run build` to create the inner ./dist directory, then run
 `surge ./dist`. Use the default name or supply your own. After Surge finishes, create a file called `CNAME`, with the name of your app ("whatever.surge.sh").
