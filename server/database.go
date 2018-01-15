@@ -5,8 +5,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
-	"github.com/nu7hatch/gouuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func database() *sqlx.DB {
@@ -15,6 +13,12 @@ func database() *sqlx.DB {
 		panic(err)
 	}
 	return db
+}
+
+func createTables() {
+	db := database()
+	defer db.Close()
+	db.MustExec(queryCreateTables)
 }
 
 type user struct {
@@ -30,11 +34,18 @@ type post struct {
 	Content string `json:"content"`
 }
 
-const schemaCreateTables = `
+type session struct {
+	UserID int    `db:"user_id" json:"userID"`
+	UUID   string `db:"uuid" json:"uuid"`
+}
+
+const queryCreateTables = `
 CREATE TABLE IF NOT EXISTS "user" (
 	id bigserial PRIMARY KEY,
 	name varchar NOT NULL,
-	password varchar NOT NULL
+	password varchar NOT NULL,
+	email varchar,
+	notifyOnUpdate boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS "post" (
@@ -49,24 +60,11 @@ CREATE TABLE IF NOT EXISTS "session" (
 	uuid char(36) NOT NULL
 );
 `
-
-func createPasswordHash(raw string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(raw), 0)
-	if err != nil {
-		return "", err
-	}
-	return string(hash), nil
-}
-
-func checkPasswordAgainstHash(raw, hashed string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(raw))
-	return err != nil, err
-}
-
-func createUUID() (string, error) {
-	u4, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-	return u4.String(), err
-}
+const querySelectSessionByUUID = `SELECT * FROM "session" WHERE uuid=?`
+const querySelectUserByID = `SELECT * FROM "user" WHERE id=?`
+const querySelectUserByName = `SELECT * FROM "user" WHERE name=?`
+const querySelectPosts = `SELECT * FROM "post"`
+const queryCreateUser = `INSERT INTO "user" (name, password, email) VALUES (?, ?, ?)`
+const queryCreateSession = `INSERT INTO "session" VALUES (?, ?)`
+const queryCreatePost = `INSERT INTO "post" (user_id, date, content) VALUES (?, ?, ?)`
+const queryEditPost = `UPDATE "post" SET content=? WHERE id=?`
