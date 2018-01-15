@@ -14,10 +14,9 @@ func main() {
 	r.GET("/", viewIndex)
 	r.POST("/login", viewLogin)
 	r.POST("/register", viewRegister)
-	// TODO apply middleware to the below handlers
-	r.GET("/post", viewPosts)
-	r.POST("/post", viewCreatePost)
-	r.PUT("/post", viewEditPost)
+	r.GET("/post", middlewareLoggedIn(), viewPosts)
+	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
+	r.PUT("/post", middlewareLoggedIn(), viewEditPost)
 
 	port := os.Getenv("PORT")
 	if port == "" {
