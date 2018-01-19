@@ -25,7 +25,8 @@ func createTables() {
 	db.MustExec(queryCreateTables)
 }
 
-type user struct {
+// A User is a member
+type User struct {
 	ID             int    `json:"id"`
 	Name           string `json:"name"`
 	Password       string `json:"-"`
@@ -33,19 +34,22 @@ type user struct {
 	NotifyOnUpdate bool   `json:"notifyOnUpdate"`
 }
 
-type post struct {
+// A Post is a message
+type Post struct {
 	ID      int    `json:"id"`
 	UserID  int    `db:"user_id" json:"userID"`
 	Date    string `json:"date"`
 	Content string `json:"content"`
 }
 
-type session struct {
+// A Session is used for authentication
+type Session struct {
 	UserID int    `db:"user_id" json:"userID"`
 	UUID   string `db:"uuid" json:"uuid"`
 }
 
-type roll struct {
+// A Roll is the result of rolling one or more dice
+type Roll struct {
 	ID     int    `json:"id"`
 	PostID int    `db:"post_id" json:"postID"`
 	Roll   string `json:"roll"`
@@ -88,19 +92,3 @@ const queryCreateSession = `INSERT INTO "session" VALUES ($1, $2)`
 const queryDeleteSessionsForUser = `DELETE FROM "session" WHERE user_id=$1`
 const queryCreatePost = `INSERT INTO "post" (user_id, date, content) VALUES ($1, $2, $3)`
 const queryEditPost = `UPDATE "post" SET content=? WHERE id=$1`
-
-func getUserByID(id int) (user, error) {
-	db := database()
-	defer db.Close()
-	u := user{}
-	err := db.Get(&u, querySelectUserByID, id)
-	return u, err
-}
-
-func getUserByName(name string) (user, error) {
-	db := database()
-	defer db.Close()
-	u := user{}
-	err := db.Get(&u, querySelectUserByName, name)
-	return u, err
-}

@@ -4,9 +4,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/itsjamie/gin-cors"
-
 	"github.com/gin-gonic/gin"
+	"github.com/itsjamie/gin-cors"
 )
 
 func main() {
@@ -37,22 +36,19 @@ func middlewareLoggedIn() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		if header == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Unauthorized",
-			})
-			c.Abort()
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		u := user{}
-		s := session{}
+		u := User{}
+		s := Session{}
 		db := database()
 		defer db.Close()
 		if err := db.Get(&s, querySelectSessionByUUID, header); err != nil {
-			abortError(c, err)
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 		if err := db.Get(&u, querySelectUserByID, s.UserID); err != nil {
-			abortError(c, err)
+			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
 		c.Set("authName", u.Name)

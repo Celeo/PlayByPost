@@ -46,7 +46,23 @@ func createUUID() (string, error) {
 	return u4.String(), err
 }
 
-func createSession(u user) (string, error) {
+func getUserByID(id int) (User, error) {
+	db := database()
+	defer db.Close()
+	u := User{}
+	err := db.Get(&u, querySelectUserByID, id)
+	return u, err
+}
+
+func getUserByName(name string) (User, error) {
+	db := database()
+	defer db.Close()
+	u := User{}
+	err := db.Get(&u, querySelectUserByName, name)
+	return u, err
+}
+
+func createSession(u User) (string, error) {
 	db := database()
 	defer db.Close()
 	uuid, err := createUUID()
@@ -82,7 +98,6 @@ func textFormatWithDiceRolls(text string) (string, error) {
 		rollValue := 0
 		valueOfDice := 0
 		originalRolltext := fmt.Sprintf("[dice=%s]%s[/dice]", rolls[1], rolls[2])
-
 		rollText := strings.Replace(rolls[2], " ", "", -1)
 
 		for _, dice := range regexDice.FindAllStringSubmatch(rollText, -1) {

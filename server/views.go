@@ -106,9 +106,9 @@ func viewLogin(c *gin.Context) {
 }
 
 func viewPosts(c *gin.Context) {
-	posts := []post{}
-	users := []user{}
-	userMap := make(map[int]user)
+	posts := []Post{}
+	users := []User{}
+	userMap := make(map[int]User)
 	type returnPost struct {
 		ID      int    `json:"id"`
 		Name    string `json:"name"`
