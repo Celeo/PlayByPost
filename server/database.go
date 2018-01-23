@@ -86,6 +86,7 @@ const querySelectSessionByUUID = `SELECT * FROM "session" WHERE uuid=$1`
 const querySelectUserByID = `SELECT * FROM "user" WHERE id=$1`
 const querySelectUserByName = `SELECT * FROM "user" WHERE name=$1`
 const querySelectPosts = `SELECT * FROM "post"`
+const querySelectSinglePost = `SELECT * FROM "post" WHERE id=$1`
 const queryselectUsers = `SELECT * FROM "user"`
 const queryCreateUser = `INSERT INTO "user" (name, password, email) VALUES ($1, $2, $3)`
 const queryCreateSession = `INSERT INTO "session" VALUES ($1, $2)`

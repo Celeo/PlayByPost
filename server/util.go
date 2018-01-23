@@ -79,18 +79,18 @@ func createSession(u User) (string, error) {
 }
 
 // TODO need to hook up the database in here so rolls persist
-func textFormatWithDiceRolls(text string) (string, error) {
+func textFormatWithDiceRolls(text string) (string, []Roll, error) {
 	regexBBCode, err := regexp.Compile(`\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	regexDice, err := regexp.Compile(`(\d+)d(\d+)`)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	regexMod, err := regexp.Compile(`([+-])(\d)+`)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -103,11 +103,11 @@ func textFormatWithDiceRolls(text string) (string, error) {
 		for _, dice := range regexDice.FindAllStringSubmatch(rollText, -1) {
 			rollCount, err := strconv.Atoi(dice[1])
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
 			diceSides, err := strconv.Atoi(dice[2])
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
 			for i := 0; i < rollCount; i++ {
 				rVal := rng.Intn(diceSides) + 1
@@ -118,7 +118,7 @@ func textFormatWithDiceRolls(text string) (string, error) {
 		for _, mod := range regexMod.FindAllStringSubmatch(rollText, -1) {
 			val, err := strconv.Atoi(mod[2])
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
 			if mod[1] == "+" {
 				rollValue += val
@@ -129,5 +129,21 @@ func textFormatWithDiceRolls(text string) (string, error) {
 		diceRollResults := regexDice.ReplaceAllString(rolls[2], "")
 		text = strings.Replace(text, originalRolltext, fmt.Sprintf("<br>%s: %s ⇒ (%d)%s -> %d<br>", rolls[1], rolls[2], valueOfDice, diceRollResults, rollValue), 1)
 	}
-	return text, nil
+	return text, []Roll{}, nil
+}
+
+type parsedRoll struct {
+	Post Post
+	Dice map[int]Roll
+}
+
+func insertRolls(p Post) (parsedRoll, error) {
+	// TODO
+	diceMap := make(map[int]Roll)
+	content, dice, err := textFormatWithDiceRolls(p.Content)
+
+	return parsedRoll{
+		Post: p,
+		Dice: diceMap,
+	}, nil
 }

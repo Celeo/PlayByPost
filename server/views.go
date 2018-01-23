@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -130,14 +131,36 @@ func viewPosts(c *gin.Context) {
 		userMap[u.ID] = u
 	}
 	for _, p := range posts {
+		content, err := insertRolls(p)
+		if err != nil {
+			abortError(c, err)
+			return
+		}
 		retVal = append(retVal, returnPost{
 			ID:      p.ID,
 			Name:    userMap[p.UserID].Name,
 			Date:    p.Date,
-			Content: p.Content,
+			Content: content,
 		})
 	}
 	c.JSON(http.StatusOK, retVal)
+}
+
+func viewSinglePost(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	post := Post{}
+	db := database()
+	defer db.Close()
+	if err := db.Get(&post, querySelectSinglePost, id); err != nil {
+		abortError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, post)
 }
 
 func viewCreatePost(c *gin.Context) {
@@ -153,6 +176,7 @@ func viewCreatePost(c *gin.Context) {
 		abortError(c, err)
 		return
 	}
+	// TODO inject rolls
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Message posted successfully",
 	})
@@ -173,5 +197,6 @@ func viewEditPost(c *gin.Context) {
 		abortError(c, err)
 		return
 	}
+	// TODO update/delete rolls
 	c.Status(http.StatusNoContent)
 }

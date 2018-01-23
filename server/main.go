@@ -22,6 +22,7 @@ func main() {
 	r.POST("/login", viewLogin)
 	r.POST("/register", viewRegister)
 	r.GET("/post", viewPosts)
+	r.GET("/post/:id", viewSinglePost)
 	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
 	r.PUT("/post", middlewareLoggedIn(), viewEditPost)
 
