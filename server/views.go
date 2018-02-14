@@ -36,6 +36,20 @@ func viewRegister(c *gin.Context) {
 	}
 	db := database()
 	defer db.Close()
+
+	existingUsers := []User{}
+	if err := db.Select(&existingUsers, querySelectUserByName, data.Name); err != nil {
+		abortError(c, err)
+		return
+	}
+	if len(existingUsers) != 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "A user with that name already exists",
+			"error":   "Unique name required",
+		})
+		return
+	}
+
 	hashedPassword, err := createPasswordHash(data.Password)
 	if err != nil {
 		abortError(c, err)
@@ -131,16 +145,16 @@ func viewPosts(c *gin.Context) {
 		userMap[u.ID] = u
 	}
 	for _, p := range posts {
-		// content, err := insertRolls(p)
-		// if err != nil {
-		// 	abortError(c, err)
-		// 	return
-		// }
+		newPost, err := insertRolls(p)
+		if err != nil {
+			abortError(c, err)
+			return
+		}
 		retVal = append(retVal, returnPost{
 			ID:      p.ID,
 			Name:    userMap[p.UserID].Name,
 			Date:    p.Date,
-			Content: p.Content,
+			Content: newPost.Content,
 		})
 	}
 	c.JSON(http.StatusOK, retVal)

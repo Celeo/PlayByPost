@@ -79,18 +79,18 @@ func createSession(u User) (string, error) {
 }
 
 // TODO need to hook up the database in here so rolls persist
-func textFormatWithDiceRolls(text string) (string, []Roll, error) {
+func textFormatWithDiceRolls(text string) (string, error) {
 	regexBBCode, err := regexp.Compile(`\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 	regexDice, err := regexp.Compile(`(\d+)d(\d+)`)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 	regexMod, err := regexp.Compile(`([+-])(\d)+`)
 	if err != nil {
-		return "", nil, err
+		return "", err
 	}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -103,11 +103,11 @@ func textFormatWithDiceRolls(text string) (string, []Roll, error) {
 		for _, dice := range regexDice.FindAllStringSubmatch(rollText, -1) {
 			rollCount, err := strconv.Atoi(dice[1])
 			if err != nil {
-				return "", nil, err
+				return "", err
 			}
 			diceSides, err := strconv.Atoi(dice[2])
 			if err != nil {
-				return "", nil, err
+				return "", err
 			}
 			for i := 0; i < rollCount; i++ {
 				rVal := rng.Intn(diceSides) + 1
@@ -118,7 +118,7 @@ func textFormatWithDiceRolls(text string) (string, []Roll, error) {
 		for _, mod := range regexMod.FindAllStringSubmatch(rollText, -1) {
 			val, err := strconv.Atoi(mod[2])
 			if err != nil {
-				return "", nil, err
+				return "", err
 			}
 			if mod[1] == "+" {
 				rollValue += val
@@ -127,9 +127,9 @@ func textFormatWithDiceRolls(text string) (string, []Roll, error) {
 			}
 		}
 		diceRollResults := regexDice.ReplaceAllString(rolls[2], "")
-		text = strings.Replace(text, originalRolltext, fmt.Sprintf("<br>%s: %s ⇒ (%d)%s -> %d<br>", rolls[1], rolls[2], valueOfDice, diceRollResults, rollValue), 1)
+		text = strings.Replace(text, originalRolltext, fmt.Sprintf("<br><span style=\"color: green;\">%s: %s ⇒ (%d)%s -> %d</span><br>", rolls[1], rolls[2], valueOfDice, diceRollResults, rollValue), 1)
 	}
-	return text, []Roll{}, nil
+	return text, nil
 }
 
 type parsedRoll struct {
@@ -137,13 +137,11 @@ type parsedRoll struct {
 	Dice map[int]Roll
 }
 
-// TODO
-func insertRolls(p Post) (parsedRoll, error) {
-	diceMap := make(map[int]Roll)
-	// content, dice, err := textFormatWithDiceRolls(p.Content)
-
-	return parsedRoll{
-		Post: p,
-		Dice: diceMap,
-	}, nil
+func insertRolls(p Post) (Post, error) {
+	content, err := textFormatWithDiceRolls(p.Content)
+	if err != nil {
+		return Post{}, err
+	}
+	p.Content = content
+	return p, nil
 }
