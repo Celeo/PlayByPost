@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsjamie/gin-cors"
@@ -25,12 +24,9 @@ func main() {
 	r.GET("/post/:id", viewSinglePost)
 	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
 	r.PUT("/post", middlewareLoggedIn(), viewEditPost)
+	r.POST("/changePassword", middlewareLoggedIn(), viewChangePassword)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "5000"
-	}
-	r.Run(":" + port)
+	r.Run(":5000")
 }
 
 func middlewareLoggedIn() gin.HandlerFunc {

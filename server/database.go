@@ -1,11 +1,17 @@
 package main
 
 import (
+	"os"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // sqolite3 driver
 )
 
 func database() *sqlx.DB {
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "data.db"
+	}
 	db, err := sqlx.Connect("sqlite3", "data.db")
 	if err != nil {
 		panic(err)
@@ -86,3 +92,4 @@ const queryCreateSession = `INSERT INTO session VALUES (?, ?)`
 const queryDeleteSessionsForUser = `DELETE FROM session WHERE user_id=?`
 const queryCreatePost = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
 const queryEditPost = `UPDATE post SET content=? WHERE id=?`
+const queryUpdatePassword = `UPDATE user SET password=? WHERE id=?`

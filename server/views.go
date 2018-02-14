@@ -130,20 +130,19 @@ func viewPosts(c *gin.Context) {
 	for _, u := range users {
 		userMap[u.ID] = u
 	}
-	// for _, p := range posts {
-	// content, err := insertRolls(p)
-	// if err != nil {
-	// 	abortError(c, err)
-	// 	return
-	// }
-	// TODO
-	// retVal = append(retVal, returnPost{
-	// 	ID:      p.ID,
-	// 	Name:    userMap[p.UserID].Name,
-	// 	Date:    p.Date,
-	// 	Content: content,
-	// })
-	// }
+	for _, p := range posts {
+		// content, err := insertRolls(p)
+		// if err != nil {
+		// 	abortError(c, err)
+		// 	return
+		// }
+		retVal = append(retVal, returnPost{
+			ID:      p.ID,
+			Name:    userMap[p.UserID].Name,
+			Date:    p.Date,
+			Content: p.Content,
+		})
+	}
 	c.JSON(http.StatusOK, retVal)
 }
 
@@ -200,4 +199,41 @@ func viewEditPost(c *gin.Context) {
 	}
 	// TODO update/delete rolls
 	c.Status(http.StatusNoContent)
+}
+
+func viewChangePassword(c *gin.Context) {
+	data := struct {
+		OldPassword string `json:"old"`
+		NewPassword string `json:"new"`
+	}{}
+	if err := c.BindJSON(&data); err != nil {
+		abortError(c, err)
+		return
+	}
+	db := database()
+	defer db.Close()
+	u, err := getUserByName(c.GetString("authName"))
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	oldPasswordMatches, err := checkHashAgainstPassword(u.Password, data.OldPassword)
+	if err != nil || !oldPasswordMatches {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Old password does not match",
+			"error":   err.Error(),
+		})
+		return
+	}
+	newHash, err := createPasswordHash(data.NewPassword)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	_, err = db.Exec(queryUpdatePassword, newHash, u.ID)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	c.Status(200)
 }

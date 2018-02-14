@@ -7,6 +7,7 @@
         v-btn(flat :exact="true" :to="{ name: 'posts' }") Posts
         v-btn(flat :exact="true" :to="{name: 'login'}" v-if="!loggedIn") Log in
         v-btn(flat :exact="true" :to="{name: 'register'}" v-if="!loggedIn") Register
+        v-btn(flat :exact="true" :to="{name: 'changePassword'}" v-if="loggedIn") Change password
         v-btn(flat :exact="true" :to="{name: 'logout'}" v-if="loggedIn") Log out
     v-content
       v-container

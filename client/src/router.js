@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import Posts from '@/components/Posts'
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
+import ChangePassword from '@/components/ChangePassword'
 import Register from '@/components/Register'
 
 import store from './store'
@@ -26,6 +27,11 @@ const router = new Router({
       path: '/logout',
       component: Logout,
       name: 'logout'
+    },
+    {
+      path: '/changePassword',
+      component: ChangePassword,
+      name: 'changePassword'
     },
     {
       path: '/register',
