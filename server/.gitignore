@@ -2,3 +2,4 @@ server
 vendor
 debug
 debug.*
+data.db

@@ -1,18 +1,12 @@
 package main
 
 import (
-	"os"
-
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq" // postgres driver
+	_ "github.com/mattn/go-sqlite3" // sqolite3 driver
 )
 
 func database() *sqlx.DB {
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		databaseURL = "user=postgres password=postgres host=localhost port=5432 dbname=playbypost sslmode=disable"
-	}
-	db, err := sqlx.Connect("postgres", databaseURL)
+	db, err := sqlx.Connect("sqlite3", "data.db")
 	if err != nil {
 		panic(err)
 	}
@@ -57,39 +51,39 @@ type Roll struct {
 
 const queryCreateTables = `
 CREATE TABLE IF NOT EXISTS "user" (
-	id bigserial PRIMARY KEY,
-	name varchar NOT NULL,
-	password varchar NOT NULL,
-	email varchar NOT NULL DEFAULT '',
-	notifyOnUpdate boolean NOT NULL DEFAULT false
+	id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+	password TEXT NOT NULL,
+	email TEXT NOT NULL DEFAULT '',
+	notifyOnUpdate INTEGER NOT NULL DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS "post" (
-	id bigserial PRIMARY KEY,
-	user_id bigserial REFERENCES "user" (id) NOT NULL,
-	date varchar NOT NULL,
-	content varchar NOT NULL
+	id INTEGER PRIMARY KEY,
+	user_id INTEGER REFERENCES "user" (id) NOT NULL,
+	date TEXT NOT NULL,
+	content TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "session" (
-	user_id bigserial PRIMARY KEY REFERENCES "user" (id) NOT NULL,
-	uuid char(36) NOT NULL
+	user_id INTEGER PRIMARY KEY REFERENCES "user" (id) NOT NULL,
+	uuid TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "roll" (
-	id bigserial PRIMARY KEY,
-	post_id bigserial REFERENCES "post" (id) NOT NULL,
-	roll varchar NOT NULL
+	id INTEGER PRIMARY KEY,
+	post_id INTEGER REFERENCES "post" (id) NOT NULL,
+	roll TEXT NOT NULL
 );
 `
-const querySelectSessionByUUID = `SELECT * FROM "session" WHERE uuid=$1`
-const querySelectUserByID = `SELECT * FROM "user" WHERE id=$1`
-const querySelectUserByName = `SELECT * FROM "user" WHERE name=$1`
-const querySelectPosts = `SELECT * FROM "post"`
-const querySelectSinglePost = `SELECT * FROM "post" WHERE id=$1`
-const queryselectUsers = `SELECT * FROM "user"`
-const queryCreateUser = `INSERT INTO "user" (name, password, email) VALUES ($1, $2, $3)`
-const queryCreateSession = `INSERT INTO "session" VALUES ($1, $2)`
-const queryDeleteSessionsForUser = `DELETE FROM "session" WHERE user_id=$1`
-const queryCreatePost = `INSERT INTO "post" (user_id, date, content) VALUES ($1, $2, $3)`
-const queryEditPost = `UPDATE "post" SET content=? WHERE id=$1`
+const querySelectSessionByUUID = `SELECT * FROM session WHERE uuid=?`
+const querySelectUserByID = `SELECT * FROM user WHERE id=?`
+const querySelectUserByName = `SELECT * FROM user WHERE name=?`
+const querySelectPosts = `SELECT * FROM post`
+const querySelectSinglePost = `SELECT * FROM post WHERE id=?`
+const queryselectUsers = `SELECT * FROM user`
+const queryCreateUser = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
+const queryCreateSession = `INSERT INTO session VALUES (?, ?)`
+const queryDeleteSessionsForUser = `DELETE FROM session WHERE user_id=?`
+const queryCreatePost = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
+const queryEditPost = `UPDATE post SET content=? WHERE id=?`

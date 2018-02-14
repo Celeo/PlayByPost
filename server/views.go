@@ -130,19 +130,20 @@ func viewPosts(c *gin.Context) {
 	for _, u := range users {
 		userMap[u.ID] = u
 	}
-	for _, p := range posts {
-		content, err := insertRolls(p)
-		if err != nil {
-			abortError(c, err)
-			return
-		}
-		retVal = append(retVal, returnPost{
-			ID:      p.ID,
-			Name:    userMap[p.UserID].Name,
-			Date:    p.Date,
-			Content: content,
-		})
-	}
+	// for _, p := range posts {
+	// content, err := insertRolls(p)
+	// if err != nil {
+	// 	abortError(c, err)
+	// 	return
+	// }
+	// TODO
+	// retVal = append(retVal, returnPost{
+	// 	ID:      p.ID,
+	// 	Name:    userMap[p.UserID].Name,
+	// 	Date:    p.Date,
+	// 	Content: content,
+	// })
+	// }
 	c.JSON(http.StatusOK, retVal)
 }
 

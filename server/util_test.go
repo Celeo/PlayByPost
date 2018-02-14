@@ -46,11 +46,5 @@ func TestCheckHashAgainstPassword(t *testing.T) {
 }
 
 func TestInsertRolls(t *testing.T) {
-	post := Post{
-		ID:      1,
-		UserID:  1,
-		Date:    "",
-		Content: "",
-	}
-	parsed := insertRolls(post)
+	// TODO
 }

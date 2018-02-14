@@ -5,6 +5,3 @@ run: build
 
 build:
 	@go build
-
-deploy:
-	@cd .. && git subtree push --prefix server heroku master

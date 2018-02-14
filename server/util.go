@@ -137,10 +137,10 @@ type parsedRoll struct {
 	Dice map[int]Roll
 }
 
+// TODO
 func insertRolls(p Post) (parsedRoll, error) {
-	// TODO
 	diceMap := make(map[int]Roll)
-	content, dice, err := textFormatWithDiceRolls(p.Content)
+	// content, dice, err := textFormatWithDiceRolls(p.Content)
 
 	return parsedRoll{
 		Post: p,
