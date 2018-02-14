@@ -1,14 +1,46 @@
 <template lang="pug">
   v-app(light)
+    v-navigation-drawer(temporary v-model="drawer" absolute)
+      v-list.pt-0(dense)
+        v-list-tile(:exact="true" :to="{ name: 'posts' }")
+          v-list-tile-action
+            v-icon fa-book
+          v-list-tile-content
+            v-list-tile-title Posts
+        v-list-tile(:exact="true" :to="{ name: 'changePassword' }")
+          v-list-tile-action
+            v-icon fa-question
+          v-list-tile-content
+            v-list-tile-title Help
+        v-list-tile(:exact="true" :to="{ name: 'login' }" v-if="!loggedIn")
+          v-list-tile-action
+            v-icon fa-sign-in
+          v-list-tile-content
+            v-list-tile-title Log in
+        v-list-tile(:exact="true" :to="{ name: 'register' }" v-if="!loggedIn")
+          v-list-tile-action
+            v-icon fa-user-plus
+          v-list-tile-content
+            v-list-tile-title Register
+        v-list-tile(:exact="true" :to="{ name: 'changePassword' }" v-if="loggedIn")
+          v-list-tile-action
+            v-icon fa-key
+          v-list-tile-content
+            v-list-tile-title Change password
+        v-list-tile(:exact="true" :to="{ name: 'logout' }" v-if="loggedIn")
+          v-list-tile-action
+            v-icon fa-sign-out
+          v-list-tile-content
+            v-list-tile-title Log out
+        v-divider
+        v-list-tile(@click="drawer = false")
+          v-list-tile-action
+            v-icon fa-times
+          v-list-tile-content
+            v-list-tile-title Close this
     v-toolbar(app)
+      v-toolbar-side-icon(@click="drawer = !drawer")
       v-toolbar-title Play By Post
-      v-spacer
-      v-toolbar-items
-        v-btn(flat :exact="true" :to="{ name: 'posts' }") Posts
-        v-btn(flat :exact="true" :to="{name: 'login'}" v-if="!loggedIn") Log in
-        v-btn(flat :exact="true" :to="{name: 'register'}" v-if="!loggedIn") Register
-        v-btn(flat :exact="true" :to="{name: 'changePassword'}" v-if="loggedIn") Change password
-        v-btn(flat :exact="true" :to="{name: 'logout'}" v-if="loggedIn") Log out
     v-content
       v-container
         transition(name="fade" mode="out-in")
@@ -17,6 +49,11 @@
 
 <script>
 export default {
+  data() {
+    return {
+      drawer: false
+    }
+  },
   computed: {
     loggedIn() {
       return this.$store.getters.isLoggedIn
