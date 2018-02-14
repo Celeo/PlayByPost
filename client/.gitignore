@@ -13,6 +13,3 @@ appConfig.json
 *.ntvs*
 *.njsproj
 *.sln
-
-# Surge
-CNAME

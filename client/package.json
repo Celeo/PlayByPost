@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "lint": "eslint --ext .js,.vue src",
-    "build": "node build/build.js",
-    "deploy": "cp CNAME dist && surge ./dist"
+    "build": "node build/build.js"
   },
   "dependencies": {
     "axios": "^0.17.1",

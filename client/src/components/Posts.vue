@@ -1,8 +1,13 @@
 <template lang="pug">
   div
-    post(v-for="post in posts" :key="post.id" :post="post")
-    editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
-    v-alert.mt-3.black--text(type="warning" :value="true" v-if="!!error") {{ error }}
+    div(v-if="!error")
+      div(v-if="posts && posts.length > 0")
+        post(v-for="post in posts" :key="post.id" :post="post")
+      div(v-else)
+        h1 No posts have been made
+      editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
+    div(v-else)
+      v-alert.mt-3.black--text(type="warning" :value="true") {{ error }}
 </template>
 
 <script>

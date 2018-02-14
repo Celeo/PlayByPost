@@ -7,8 +7,6 @@ import store from './store'
 
 import 'vuetify/src/stylus/main.styl'
 
-import config from '@/appConfig'
-
 Vue.use(Vuetify)
 
 Vue.config.productionTip = false
@@ -17,7 +15,7 @@ let url = ''
 if (process.env.NODE_ENV === 'development') {
   url = 'http://localhost:5000/'
 } else {
-  url = config.server_url
+  url = window.location.origin + '/api/'
 }
 Vue.config.SERVER_URL = url
 
