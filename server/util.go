@@ -78,7 +78,6 @@ func createSession(u User) (string, error) {
 	return uuid, nil
 }
 
-// TODO need to hook up the database in here so rolls persist
 func textFormatWithDiceRolls(text string) (string, error) {
 	regexBBCode, err := regexp.Compile(`(?i)\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
 	if err != nil {
@@ -130,11 +129,6 @@ func textFormatWithDiceRolls(text string) (string, error) {
 		text = strings.Replace(text, originalRolltext, fmt.Sprintf("<br><span style=\"color: green;\">%s: %s ⇒ (%d)%s -> %d</span><br>", rolls[1], rolls[2], valueOfDice, diceRollResults, rollValue), 1)
 	}
 	return text, nil
-}
-
-type parsedRoll struct {
-	Post Post
-	Dice map[int]Roll
 }
 
 func insertRolls(p Post) (Post, error) {
