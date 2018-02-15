@@ -80,7 +80,7 @@ func createSession(u User) (string, error) {
 
 // TODO need to hook up the database in here so rolls persist
 func textFormatWithDiceRolls(text string) (string, error) {
-	regexBBCode, err := regexp.Compile(`\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
+	regexBBCode, err := regexp.Compile(`(?i)\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
 	if err != nil {
 		return "", err
 	}
