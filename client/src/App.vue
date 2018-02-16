@@ -42,7 +42,7 @@
       v-toolbar-side-icon(@click="drawer = !drawer")
       v-toolbar-title Play By Post
       v-spacer
-      v-toolbar-items
+      v-toolbar-items(v-if="loggedIn")
         v-btn.not-link(flat :ripple="false") Logged in as {{ username }}
     v-content
       v-container
