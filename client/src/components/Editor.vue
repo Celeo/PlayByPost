@@ -34,7 +34,7 @@ export default {
       toolbar: [
         ['bold', 'italic'],
         [{ list: 'bullet' }],
-        [{ color: ['blue'] }, 'clean']
+        [{ color: ['blue', 'black'] }, 'clean']
       ]
     }
   },
