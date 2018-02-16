@@ -1,12 +1,12 @@
 <template lang="pug">
-  div
+  div(v-if="!isLoading")
     div(v-if="!error")
       div(v-if="posts && posts.length > 0")
         post(v-for="post in posts" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
       editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
-    div(v-else)
+    div(v-if="error")
       v-alert.mt-3.black--text(type="warning" :value="true") {{ error }}
 </template>
 
@@ -39,6 +39,8 @@ export default {
       } catch (err) {
         console.error(err)
         this.error = 'Error loading posts'
+      } finally {
+        this.isLoading = false
       }
     },
     async save() {
