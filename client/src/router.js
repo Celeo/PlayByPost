@@ -6,6 +6,7 @@ import Login from '@/components/Login'
 import Logout from '@/components/Logout'
 import ChangePassword from '@/components/ChangePassword'
 import Register from '@/components/Register'
+import Help from '@/components/Help'
 
 import store from './store'
 
@@ -37,6 +38,11 @@ const router = new Router({
       path: '/register',
       component: Register,
       name: 'register'
+    },
+    {
+      path: '/help',
+      component: Help,
+      name: 'help'
     }
   ],
   mode: 'history'

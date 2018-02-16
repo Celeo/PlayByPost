@@ -7,7 +7,7 @@
             v-icon fa-book
           v-list-tile-content
             v-list-tile-title Posts
-        v-list-tile(:exact="true" :to="{ name: 'changePassword' }")
+        v-list-tile(:exact="true" :to="{ name: 'help' }")
           v-list-tile-action
             v-icon fa-question
           v-list-tile-content
