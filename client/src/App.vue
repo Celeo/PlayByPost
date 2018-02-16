@@ -41,6 +41,9 @@
     v-toolbar(app)
       v-toolbar-side-icon(@click="drawer = !drawer")
       v-toolbar-title Play By Post
+      v-spacer
+      v-toolbar-items
+        v-btn.not-link(flat :ripple="false") Logged in as {{ username }}
     v-content
       v-container
         transition(name="fade" mode="out-in")
@@ -57,6 +60,9 @@ export default {
   computed: {
     loggedIn() {
       return this.$store.getters.isLoggedIn
+    },
+    username() {
+      return this.$store.getters.name
     }
   }
 }
@@ -81,6 +87,7 @@ export default {
 .card__text ul
   margin-left 1rem
 
-a.not-link
+.not-link
   text-decoration none
+  cursor default !important
 </style>
