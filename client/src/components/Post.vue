@@ -1,12 +1,12 @@
 <template lang="pug">
   div
-    v-card.elevation-3(light)
-      v-card-title(primary-title)
-        a(:href="'#' + post.id").mr-1.not-link
-          v-icon(color="grey lighten-1") fa-link
-        h3.headline(:id="post.id") <strong>{{ post.name }}</strong> at {{ post.date }}
+    v-card.elevation-5(light)
+      div.clearfix.purple--text.text--darken-3
+        h3.go-left {{ post.name }}
+        h3.go-right {{ post.date }}
       v-card-text
         div.px-3(v-html="post.content")
+    div.mt-2
 </template>
 
 <script>
@@ -16,3 +16,21 @@ export default {
   ]
 }
 </script>
+
+<style lang="stylus" scoped>
+.clearfix
+  border-bottom 1px solid rgb(106, 27, 154)
+  padding 1% 1% 0 1%
+  font-size 1.2rem
+
+.clearfix::after
+  content ""
+  clear both
+  display table
+
+.go-left
+  float left !important
+
+.go-right
+  float right !important
+</style>
