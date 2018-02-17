@@ -4,7 +4,7 @@ import Router from 'vue-router'
 import Posts from '@/components/Posts'
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
-import ChangePassword from '@/components/ChangePassword'
+import Profile from '@/components/Profile'
 import Register from '@/components/Register'
 import Help from '@/components/Help'
 
@@ -30,9 +30,9 @@ const router = new Router({
       name: 'logout'
     },
     {
-      path: '/changePassword',
-      component: ChangePassword,
-      name: 'changePassword'
+      path: '/profile',
+      component: Profile,
+      name: 'profile'
     },
     {
       path: '/register',

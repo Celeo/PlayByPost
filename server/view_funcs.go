@@ -41,6 +41,18 @@ type newPasswordData struct {
 	AuthID      int    `json:"-"`
 }
 
+// newNameData is data required for changing a user's name.
+type newNameData struct {
+	AuthID int    `json:"-"`
+	Name   string `json:"name"`
+}
+
+// newEmailData is data required for changing a user's email.
+type newEmailData struct {
+	AuthID int    `json:"-"`
+	Email  string `json:"email"`
+}
+
 // registerNewAccount takes a struct of data and creates a new user
 // account so long as one with the same name does not already exist.
 func registerNewAccount(data *registerData) (string, error) {
@@ -164,5 +176,21 @@ func changePassword(data *newPasswordData) error {
 		return err
 	}
 	_, err = db.Exec(queryUpdatePassword, newHash, u.ID)
+	return err
+}
+
+// changeName changes a user's name.
+func changeName(data *newNameData) error {
+	db := database()
+	defer db.Close()
+	_, err := db.Exec(queryUpdateName, data.Name, data.AuthID)
+	return err
+}
+
+// changeEmail changes a user's email.
+func changeEmail(data *newEmailData) error {
+	db := database()
+	defer db.Close()
+	_, err := db.Exec(queryUpdateEmail, data.Email, data.AuthID)
 	return err
 }

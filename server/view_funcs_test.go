@@ -155,3 +155,37 @@ func TestChangePassword(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, checkHashAgainstPassword(u.Password, newPass))
 }
+
+func TestChangeName(t *testing.T) {
+	newDB()
+	const newName = "new name"
+	db := database()
+	defer db.Close()
+	addUser(db)
+	data := newNameData{
+		Name:   newName,
+		AuthID: 1,
+	}
+	err := changeName(&data)
+	require.Nil(t, err)
+	u, err := getUserByID(1)
+	require.Nil(t, err)
+	require.Equal(t, u.Name, newName)
+}
+
+func testChangeEmail(t *testing.T) {
+	newDB()
+	const newEmail = "new@email"
+	db := database()
+	defer db.Close()
+	addUser(db)
+	data := newEmailData{
+		Email:  newEmail,
+		AuthID: 1,
+	}
+	err := changeEmail(&data)
+	require.Nil(t, err)
+	u, err := getUserByID(1)
+	require.Nil(t, err)
+	require.Equal(t, u.Email, newEmail)
+}

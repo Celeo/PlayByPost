@@ -18,6 +18,10 @@ const mutations = {
   LOG_OUT(state) {
     state.uuid = null
     state.name = null
+  },
+
+  UPDATE_NAME(state, name) {
+    state.name = name
   }
 }
 

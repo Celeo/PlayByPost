@@ -95,3 +95,5 @@ const queryDeleteSessionsForUser = `DELETE FROM session WHERE user_id=?`
 const queryCreatePost = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
 const queryEditPost = `UPDATE post SET content=? WHERE id=?`
 const queryUpdatePassword = `UPDATE user SET password=? WHERE id=?`
+const queryUpdateName = `UPDATE user SET name=? WHERE id=?`
+const queryUpdateEmail = `UPDATE user SET email=? WHERE id=?`

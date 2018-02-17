@@ -22,11 +22,11 @@
             v-icon fa-user-plus
           v-list-tile-content
             v-list-tile-title Register
-        v-list-tile(:exact="true" :to="{ name: 'changePassword' }" v-if="loggedIn")
+        v-list-tile(:exact="true" :to="{ name: 'profile' }" v-if="loggedIn")
           v-list-tile-action
             v-icon fa-key
           v-list-tile-content
-            v-list-tile-title Change password
+            v-list-tile-title Profile
         v-list-tile(:exact="true" :to="{ name: 'logout' }" v-if="loggedIn")
           v-list-tile-action
             v-icon fa-sign-out

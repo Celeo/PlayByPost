@@ -1,36 +1,26 @@
 <template lang="pug">
   div
-    h3.display-1.mb-4 Change password
+    h3.display-1.mb-4 Change email
     v-form
       v-text-field(
-        label="Old password"
-        v-model="oldPassword"
-        type="password"
-        required
-      )
-      v-text-field(
-        label="New password"
-        v-model="newPassword"
-        type="password"
+        label="New email"
+        v-model="email"
         required
       )
     v-btn(@click="submit" :disabled="!isValid || isLoading" color="primary") Submit
     span.grey--text(v-if="isLoading") Loading...
     v-alert.mt-3.black--text(type="warning" :value="true" v-if="!!error") {{ error }}
-    v-alert.mt-3.black--text(type="info" :value="true" v-if="successful") Password changed successfully
+    v-alert.mt-3.black--text(type="info" :value="true" v-if="successful") Email changed successfully
 </template>
 
 <script>
 import Vue from 'vue'
 import axios from 'axios'
 
-const mismatch = 'Old password does not match'
-
 export default {
   data() {
     return {
-      oldPassword: '',
-      newPassword: '',
+      email: '',
       valid: false,
       isLoading: false,
       error: null,
@@ -40,29 +30,30 @@ export default {
   },
   computed: {
     isValid() {
-      return this.oldPassword !== '' && this.newPassword !== ''
+      return this.email !== ''
     }
   },
   methods: {
     async submit() {
       this.isLoading = true
-      const data = { old: this.oldPassword, new: this.newPassword }
       try {
-        await this.handler.post(`${Vue.config.SERVER_URL}profile/password`, data)
+        await this.handler.post(`${Vue.config.SERVER_URL}profile/email`, { email: this.email })
         this.successful = true
         this.error = null
-        this.oldPassword = ''
-        this.newPassword = ''
       } catch (err) {
         console.error(err)
-        if (err.response && err.response.data.error === mismatch) {
-          this.error = mismatch
-        } else {
-          this.error = 'Could not change password'
-        }
+        this.error = 'Could not change email'
       } finally {
         this.isLoading = false
       }
+    }
+  },
+  async created() {
+    try {
+      const response = await this.handler.get(`${Vue.config.SERVER_URL}profile`)
+      this.email = response.data.email
+    } catch (err) {
+      console.error(err)
     }
   }
 }
