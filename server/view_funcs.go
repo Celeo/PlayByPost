@@ -123,7 +123,7 @@ func getAllPosts() ([]formattedPost, error) {
 		userMap[u.ID] = u
 	}
 	for _, p := range posts {
-		newPost, err := insertRolls(p)
+		err := insertRolls(&p)
 		if err != nil {
 			return nil, err
 		}
@@ -131,7 +131,7 @@ func getAllPosts() ([]formattedPost, error) {
 			ID:      p.ID,
 			Name:    userMap[p.UserID].Name,
 			Date:    p.Date,
-			Content: newPost.Content,
+			Content: p.Content,
 		})
 	}
 	return retVal, nil

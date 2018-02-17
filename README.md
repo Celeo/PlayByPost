@@ -14,7 +14,8 @@ for p in \
         github.com/jmoiron/sqlx \
         github.com/nu7hatch/gouuid \
         golang.org/x/crypto/bcrypt \
-        github.com/mattn/go-sqlite3
+        github.com/mattn/go-sqlite3 \
+        github.com/stretchr/testify
     do
     go get $p
 done

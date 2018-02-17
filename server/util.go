@@ -14,17 +14,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// abortError sets the Gin header and body with a generic
+// error message that includes the passed error's message.
 func abortError(c *gin.Context, err error) {
 	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-		"message": "Could not access database",
+		"message": "Internal error occurred",
 		"error":   err.Error(),
 	})
 }
 
+// timestamp returns the current time as a formatted string.
 func timestamp() string {
 	return time.Now().UTC().Format("Jan _2, 2006 @ 15:04:05")
 }
 
+// createPasswordHash takes a user's raw password string and
+// returns the hashed version of it by running it through bcrypt.
 func createPasswordHash(raw string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(raw), 0)
 	if err != nil {
@@ -33,10 +38,13 @@ func createPasswordHash(raw string) (string, error) {
 	return string(hashed), nil
 }
 
+// checkHashAgainstPassword takes the hashed and raw passwords and
+// calls bcrypt to see if they match.
 func checkHashAgainstPassword(hashed, raw string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(raw)) == nil
 }
 
+// createUUID creates and returns a new UUID.
 func createUUID() (string, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
@@ -45,6 +53,7 @@ func createUUID() (string, error) {
 	return u4.String(), err
 }
 
+// getUserByID searches for the database user model by the passed id.
 func getUserByID(id int) (User, error) {
 	db := database()
 	defer db.Close()
@@ -53,6 +62,7 @@ func getUserByID(id int) (User, error) {
 	return u, err
 }
 
+// getUserByName searches for the database user model by the passed name.
 func getUserByName(name string) (User, error) {
 	db := database()
 	defer db.Close()
@@ -61,6 +71,8 @@ func getUserByName(name string) (User, error) {
 	return u, err
 }
 
+// createSession creates a new database model for a new session for a user
+// and returns the new session UUID.
 func createSession(u User) (string, error) {
 	db := database()
 	defer db.Close()
@@ -77,6 +89,9 @@ func createSession(u User) (string, error) {
 	return uuid, nil
 }
 
+// textFormatWithDiceRolls takes a post's raw, just-submitted content and uses
+// a RNG to replace the user's "dice rolls" with actual values. This modified
+// post content is then returned.
 func textFormatWithDiceRolls(text string) (string, error) {
 	regexBBCode, err := regexp.Compile(`(?i)\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
 	if err != nil {
@@ -130,11 +145,13 @@ func textFormatWithDiceRolls(text string) (string, error) {
 	return text, nil
 }
 
-func insertRolls(p Post) (Post, error) {
+// insertRolls takes a new post from a user and replaces the "dice rolls"
+// with RNG values and modifies the passed post struct with that new content.
+func insertRolls(p *Post) error {
 	content, err := textFormatWithDiceRolls(p.Content)
 	if err != nil {
-		return Post{}, err
+		return err
 	}
 	p.Content = content
-	return p, nil
+	return nil
 }

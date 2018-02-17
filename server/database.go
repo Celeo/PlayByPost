@@ -12,13 +12,15 @@ func database() *sqlx.DB {
 	if dbPath == "" {
 		dbPath = "data.db"
 	}
-	db, err := sqlx.Connect("sqlite3", "data.db")
+	db, err := sqlx.Connect("sqlite3", dbPath)
 	if err != nil {
 		panic(err)
 	}
 	return db
 }
 
+// createTables executes the query to creates all of the
+// database tables.
 func createTables() {
 	db := database()
 	defer db.Close()
