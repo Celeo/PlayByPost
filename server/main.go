@@ -126,7 +126,7 @@ func viewCreatePost(c *gin.Context) {
 	if err := c.BindJSON(&data); err != nil {
 		return
 	}
-	data.AuthID = c.GetInt("AuthID")
+	data.AuthID = c.GetInt("authID")
 	if err := createNewPost(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "New post could not be created",
@@ -146,7 +146,7 @@ func viewChangePassword(c *gin.Context) {
 		abortError(c, err)
 		return
 	}
-	data.AuthID = c.GetInt("AuthID")
+	data.AuthID = c.GetInt("authID")
 	if err := changePassword(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Updating password failed",
