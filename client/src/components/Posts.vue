@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce'
 import Vue from 'vue'
 import axios from 'axios'
 import Editor from '@/components/Editor'
@@ -48,6 +49,7 @@ export default {
         await this.handler.post(`${Vue.config.SERVER_URL}post`, { content: this.newContent })
         this.error = null
         this.newContent = ''
+        window.localStorage.removeItem('post')
         this.loadData()
       } catch (err) {
         console.error(err)
@@ -57,6 +59,15 @@ export default {
   },
   mounted() {
     this.loadData()
+    const postAttempt = window.localStorage.getItem('post')
+    if (postAttempt) {
+      this.newContent = postAttempt
+    }
+  },
+  watch: {
+    newContent: debounce((val) => {
+      window.localStorage.setItem('post', val)
+    }, 1000)
   }
 }
 </script>
