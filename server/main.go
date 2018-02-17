@@ -7,6 +7,7 @@ import (
 	"github.com/itsjamie/gin-cors"
 )
 
+// main is the entry point for the app
 func main() {
 	createTables()
 	r := gin.Default()
@@ -21,14 +22,17 @@ func main() {
 	r.POST("/login", viewLogin)
 	r.POST("/register", viewRegister)
 	r.GET("/post", viewPosts)
-	r.GET("/post/:id", viewSinglePost)
 	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
-	r.PUT("/post", middlewareLoggedIn(), viewEditPost)
 	r.POST("/changePassword", middlewareLoggedIn(), viewChangePassword)
 
 	r.Run(":5000")
 }
 
+// middlewareLoggedIn returns a Gin handler function that asserts
+// the the incoming HTTP requests to the restricted endpoints are
+// from an authenticated user. If they aren't, the the request is aborted
+// with a HTTP status code that explains why the user was not allowed
+// access to that endpoint.
 func middlewareLoggedIn() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
@@ -52,4 +56,103 @@ func middlewareLoggedIn() gin.HandlerFunc {
 		c.Set("authID", u.ID)
 		c.Next()
 	}
+}
+
+// endpoint: GET /
+func viewIndex(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Index page",
+	})
+}
+
+// endpoint: GET /register
+func viewRegister(c *gin.Context) {
+	data := registerData{}
+	if err := c.BindJSON(&data); err != nil {
+		return
+	}
+	uuid, err := registerNewAccount(&data)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not register account",
+			"error":   err.Error,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Registration successful",
+		"uuid":    uuid,
+		"name":    data.Name,
+	})
+}
+
+// endpoint: GET /login
+func viewLogin(c *gin.Context) {
+	data := loginData{}
+	if err := c.BindJSON(&data); err != nil {
+		return
+	}
+	uuid, err := login(&data)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not complete the login",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"uuid":    uuid,
+		"name":    data.Name,
+	})
+}
+
+// endpoint: GET /post
+func viewPosts(c *gin.Context) {
+	posts, err := getAllPosts()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not get all posts from the database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, posts)
+}
+
+// endpoint: POST /post
+func viewCreatePost(c *gin.Context) {
+	data := newPostData{}
+	if err := c.BindJSON(&data); err != nil {
+		return
+	}
+	data.AuthID = c.GetInt("AuthID")
+	if err := createNewPost(&data); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "New post could not be created",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Message posted successfully",
+	})
+}
+
+// endpoint: POST /changePassword
+func viewChangePassword(c *gin.Context) {
+	data := newPasswordData{}
+	if err := c.BindJSON(&data); err != nil {
+		abortError(c, err)
+		return
+	}
+	data.AuthID = c.GetInt("AuthID")
+	if err := changePassword(&data); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Updating password failed",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.Status(200)
 }

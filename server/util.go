@@ -33,9 +33,8 @@ func createPasswordHash(raw string) (string, error) {
 	return string(hashed), nil
 }
 
-func checkHashAgainstPassword(hashed, raw string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(raw))
-	return err == nil, err
+func checkHashAgainstPassword(hashed, raw string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(raw)) == nil
 }
 
 func createUUID() (string, error) {
