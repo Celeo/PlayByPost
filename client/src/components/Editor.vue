@@ -33,6 +33,7 @@ export default {
       innerValue: this.value,
       toolbar: [
         ['bold', 'italic'],
+        [{ 'header': [false, 3, 6] }],
         [{ list: 'bullet' }],
         [{ color: ['blue', 'black'] }, 'clean']
       ]
