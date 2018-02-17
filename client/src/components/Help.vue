@@ -28,7 +28,7 @@
               li <strong>Help</strong> - view this page
               li <strong>Log in</strong> - log into your character/user account
               li <strong>Register</strong> - create a new account
-              li <strong>Change password</strong> - change your password
+              li <strong>Profile</strong> - change your name, password, email, etc.
               li <strong>Log out</strong> - log out of your account
               li <strong>Close this</strong> - close the side navigation panel
             span You can also close the panel by clicking or tapping anywhere on the shaded area that appears
