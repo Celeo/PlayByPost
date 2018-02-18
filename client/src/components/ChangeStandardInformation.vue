@@ -3,7 +3,9 @@
     h4.display-1.mb-4 Change general info
     p.
       This is your current information. If you want to change something, change that box/picker/checkbox and click Submit.
-      You can change multiple things at once.
+      You can change multiple things at once. Your <strong>name</strong> here is both your <i>login</i> name and what
+      appears on your posts as your character's name, so if you change it, don't forget that the next time you login,
+      you'll be using the new name.
     v-form
       v-text-field(
         label="New name"
