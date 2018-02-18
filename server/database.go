@@ -29,11 +29,12 @@ func createTables() {
 
 // A User is a member
 type User struct {
-	ID             int    `json:"id"`
-	Name           string `json:"name"`
-	Password       string `json:"-"`
-	Email          string `json:"email"`
-	NotifyOnUpdate bool   `json:"notifyOnUpdate"`
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	Password     string `json:"-"`
+	Email        string `json:"email"`
+	PostsPerPage int    `json:"postsPerPage" db:"postsPerPage"`
+	NewestAtTop  bool   `json:"newestAtTop" db:"newestAtTop"`
 }
 
 // A Post is a message
@@ -62,7 +63,9 @@ CREATE TABLE IF NOT EXISTS "user" (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
 	password TEXT NOT NULL,
-	email TEXT NOT NULL DEFAULT ''
+	email TEXT NOT NULL DEFAULT '',
+	postsPerPage INT NOT NULL DEFAULT 25,
+	newestAtTop INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS "post" (
@@ -95,5 +98,4 @@ const queryDeleteSessionsForUser = `DELETE FROM session WHERE user_id=?`
 const queryCreatePost = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
 const queryEditPost = `UPDATE post SET content=? WHERE id=?`
 const queryUpdatePassword = `UPDATE user SET password=? WHERE id=?`
-const queryUpdateName = `UPDATE user SET name=? WHERE id=?`
-const queryUpdateEmail = `UPDATE user SET email=? WHERE id=?`
+const queryUpdateUser = `UPDATE user SET name=?, email=?, postsPerPage=?, newestAtTop=? WHERE id=?`

@@ -45,10 +45,8 @@ export default {
       const data = { name: this.name, password: this.password }
       try {
         const response = await axios.post(`${Vue.config.SERVER_URL}login`, data)
-        const { name, uuid } = response.data
-        const payload = { name, uuid }
-        this.$store.commit('LOG_IN', payload)
-        window.localStorage.setItem('token', JSON.stringify(payload))
+        this.$store.commit('LOG_IN', response.data)
+        window.localStorage.setItem('login', JSON.stringify(response.data))
         this.$router.push({ name: 'posts' })
         this.error = false
       } catch (err) {

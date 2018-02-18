@@ -5,23 +5,32 @@ Vue.use(Vuex)
 
 const state = {
   name: null,
+  postsPerPage: null,
+  newestAtTop: null,
   uuid: null
 }
 
 const mutations = {
   LOG_IN(state, payload) {
-    const { uuid, name } = payload
-    state.uuid = uuid
+    const { uuid, name, postsPerPage, newestAtTop } = payload
     state.name = name
+    state.postsPerPage = postsPerPage
+    state.newestAtTop = newestAtTop
+    state.uuid = uuid
   },
 
   LOG_OUT(state) {
-    state.uuid = null
     state.name = null
+    state.postsPerPage = null
+    state.newestAtTop = null
+    state.uuid = null
   },
 
-  UPDATE_NAME(state, name) {
+  UPDATE_DATA(state, payload) {
+    const { name, postsPerPage, newestAtTop } = payload
     state.name = name
+    state.postsPerPage = postsPerPage
+    state.newestAtTop = newestAtTop
   }
 }
 
@@ -36,6 +45,14 @@ const getters = {
 
   name(state) {
     return state.name
+  },
+
+  postsPerPage(state) {
+    return state.postsPerPage
+  },
+
+  newestAtTop(state) {
+    return state.newestAtTop
   }
 }
 

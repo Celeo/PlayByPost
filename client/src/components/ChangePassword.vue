@@ -1,6 +1,8 @@
 <template lang="pug">
   div
-    h3.display-1.mb-4 Change password
+    h4.display-1.mb-4 Change password
+    p.
+      If you want to change your password, supply your <i>old</i> password in the first textbox, and your <i>new</i> password in the second textbox.
     v-form
       v-text-field(
         label="Old password"
@@ -31,7 +33,6 @@ export default {
     return {
       oldPassword: '',
       newPassword: '',
-      valid: false,
       isLoading: false,
       error: null,
       successful: false,
@@ -48,7 +49,7 @@ export default {
       this.isLoading = true
       const data = { old: this.oldPassword, new: this.newPassword }
       try {
-        await this.handler.post(`${Vue.config.SERVER_URL}profile/password`, data)
+        await this.handler.put(`${Vue.config.SERVER_URL}profile/password`, data)
         this.successful = true
         this.error = null
         this.oldPassword = ''

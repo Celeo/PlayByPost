@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+
+	"github.com/gin-gonic/gin/binding"
 
 	"github.com/gin-gonic/gin"
 	"github.com/itsjamie/gin-cors"
@@ -24,9 +27,8 @@ func main() {
 	r.GET("/post", viewPosts)
 	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
 	r.GET("/profile", middlewareLoggedIn(), viewGetProfile)
-	r.POST("/profile/password", middlewareLoggedIn(), viewChangePassword)
-	r.POST("/profile/name", middlewareLoggedIn(), viewChangeName)
-	r.POST("/profile/email", middlewareLoggedIn(), viewChangeEmail)
+	r.PUT("/profile", middlewareLoggedIn(), viewUpdateUser)
+	r.PUT("/profile/password", middlewareLoggedIn(), viewChangePassword)
 
 	r.Run(":5000")
 }
@@ -74,7 +76,7 @@ func viewRegister(c *gin.Context) {
 	if err := c.BindJSON(&data); err != nil {
 		return
 	}
-	uuid, err := registerNewAccount(&data)
+	uuid, user, err := registerNewAccount(&data)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Could not register account",
@@ -83,9 +85,11 @@ func viewRegister(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Registration successful",
-		"uuid":    uuid,
-		"name":    data.Name,
+		"message":      "Registration successful",
+		"uuid":         uuid,
+		"name":         data.Name,
+		"postsPerPage": user.PostsPerPage,
+		"newestAtTop":  user.NewestAtTop,
 	})
 }
 
@@ -95,7 +99,7 @@ func viewLogin(c *gin.Context) {
 	if err := c.BindJSON(&data); err != nil {
 		return
 	}
-	uuid, err := login(&data)
+	uuid, user, err := login(&data)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Could not complete the login",
@@ -104,9 +108,11 @@ func viewLogin(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
-		"uuid":    uuid,
-		"name":    data.Name,
+		"message":      "Login successful",
+		"uuid":         uuid,
+		"name":         data.Name,
+		"postsPerPage": user.PostsPerPage,
+		"newestAtTop":  user.NewestAtTop,
 	})
 }
 
@@ -129,7 +135,7 @@ func viewCreatePost(c *gin.Context) {
 	if err := c.BindJSON(&data); err != nil {
 		return
 	}
-	data.AuthID = c.GetInt("authID")
+	data.ID = c.GetInt("authID")
 	if err := createNewPost(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "New post could not be created",
@@ -155,14 +161,31 @@ func viewGetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, u)
 }
 
-// endpoint: POST /profile/password
+// endpoint: PUT /profile
+func viewUpdateUser(c *gin.Context) {
+	data := updateUserData{}
+	if err := c.ShouldBindWith(&data, binding.JSON); err != nil {
+		fmt.Printf("Error from ShouldBindWith: %v", err) // TODO remoev this
+		abortError(c, err)
+		return
+	}
+	data.ID = c.GetInt("authID")
+	u, err := updateUserInformation(&data)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, u)
+}
+
+// endpoint: PUT /profile/password
 func viewChangePassword(c *gin.Context) {
 	data := newPasswordData{}
 	if err := c.BindJSON(&data); err != nil {
 		abortError(c, err)
 		return
 	}
-	data.AuthID = c.GetInt("authID")
+	data.ID = c.GetInt("authID")
 	if err := changePassword(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Updating password failed",
@@ -170,41 +193,5 @@ func viewChangePassword(c *gin.Context) {
 		})
 		return
 	}
-	c.Status(200)
-}
-
-// endpoint: POST /profile/name
-func viewChangeName(c *gin.Context) {
-	data := newNameData{}
-	if err := c.BindJSON(&data); err != nil {
-		abortError(c, err)
-		return
-	}
-	data.AuthID = c.GetInt("authID")
-	if err := changeName(&data); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Updating name failed",
-			"error":   err.Error(),
-		})
-		return
-	}
-	c.Status(200)
-}
-
-// endpoint: POST /profile/email
-func viewChangeEmail(c *gin.Context) {
-	data := newEmailData{}
-	if err := c.BindJSON(&data); err != nil {
-		abortError(c, err)
-		return
-	}
-	data.AuthID = c.GetInt("authID")
-	if err := changeEmail(&data); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Updating email failed",
-			"error":   err.Error(),
-		})
-		return
-	}
-	c.Status(200)
+	c.Status(http.StatusOK)
 }

@@ -15,8 +15,9 @@ func TestRegisterNewAccountDefaultJoinCode(t *testing.T) {
 		Email:    "ccc",
 		Code:     "join",
 	}
-	uuid, err := registerNewAccount(&data)
+	uuid, u, err := registerNewAccount(&data)
 	require.Nil(t, err)
+	require.NotEqual(t, u.ID, 0)
 	require.NotEmpty(t, uuid, "Returned uuid is empty")
 }
 
@@ -30,8 +31,9 @@ func TestRegisterNewAccountDefaultNewCode(t *testing.T) {
 		Email:    "ccc",
 		Code:     code,
 	}
-	uuid, err := registerNewAccount(&data)
+	uuid, u, err := registerNewAccount(&data)
 	require.Nil(t, err)
+	require.NotEqual(t, u.ID, 0)
 	require.NotEmpty(t, uuid, "Returned uuid is empty")
 	os.Unsetenv("JOIN_CODE")
 }
@@ -44,11 +46,13 @@ func TestRegisterNewAccountUserExists(t *testing.T) {
 		Email:    "ccc",
 		Code:     "join",
 	}
-	uuid, err := registerNewAccount(&data)
+	uuid, u, err := registerNewAccount(&data)
 	require.Nil(t, err)
+	require.NotEqual(t, u.ID, 0)
 	require.NotEmpty(t, uuid, "Returned uuid is empty")
-	uuid, err = registerNewAccount(&data)
+	uuid, u, err = registerNewAccount(&data)
 	require.NotNil(t, err, "No error thrown")
+	require.Equal(t, u.ID, 0)
 	require.Contains(t, err.Error(), "Username not unique")
 }
 
@@ -60,9 +64,10 @@ func TestRegisterNewAccountInvalidJoinCode(t *testing.T) {
 		Email:    "ccc",
 		Code:     "invalid-code",
 	}
-	uuid, err := registerNewAccount(&data)
+	uuid, u, err := registerNewAccount(&data)
 	require.NotNil(t, err, "No error thrown")
 	require.Contains(t, err.Error(), "Join code mismatch")
+	require.Equal(t, u.ID, 0)
 	require.Empty(t, uuid)
 }
 
@@ -72,8 +77,9 @@ func TestLoginNoUser(t *testing.T) {
 		Name:     "aaa",
 		Password: "bbb",
 	}
-	uuid, err := login(&data)
+	uuid, u, err := login(&data)
 	require.NotNil(t, err, "No error thrown")
+	require.Equal(t, u.ID, 0)
 	require.Empty(t, uuid)
 }
 
@@ -86,8 +92,9 @@ func TestLoinWithUser(t *testing.T) {
 		Name:     "username",
 		Password: "password",
 	}
-	uuid, err := login(&data)
+	uuid, u, err := login(&data)
 	require.Nil(t, err)
+	require.NotEqual(t, u.ID, 0)
 	require.NotEmpty(t, uuid, "UUID is blank")
 }
 
@@ -116,8 +123,8 @@ func TestCreatePost(t *testing.T) {
 	defer db.Close()
 	addUser(db)
 	data := newPostData{
+		ID:      1,
 		Content: "Content",
-		AuthID:  1,
 	}
 	err := createNewPost(&data)
 	require.Nil(t, err)
@@ -129,13 +136,34 @@ func TestChangePasswordMismatch(t *testing.T) {
 	defer db.Close()
 	addUser(db)
 	data := newPasswordData{
+		ID:          1,
 		OldPassword: "",
 		NewPassword: "",
-		AuthID:      1,
 	}
 	err := changePassword(&data)
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "Old password does not match")
+}
+
+func TestUpdateUser(t *testing.T) {
+	newDB()
+	db := database()
+	defer db.Close()
+	addUser(db)
+	data := updateUserData{
+		ID:           1,
+		Name:         "new-name",
+		Email:        "new-email",
+		PostsPerPage: "5",
+		NewestAtTop:  true,
+	}
+	u, err := updateUserInformation(&data)
+	require.Nil(t, err)
+	require.Equal(t, u.ID, 1)
+	require.Equal(t, u.Name, "new-name")
+	require.Equal(t, u.Email, "new-email")
+	require.Equal(t, u.PostsPerPage, 5)
+	require.Equal(t, u.NewestAtTop, true)
 }
 
 func TestChangePassword(t *testing.T) {
@@ -145,47 +173,13 @@ func TestChangePassword(t *testing.T) {
 	defer db.Close()
 	addUser(db)
 	data := newPasswordData{
+		ID:          1,
 		OldPassword: "password",
 		NewPassword: newPass,
-		AuthID:      1,
 	}
 	err := changePassword(&data)
 	require.Nil(t, err)
 	u, err := getUserByID(1)
 	require.Nil(t, err)
 	require.True(t, checkHashAgainstPassword(u.Password, newPass))
-}
-
-func TestChangeName(t *testing.T) {
-	newDB()
-	const newName = "new name"
-	db := database()
-	defer db.Close()
-	addUser(db)
-	data := newNameData{
-		Name:   newName,
-		AuthID: 1,
-	}
-	err := changeName(&data)
-	require.Nil(t, err)
-	u, err := getUserByID(1)
-	require.Nil(t, err)
-	require.Equal(t, u.Name, newName)
-}
-
-func testChangeEmail(t *testing.T) {
-	newDB()
-	const newEmail = "new@email"
-	db := database()
-	defer db.Close()
-	addUser(db)
-	data := newEmailData{
-		Email:  newEmail,
-		AuthID: 1,
-	}
-	err := changeEmail(&data)
-	require.Nil(t, err)
-	u, err := getUserByID(1)
-	require.Nil(t, err)
-	require.Equal(t, u.Email, newEmail)
 }

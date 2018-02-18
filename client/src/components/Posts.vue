@@ -2,7 +2,9 @@
   div(v-if="!isLoading")
     div(v-if="!error")
       div(v-if="posts && posts.length > 0")
-        post(v-for="post in posts" :key="post.id" :post="post")
+        div.text-xs-center(v-if="posts.length > postsPerPage")
+          v-pagination.mb-2(:length="Math.ceil(posts.length / postsPerPage)" v-model="page" :total-visible="5" circle)
+        post(v-for="post in postsThisPage()" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
       editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
@@ -28,6 +30,9 @@ export default {
       posts: [],
       isLoading: true,
       error: null,
+      page: 1,
+      postsPerPage: null,
+      newestAtTop: null,
       handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
     }
   },
@@ -55,6 +60,22 @@ export default {
         console.error(err)
         this.error = 'Error saving new post'
       }
+    },
+    postsThisPage() {
+      let ret = this.posts.slice()
+      if (this.newestAtTop) {
+        ret = ret.reverse()
+      }
+      return ret.slice((this.page - 1) * this.postsPerPage, this.page * this.postsPerPage)
+    }
+  },
+  created() {
+    if (this.$store.getters.isLoggedIn) {
+      this.postsPerPage = this.$store.getters.postsPerPage
+      this.newestAtTop = this.$store.getters.newestAtTop
+    } else {
+      this.postsPerPage = 25
+      this.newestAtTop = false
     }
   },
   mounted() {
