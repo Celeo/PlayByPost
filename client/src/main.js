@@ -24,6 +24,10 @@ if (loginInfo) {
   store.commit('LOG_IN', JSON.parse(loginInfo))
 }
 
+if (location.protocol === 'https:' && navigator.serviceWorker) {
+  navigator.serviceWorker.register('/service-worker.js')
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
