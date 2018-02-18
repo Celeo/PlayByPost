@@ -2,7 +2,7 @@
   div
     v-card.elevation-5(light)
       div.clearfix.purple--text.text--darken-3
-        h3.go-left {{ post.id }} - {{ post.name }}
+        h3.go-left {{ post.name }}
         h4.go-right {{ post.date }}
       v-card-text
         div.px-3(v-html="post.content")
