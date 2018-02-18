@@ -1,9 +1,14 @@
 <template lang="pug">
   div
-    h3.display-1.header.mt-5.mb-2 {{ title }}
+    h3.display-1.header.mt-5.mb-1 {{ title }}
     vue-editor(v-model="innerValue" :editorToolbar="toolbar")
     v-btn(color="info" :disabled="!hasWrittenContent" @click="func") {{ buttonText }}
       v-icon(right dark) fa-floppy-o
+    br
+    span.help.ml-2 Need help with formatting? Check the 
+      router-link(:to="{ name: 'help' }") help
+      |  page.
+    div.below-editor
 </template>
 
 <script>
@@ -54,3 +59,11 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+.help
+  font-size 1rem !important
+
+.below-editor
+  height 5rem
+</style>
