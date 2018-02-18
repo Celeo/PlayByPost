@@ -47,6 +47,7 @@
       Type your post into the text area. You can use the buttons on the top of the editor to bold your text, add italics, add lists, and
       change the color to blue to denote "out of character" text. The rightmost button will remove all text formatting from whatever you
       have highlighted when you click it. Additionally, some common <i>keyboard shortcuts</i> work, like <strong>Ctrl+B</strong> to bold.
+    h2.mt-4.mb-4 Rolling
     p.
       For now, rolling dice works as it does on Paizo's play by post forums - manually typing in text in the form of
       <strong>[dice=<code>action you're doing</code>] <code>dice rolls and modifiers</code> [/dice]</strong>.
