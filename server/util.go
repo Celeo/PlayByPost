@@ -145,9 +145,9 @@ func textFormatWithDiceRolls(text string) (string, error) {
 	return text, nil
 }
 
-// insertRolls takes a new post from a user and replaces the "dice rolls"
-// with RNG values and modifies the passed post struct with that new content.
-func insertRolls(p *Post) error {
+// insertRolls takes ata from a user and replaces the "dice rolls"
+// with RNG values and modifies the passed struct with that new content.
+func insertRolls(p *newPostData) error {
 	content, err := textFormatWithDiceRolls(p.Content)
 	if err != nil {
 		return err

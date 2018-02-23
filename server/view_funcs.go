@@ -133,10 +133,6 @@ func getAllPosts() ([]formattedPost, error) {
 		userMap[u.ID] = u
 	}
 	for _, p := range posts {
-		err := insertRolls(&p)
-		if err != nil {
-			return nil, err
-		}
 		retVal = append(retVal, formattedPost{
 			ID:      p.ID,
 			Name:    userMap[p.UserID].Name,
@@ -152,6 +148,9 @@ func getAllPosts() ([]formattedPost, error) {
 func createNewPost(data *newPostData) error {
 	db := database()
 	defer db.Close()
+	if err := insertRolls(data); err != nil {
+		return err
+	}
 	_, err := db.Exec(queryCreatePost, data.ID, timestamp(), data.Content)
 	return err
 }
