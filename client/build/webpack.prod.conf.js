@@ -123,7 +123,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       }
     ]),
     new WebpackPwaManifest({
-      name: 'PlayByPost',
+      name: 'Play by Post',
       short_name: 'PlayByPost',
       description: 'PlayByPost',
       background_color: '#ffffff',

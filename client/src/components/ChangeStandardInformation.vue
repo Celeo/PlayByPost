@@ -71,7 +71,7 @@ export default {
         window.localStorage.setItem('login', JSON.stringify(updateData))
       } catch (err) {
         console.error(err)
-        this.error = 'Could not change name'
+        this.error = 'Could not change information'
       } finally {
         this.isLoading = false
       }

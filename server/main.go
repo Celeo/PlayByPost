@@ -45,7 +45,6 @@ func middlewareLoggedIn() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		u := User{}
 		s := Session{}
 		db := database()
 		defer db.Close()
@@ -53,7 +52,8 @@ func middlewareLoggedIn() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		if err := db.Get(&u, querySelectUserByID, s.UserID); err != nil {
+		u, err := getUserByID(s.UserID)
+		if err != nil {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}

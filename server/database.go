@@ -51,13 +51,6 @@ type Session struct {
 	UUID   string `db:"uuid" json:"uuid"`
 }
 
-// A Roll is the result of rolling one or more dice
-type Roll struct {
-	ID     int    `json:"id"`
-	PostID int    `db:"post_id" json:"postID"`
-	Roll   string `json:"roll"`
-}
-
 const queryCreateTables = `
 CREATE TABLE IF NOT EXISTS "user" (
 	id INTEGER PRIMARY KEY,
@@ -78,12 +71,6 @@ CREATE TABLE IF NOT EXISTS "post" (
 CREATE TABLE IF NOT EXISTS "session" (
 	user_id INTEGER PRIMARY KEY REFERENCES "user" (id) NOT NULL,
 	uuid TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "roll" (
-	id INTEGER PRIMARY KEY,
-	post_id INTEGER REFERENCES "post" (id) NOT NULL,
-	roll TEXT NOT NULL
 );
 `
 const querySelectSessionByUUID = `SELECT * FROM session WHERE uuid=?`
