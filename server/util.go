@@ -93,7 +93,7 @@ func createSession(u User) (string, error) {
 // a RNG to replace the user's "dice rolls" with actual values. This modified
 // post content is then returned.
 func textFormatWithDiceRolls(text string) (string, error) {
-	regexBBCode, err := regexp.Compile(`(?i)\[dice=([\w ]+)\]([\dd\+ ]+)\[/dice\]`)
+	regexBBCode, err := regexp.Compile(`(?i)\[dice=([\w ]+)\]([\dd\+\- ]+)\[/dice\]`)
 	if err != nil {
 		return "", err
 	}
