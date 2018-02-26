@@ -48,7 +48,29 @@
       change the color to blue to denote "out of character" text. The rightmost button will remove all text formatting from whatever you
       have highlighted when you click it. Additionally, some common <i>keyboard shortcuts</i> work, like <strong>Ctrl+B</strong> to bold.
     h2.mt-4.mb-4 Rolling
-    p TBD
+    p.
+      There is a widget titled "Dice Roller" that appears to the right of (or under, if on a small screen) the text widget where you write
+      the content of your post. To roll some dice, first type in <i>what</i> you're rolling for, whether that's a Perception check, attacking,
+      dealing damage, etc. Then, select the number of the <i>same type of dice</i> you're rolling, then the number of sides on that dice, and
+      your net modifier, if any, to that roll.
+    p.
+      For a DnD 5e example, if you're rolling a Perception check, and are proficient in the skill and have a proficiency stat of 3 and Wisdom
+      of 12, then your roll would be <code>1d20 + 3 + 1</code> which would be <code>1</code>, <code>20</code>, and <code>4</code> in the row.
+      Then, click "Roll!". You'll see your dice and the result in the area under the button. If you have another check or attack or whatever
+      to roll in the same post, repeat the process, substituting the new values for the next roll.
+    p.
+      If you have a roll that require multiple dice with multiple sides, then use the green plus button to the right of the first row to add
+      additional rows. For another DnD 5e example, if you're rolling Investigation and have been given a bonus dice to roll alongside your d20,
+      then you might set the first row in the roller to <code>1d20 + 3</code>, add a second row, and set that row to <code>1d4</code>. You
+      can remove rows that you don't need with the red minus button to the left of the green button (only if you have more than one row).
+    h2.mt-4.mb-4 Editing
+    p.
+      For 30 minutes after submiting your post, you can edit it. You can not edit your rolls, but you can change the text.
+    p.
+      When viewing posts, you'll see a small edit icon to the right of the submission date in the title of the post. Clicking on this icon
+      will take you to a new page that allows you to change the content of the post and submit it. If you do so, the content of your post
+      is changed for good. You can change your post as many times as you need to inside that editing window time, but after the window
+      closes, your post is as it's going to be moving forward.
     h3.mt-2 Submitting
     p.
       Once you have written what your character does, click the blue <strong>Save</strong> button under the editor (it'll only be clickable
