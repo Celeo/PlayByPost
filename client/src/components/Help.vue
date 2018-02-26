@@ -48,17 +48,7 @@
       change the color to blue to denote "out of character" text. The rightmost button will remove all text formatting from whatever you
       have highlighted when you click it. Additionally, some common <i>keyboard shortcuts</i> work, like <strong>Ctrl+B</strong> to bold.
     h2.mt-4.mb-4 Rolling
-    p.
-      For now, rolling dice works as it does on Paizo's play by post forums - manually typing in text in the form of
-      <strong>[dice=<code>action you're doing</code>] <code>dice rolls and modifiers</code> [/dice]</strong>.
-    h4.mb-1 For example:
-    p.
-      If you were rolling for <strong>Perception</strong> and have a modifier of <strong>+3</strong>, then you would type in
-      <code>[dice=Perception]1d20+3[/dice]</code>. If you're rolling damage for a weapon attack, you might type in
-      <code>[dice=Damage]2d4-1[/dice]</code>.
-    p.
-      For now, you'll know what your dice values are <strong>after you submit your post</strong>. Because this is a little different
-      than Paizo's forum, you may need to roll multiple dice in the same post, or make multiple posts as you learn what you got.
+    p TBD
     h3.mt-2 Submitting
     p.
       Once you have written what your character does, click the blue <strong>Save</strong> button under the editor (it'll only be clickable

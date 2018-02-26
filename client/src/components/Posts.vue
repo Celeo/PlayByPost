@@ -3,13 +3,17 @@
     div(v-if="!error")
       div(v-if="posts && posts.length > 0")
         div.text-xs-center(v-if="posts.length > postsPerPage")
-          v-pagination.mb-2(:length="Math.ceil(posts.length / postsPerPage)" v-model="page" :total-visible="5" circle)
+          v-pagination.mb-2(:length="Math.ceil(posts.length / postsPerPage)" v-model="page" :total-visible="7" circle)
         post(v-for="post in postsThisPage()" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
-      editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
+      v-layout(row wrap)
+        v-flex(md8 sm12)
+          editor.mt-5(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
+        v-flex.pl-3(md4 sm12)
+          roller
     div(v-if="error")
-      v-alert.mt-3.black--text(type="warning" :value="true") {{ error }}
+      v-alert.mt-3.black--text(type="error" :value="true") {{ error }}
 </template>
 
 <script>
@@ -17,11 +21,13 @@ import debounce from 'lodash/debounce'
 import Vue from 'vue'
 import axios from 'axios'
 import Editor from '@/components/Editor'
+import Roller from '@/components/Roller'
 import Post from '@/components/Post'
 
 export default {
   components: {
     Editor,
+    Roller,
     Post
   },
   data() {
@@ -55,6 +61,7 @@ export default {
         this.error = null
         this.newContent = ''
         window.localStorage.removeItem('post')
+        this.$store.commit('CLEAR_PENDING_ROLLS')
         this.loadData()
       } catch (err) {
         console.error(err)

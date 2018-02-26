@@ -43,7 +43,7 @@
       v-toolbar-title Play By Post
       v-spacer
       v-toolbar-items(v-if="loggedIn")
-        v-btn.not-link(flat :ripple="false") Logged in as {{ username }}
+        v-btn.not-link(flat :ripple="false") {{ username }}
     v-content
       v-container
         transition(name="fade" mode="out-in")

@@ -183,3 +183,64 @@ func TestChangePassword(t *testing.T) {
 	require.Nil(t, err)
 	require.True(t, checkHashAgainstPassword(u.Password, newPass))
 }
+
+func TestAddingGettingDice(t *testing.T) {
+	newDB()
+	const roll = "1d20 + 3"
+	db := database()
+	defer db.Close()
+	addUser(db)
+	data := addRollData{
+		ID:     1,
+		String: roll,
+	}
+	rolls, err := addPendingDie(&data)
+	require.Nil(t, err)
+	require.Equal(t, len(rolls), 1)
+	require.Equal(t, rolls[0].String, roll)
+}
+
+func TestSaveRollsOnPostCreate(t *testing.T) {
+	newDB()
+	db := database()
+	defer db.Close()
+	addUser(db)
+	pendingRollData := []addRollData{
+		{
+			ID:     1,
+			String: "1d20",
+		},
+		{
+			ID:     1,
+			String: "1d20 + 3",
+		},
+		{
+			ID:     1,
+			String: "2d6 + 3, 1d4 - 1",
+		},
+	}
+	for i := 0; i < len(pendingRollData); i++ {
+		accum, err := addPendingDie(&pendingRollData[i])
+		require.Nil(t, err)
+		require.Equal(t, len(accum), i+1)
+	}
+	addPost(db)
+	posts, err := getAllPosts()
+	require.Nil(t, err)
+	require.Equal(t, len(posts), 1)
+	for _, roll := range posts[0].Rolls {
+		require.Equal(t, roll.Pending, false)
+	}
+	require.True(t, posts[0].EditingWindow)
+}
+
+func TestGetPostByID(t *testing.T) {
+	newDB()
+	db := database()
+	defer db.Close()
+	addUser(db)
+	addPost(db)
+	post, err := getPostByID(1)
+	require.Nil(t, err)
+	require.Equal(t, post.ID, 1)
+}

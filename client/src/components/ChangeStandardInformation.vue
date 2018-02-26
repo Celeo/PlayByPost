@@ -32,7 +32,7 @@
       color="primary"
     ) Submit
     span.grey--text(v-if="isLoading") Loading...
-    v-alert.mt-3.black--text(type="warning" :value="true" v-if="!!error") {{ error }}
+    v-alert.mt-3.black--text(type="error" :value="true" v-if="!!error") {{ error }}
     v-alert.mt-3.black--text(type="info" :value="true" v-if="successful") Info changed successfully
 </template>
 

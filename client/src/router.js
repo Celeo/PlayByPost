@@ -7,6 +7,7 @@ import Logout from '@/components/Logout'
 import Profile from '@/components/Profile'
 import Register from '@/components/Register'
 import Help from '@/components/Help'
+import EditPost from '@/components/EditPost'
 
 import store from './store'
 
@@ -43,6 +44,11 @@ const router = new Router({
       path: '/help',
       component: Help,
       name: 'help'
+    },
+    {
+      path: '/edit/:id',
+      component: EditPost,
+      name: 'edit'
     }
   ],
   mode: 'history'

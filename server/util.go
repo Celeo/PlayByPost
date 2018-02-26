@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -14,6 +13,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const timeFormat string = "Jan _2, 2006 @ 15:04:05"
+const editWindow time.Duration = time.Duration(30) * time.Minute
+
 // abortError sets the Gin header and body with a generic
 // error message that includes the passed error's message.
 func abortError(c *gin.Context, err error) {
@@ -25,7 +27,23 @@ func abortError(c *gin.Context, err error) {
 
 // timestamp returns the current time as a formatted string.
 func timestamp() string {
-	return time.Now().UTC().Format("Jan _2, 2006 @ 15:04:05")
+	return time.Now().UTC().Format(timeFormat)
+}
+
+// readTimestamp converts a string timestamp to a time.Time struct.
+func readTimestamp(str string) (time.Time, error) {
+	return time.Parse(timeFormat, str)
+}
+
+// isPostWithinEditWindow returns true if the post is within the
+// window of "recently posted" so that the user can edit it.
+func isPostWithinEditWindow(p *Post) bool {
+	t, err := readTimestamp(p.Date)
+	if err != nil {
+		return false
+	}
+	dateIsPast := time.Now().UTC().After(t)
+	return dateIsPast && time.Since(t) < editWindow
 }
 
 // createPasswordHash takes a user's raw password string and
@@ -89,69 +107,58 @@ func createSession(u User) (string, error) {
 	return uuid, nil
 }
 
-// textFormatWithDiceRolls takes a post's raw, just-submitted content and uses
-// a RNG to replace the user's "dice rolls" with actual values. This modified
-// post content is then returned.
-func textFormatWithDiceRolls(text string) (string, error) {
-	regexBBCode, err := regexp.Compile(`(?i)\[dice=([\w ]+)\]([\dd\+\- ]+)\[/dice\]`)
-	if err != nil {
-		return "", err
-	}
+// rollDice takes in a string from the frontend and returns an int value
+// of what the rolls come out to. No database interaction.
+func rollDice(str string) (int, error) {
+	// declaration of vars and regex setup
+	finalValue := 0
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	regexDice, err := regexp.Compile(`(\d+)d(\d+)`)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	regexMod, err := regexp.Compile(`([+-])(\d)+`)
+	regexMod, err := regexp.Compile(`([+-])(\d+)`)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	for _, rolls := range regexBBCode.FindAllStringSubmatch(text, -1) {
-		rollValue := 0
-		valueOfDice := 0
-		originalRolltext := fmt.Sprintf("[dice=%s]%s[/dice]", rolls[1], rolls[2])
-		rollText := strings.Replace(rolls[2], " ", "", -1)
-
-		for _, dice := range regexDice.FindAllStringSubmatch(rollText, -1) {
-			rollCount, err := strconv.Atoi(dice[1])
-			if err != nil {
-				return "", err
-			}
-			diceSides, err := strconv.Atoi(dice[2])
-			if err != nil {
-				return "", err
-			}
-			for i := 0; i < rollCount; i++ {
-				rVal := rng.Intn(diceSides) + 1
-				rollValue += rVal
-				valueOfDice += rVal
-			}
+	// remove spaces from the string
+	str = strings.Replace(str, " ", "", -1)
+	// split into the separate groups of dice
+	dice := strings.Split(str, ",")
+	// iterate through all dice groups
+	for _, die := range dice {
+		dieResult := 0
+		// split out the number before and after the 'd'
+		groups := regexDice.FindStringSubmatch(die)
+		count, err := strconv.Atoi(groups[1])
+		if err != nil {
+			return 0, err
 		}
-		for _, mod := range regexMod.FindAllStringSubmatch(rollText, -1) {
-			val, err := strconv.Atoi(mod[2])
+		sides, err := strconv.Atoi(groups[2])
+		if err != nil {
+			return 0, err
+		}
+		// "roll" the dice
+		for i := 0; i < count; i++ {
+			dieResult += rng.Intn(sides) + 1
+		}
+		// find the mod
+		groups = regexMod.FindStringSubmatch(die)
+		if len(groups) > 0 {
+			// get the mod value and direction
+			delta, err := strconv.Atoi(groups[2])
 			if err != nil {
-				return "", err
+				return 0, err
 			}
-			if mod[1] == "+" {
-				rollValue += val
+			// apply mod
+			if groups[1] == "+" {
+				dieResult += delta
 			} else {
-				rollValue -= val
+				dieResult -= delta
 			}
 		}
-		diceRollResults := regexDice.ReplaceAllString(rolls[2], "")
-		text = strings.Replace(text, originalRolltext, fmt.Sprintf("<br><span style=\"color: green;\">%s: %s ⇒ (%d)%s -> %d</span><br>", rolls[1], rolls[2], valueOfDice, diceRollResults, rollValue), 1)
+		// add the result of rolling these die with the rolling total
+		finalValue += dieResult
 	}
-	return text, nil
-}
-
-// insertRolls takes ata from a user and replaces the "dice rolls"
-// with RNG values and modifies the passed struct with that new content.
-func insertRolls(p *newPostData) error {
-	content, err := textFormatWithDiceRolls(p.Content)
-	if err != nil {
-		return err
-	}
-	p.Content = content
-	return nil
+	return finalValue, nil
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin/binding"
 
@@ -25,7 +25,11 @@ func main() {
 	r.POST("/login", viewLogin)
 	r.POST("/register", viewRegister)
 	r.GET("/post", viewPosts)
+	r.GET("/post/:id", middlewareLoggedIn(), viewGetSinglePost)
+	r.PUT("/post/:id", middlewareLoggedIn(), viewEditPost)
 	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
+	r.GET("/roll", middlewareLoggedIn(), viewGetPendingDice)
+	r.POST("/roll", middlewareLoggedIn(), viewRollDice)
 	r.GET("/profile", middlewareLoggedIn(), viewGetProfile)
 	r.PUT("/profile", middlewareLoggedIn(), viewUpdateUser)
 	r.PUT("/profile/password", middlewareLoggedIn(), viewChangePassword)
@@ -54,7 +58,7 @@ func middlewareLoggedIn() gin.HandlerFunc {
 		}
 		u, err := getUserByID(s.UserID)
 		if err != nil {
-			c.AbortWithStatus(http.StatusForbidden)
+			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 		c.Set("authName", u.Name)
@@ -148,6 +152,38 @@ func viewCreatePost(c *gin.Context) {
 	})
 }
 
+// endpoint: GET /roll
+func viewGetPendingDice(c *gin.Context) {
+	authID := c.GetInt("authID")
+	rolls, err := getPendingDice(authID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not get pending dice",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, rolls)
+}
+
+// endpoint: POST /roll
+func viewRollDice(c *gin.Context) {
+	data := addRollData{}
+	if err := c.BindJSON(&data); err != nil {
+		return
+	}
+	data.ID = c.GetInt("authID")
+	rolls, err := addPendingDie(&data)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not roll and store dice",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, rolls)
+}
+
 // endpoint: GET /profile
 func viewGetProfile(c *gin.Context) {
 	u, err := getUserByID(c.GetInt("authID"))
@@ -165,7 +201,6 @@ func viewGetProfile(c *gin.Context) {
 func viewUpdateUser(c *gin.Context) {
 	data := updateUserData{}
 	if err := c.ShouldBindWith(&data, binding.JSON); err != nil {
-		fmt.Printf("Error from ShouldBindWith: %v", err) // TODO remoev this
 		abortError(c, err)
 		return
 	}
@@ -189,6 +224,72 @@ func viewChangePassword(c *gin.Context) {
 	if err := changePassword(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Updating password failed",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+// endpoint: GET /post/:id
+func viewGetSinglePost(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "ID is not a number",
+			"error":   err.Error(),
+		})
+		return
+	}
+	post, err := getPostByID(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not get post from database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if !isPostWithinEditWindow(&post) {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	c.JSON(http.StatusOK, post)
+}
+
+// endpoint: PUT /post/:id
+func viewEditPost(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "ID is not a number",
+			"error":   err.Error(),
+		})
+		return
+	}
+	data := editPostData{}
+	if err := c.BindJSON(&data); err != nil {
+		return
+	}
+	data.ID = id
+	p, err := getPostByID(id)
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	if p.UserID != c.GetInt("authID") {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	if !isPostWithinEditWindow(&p) {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	err = editPost(&data)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not save the modified post",
 			"error":   err.Error(),
 		})
 		return

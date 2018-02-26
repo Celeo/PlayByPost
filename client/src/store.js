@@ -7,7 +7,8 @@ const state = {
   name: null,
   postsPerPage: null,
   newestAtTop: null,
-  uuid: null
+  uuid: null,
+  pendingRolls: []
 }
 
 const mutations = {
@@ -17,6 +18,7 @@ const mutations = {
     state.postsPerPage = postsPerPage
     state.newestAtTop = newestAtTop
     state.uuid = uuid
+    state.pendingRolls = []
   },
 
   LOG_OUT(state) {
@@ -24,6 +26,7 @@ const mutations = {
     state.postsPerPage = null
     state.newestAtTop = null
     state.uuid = null
+    state.pendingRolls = []
   },
 
   UPDATE_DATA(state, payload) {
@@ -31,6 +34,14 @@ const mutations = {
     state.name = name
     state.postsPerPage = postsPerPage
     state.newestAtTop = newestAtTop
+  },
+
+  SET_PENDING_ROLLS(state, rolls) {
+    state.pendingRolls = rolls
+  },
+
+  CLEAR_PENDING_ROLLS(state) {
+    state.pendingRolls = []
   }
 }
 
@@ -53,6 +64,10 @@ const getters = {
 
   newestAtTop(state) {
     return state.newestAtTop
+  },
+
+  pendingRolls(state) {
+    return state.pendingRolls
   }
 }
 

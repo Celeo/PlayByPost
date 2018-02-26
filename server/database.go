@@ -19,8 +19,7 @@ func database() *sqlx.DB {
 	return db
 }
 
-// createTables executes the query to creates all of the
-// database tables.
+// createTables executes the query to creates all of the database tables.
 func createTables() {
 	db := database()
 	defer db.Close()
@@ -51,6 +50,16 @@ type Session struct {
 	UUID   string `db:"uuid" json:"uuid"`
 }
 
+// A Roll is the result of rolling some dice
+type Roll struct {
+	ID      int    `json:"id"`
+	UserID  int    `db:"user_id" json:"userID"`
+	PostID  int    `db:"post_id" json:"postID"`
+	Pending bool   `json:"pending"`
+	String  string `json:"string"`
+	Value   int    `json:"value"`
+}
+
 const queryCreateTables = `
 CREATE TABLE IF NOT EXISTS "user" (
 	id INTEGER PRIMARY KEY,
@@ -72,17 +81,30 @@ CREATE TABLE IF NOT EXISTS "session" (
 	user_id INTEGER PRIMARY KEY REFERENCES "user" (id) NOT NULL,
 	uuid TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "roll" (
+	id INTEGER PRIMARY KEY,
+	user_id INTEGER REFERENCES "user" (id) NOT NULL,
+	post_id INTEGER REFERENCES "post" (id) NOT NULL DEFAULT 0,
+	pending INT NOT NULL DEFAULT 1,
+	string TEXT NOT NULL DEFAULT '',
+	value INTEGER NOT NULL DEFAULT 0
+);
 `
-const querySelectSessionByUUID = `SELECT * FROM session WHERE uuid=?`
-const querySelectUserByID = `SELECT * FROM user WHERE id=?`
-const querySelectUserByName = `SELECT * FROM user WHERE name=?`
-const querySelectPosts = `SELECT * FROM post`
-const querySelectSinglePost = `SELECT * FROM post WHERE id=?`
-const queryselectUsers = `SELECT * FROM user`
-const queryCreateUser = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
-const queryCreateSession = `INSERT INTO session VALUES (?, ?)`
-const queryDeleteSessionsForUser = `DELETE FROM session WHERE user_id=?`
-const queryCreatePost = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
-const queryEditPost = `UPDATE post SET content=? WHERE id=?`
-const queryUpdatePassword = `UPDATE user SET password=? WHERE id=?`
-const queryUpdateUser = `UPDATE user SET name=?, email=?, postsPerPage=?, newestAtTop=? WHERE id=?`
+const querySelectSessionByUUID string = `SELECT * FROM session WHERE uuid=?`
+const querySelectUserByID string = `SELECT * FROM user WHERE id=?`
+const querySelectUserByName string = `SELECT * FROM user WHERE name=?`
+const querySelectPosts string = `SELECT * FROM post`
+const querySelectSinglePost string = `SELECT * FROM post WHERE id=?`
+const querySelectUsers string = `SELECT * FROM user`
+const queryCreateUser string = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
+const queryCreateSession string = `INSERT INTO session VALUES (?, ?)`
+const queryDeleteSessionsForUser string = `DELETE FROM session WHERE user_id=?`
+const queryCreatePost string = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
+const queryEditPost string = `UPDATE post SET content=? WHERE id=?`
+const queryUpdatePassword string = `UPDATE user SET password=? WHERE id=?`
+const queryUpdateUser string = `UPDATE user SET name=?, email=?, postsPerPage=?, newestAtTop=? WHERE id=?`
+const queryGetPendingRollsForUser string = `SELECT * FROM roll WHERE user_id=? AND pending=1`
+const queryInsertPendingRoll string = `INSERT INTO roll (user_id, string, value) VALUES (?, ?, ?)`
+const querySavePendingRoll string = `UPDATE roll SET pending=0, post_id=? WHERE user_id=? AND pending=1`
+const querySelectSavedRolls string = `SELECT * FROM roll WHERE pending=0`
