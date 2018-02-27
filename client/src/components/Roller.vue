@@ -4,24 +4,20 @@
     p.mb-2 For help with this, check the 
       router-link(:to="{ name: 'help' }") help
       |  page.
-    v-layout(row)
-      v-flex(sm12 xs6)
-        v-text-field(label="What for" v-model="what")
+    v-text-field(label="What for" v-model="what")
     v-layout(row v-for="(die, index) in dice" :key="index")
-      v-flex.pl-2(sm3 xs2)
+      v-flex.pl-2(lg3 xs2)
         v-text-field(label="Count" v-model="die.count" type="number" min="1")
-      v-flex.pl-2(sm3 xs2)
+      v-flex.pl-2(lg3 xs2)
         v-text-field(label="Sides" v-model="die.sides" type="number" min="2" max="20")
-      v-flex.pl-2(sm3 xs2)
-        v-text-field(label="Modifier" v-model="die.mod" type="number")
+      v-flex.pl-2(lg3 xs2)
+        v-text-field(label="Mod" v-model="die.mod" type="number")
       v-flex
-        v-btn(fab small color="red" title="Remove this" @click="removeRow(index)" :disabled="dice.length === 1")
+        v-btn.mx-1.px-0(fab small color="red" title="Remove this" @click="removeRow(index)" :disabled="dice.length === 1")
           v-icon(dark) fa-minus-circle
-        v-btn(fab small color="green" title="Add another dice" @click="addRow")
+        v-btn.mx-1.px-0(fab small color="green" title="Add another dice" @click="addRow")
           v-icon(dark) fa-plus
-    v-layout(row)
-      v-flex(xs8)
-        v-btn(block color="green" title="Roll the dice" @click="roll" :disabled="rolling || !valid") Roll!
+    v-btn(block color="green" title="Roll the dice" @click="roll" :disabled="rolling || !valid") Roll!
     div(v-if="rolled.length > 0")
       v-list.pt-0
         v-list-tile(v-for="roll in rolled" :key="roll.id")

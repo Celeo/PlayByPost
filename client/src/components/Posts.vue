@@ -8,11 +8,11 @@
       div(v-else)
         h1 No posts have been made
       div.mt-5
-      v-layout(wrap)
-        v-flex(md8 sm12)
-          editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
-        v-flex.pl-3(md4 sm12)
-          roller
+        v-layout(wrap)
+          v-flex(lg8 xs12)
+            editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
+          v-flex.pl-3(lg4 xs12)
+            roller.mt-3
     div(v-if="error")
       v-alert.mt-3.black--text(type="error" :value="true") {{ error }}
 </template>
