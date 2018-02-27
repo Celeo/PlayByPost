@@ -90,4 +90,7 @@ export default {
 .not-link
   text-decoration none
   cursor default !important
+
+.container
+  padding 10px
 </style>
