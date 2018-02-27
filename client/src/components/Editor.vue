@@ -4,7 +4,6 @@
     vue-editor(v-model="innerValue" :editorToolbar="toolbar")
     v-btn(color="info" :disabled="!hasWrittenContent" @click="func") {{ buttonText }}
       v-icon(right dark) fa-floppy-o
-    div.below-editor
 </template>
 
 <script>
@@ -55,11 +54,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus" scoped>
-.help
-  font-size 1rem !important
-
-.below-editor
-  height 5rem
-</style>

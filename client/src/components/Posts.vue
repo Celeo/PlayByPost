@@ -7,9 +7,10 @@
         post(v-for="post in postsThisPage()" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
-      v-layout(row wrap)
+      div.mt-5
+      v-layout(wrap)
         v-flex(md8 sm12)
-          editor.mt-5(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
+          editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
         v-flex.pl-3(md4 sm12)
           roller
     div(v-if="error")
