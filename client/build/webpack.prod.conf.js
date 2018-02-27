@@ -10,8 +10,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-const WebpackPwaManifest = require('webpack-pwa-manifest')
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 
 const env = require('../config/prod.env')
 
@@ -121,25 +119,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ]),
-    new WebpackPwaManifest({
-      name: 'Play by Post',
-      short_name: 'PlayByPost',
-      description: 'PlayByPost',
-      background_color: '#ffffff',
-      icons: [
-        {
-          src: path.resolve('src/assets/icon.png'),
-          sizes: [96, 128, 192, 256, 384, 512]
-        }
-      ]
-    }),
-    new SWPrecacheWebpackPlugin({
-      cacheId: 'PlayByPost',
-      filename: 'service-worker.js',
-      minify: true,
-      navigateFallback: publicPath + 'index.html'
-    })
+    ])
   ]
 })
 
