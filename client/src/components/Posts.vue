@@ -8,9 +8,9 @@
       div(v-else)
         h1 No posts have been made
       div.mt-5
-        v-layout(wrap)
+        v-layout(wrap v-if="this.$store.getters.isLoggedIn")
           v-flex(lg8 xs12)
-            editor(:func="save" v-model="newContent" v-if="this.$store.getters.isLoggedIn")
+            editor(:func="save" v-model="newContent")
           v-flex.pl-3(lg4 xs12)
             roller.mt-3
     div(v-if="error")
