@@ -65,6 +65,12 @@ type editPostData struct {
 	Content string `json:"content"`
 }
 
+// invalidLoginsData is data required for invalidating logins.
+type invalidLoginsData struct {
+	ID   int
+	UUID string
+}
+
 // registerNewAccount takes a struct of data and creates a new user
 // account so long as one with the same name does not already exist.
 func registerNewAccount(data *registerData) (string, User, error) {
@@ -98,7 +104,7 @@ func registerNewAccount(data *registerData) (string, User, error) {
 	if err != nil {
 		return "", User{}, err
 	}
-	uuid, err := createSession(u)
+	uuid, err := createSession(db, u)
 	if err != nil {
 		return "", User{}, err
 	}
@@ -120,7 +126,7 @@ func login(data *loginData) (string, User, error) {
 	if !passwordMatch {
 		return "", User{}, errors.New("Password mismatch")
 	}
-	uuid, err := createSession(u)
+	uuid, err := createSession(db, u)
 	if err != nil {
 		return "", User{}, err
 	}
@@ -282,5 +288,14 @@ func editPost(data *editPostData) error {
 	db := database()
 	defer db.Close()
 	_, err := db.Exec(queryEditPost, data.Content, data.ID)
+	return err
+}
+
+// clearLogins deletes all stored sessions from the data for the user
+// other than the single uuid that's passed in as part of the data.
+func clearLogins(data *invalidLoginsData) error {
+	db := database()
+	defer db.Close()
+	_, err := db.Exec(queryInvalidLogins, data.ID, data.UUID)
 	return err
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 	"github.com/nu7hatch/gouuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -91,14 +92,9 @@ func getUserByName(name string) (User, error) {
 
 // createSession creates a new database model for a new session for a user
 // and returns the new session UUID.
-func createSession(u User) (string, error) {
-	db := database()
-	defer db.Close()
+func createSession(db *sqlx.DB, u User) (string, error) {
 	uuid, err := createUUID()
 	if err != nil {
-		return "", err
-	}
-	if _, err := db.Exec(queryDeleteSessionsForUser, u.ID); err != nil {
 		return "", err
 	}
 	if _, err := db.Exec(queryCreateSession, u.ID, uuid); err != nil {

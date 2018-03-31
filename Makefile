@@ -1,3 +1,5 @@
+.PHONY: help deploy build_both build_client build_server deploy_both deploy_client deploy_server stop_app start_app
+
 all: deploy
 
 help:

@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 const envVarDatabasePath = "DB_PATH"
 const testDatabaseName = "test_data.db"
 
-func newDB() {
+func setDBToTest() {
 	deleteTestData()
 	os.Setenv(envVarDatabasePath, testDatabaseName)
 	createTables()
@@ -30,7 +30,7 @@ func deleteTestData() {
 	}
 }
 
-func addUser(db *sqlx.DB) {
+func addTestUser(db *sqlx.DB) {
 	hashedPassword, err := createPasswordHash("password")
 	if err != nil {
 		panic(err)
@@ -41,7 +41,7 @@ func addUser(db *sqlx.DB) {
 	}
 }
 
-func addPost(db *sqlx.DB) {
+func addTestPost(db *sqlx.DB) {
 	_, err := db.Exec(queryCreatePost, "1", timestamp(), "New post content")
 	if err != nil {
 		panic(err)

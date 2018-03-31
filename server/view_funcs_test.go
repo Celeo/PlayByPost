@@ -8,7 +8,7 @@ import (
 )
 
 func TestRegisterNewAccountDefaultJoinCode(t *testing.T) {
-	newDB()
+	setDBToTest()
 	data := registerData{
 		Name:     "aaa",
 		Password: "bbb",
@@ -22,7 +22,7 @@ func TestRegisterNewAccountDefaultJoinCode(t *testing.T) {
 }
 
 func TestRegisterNewAccountDefaultNewCode(t *testing.T) {
-	newDB()
+	setDBToTest()
 	const code = "foobar"
 	os.Setenv("JOIN_CODE", code)
 	data := registerData{
@@ -39,7 +39,7 @@ func TestRegisterNewAccountDefaultNewCode(t *testing.T) {
 }
 
 func TestRegisterNewAccountUserExists(t *testing.T) {
-	newDB()
+	setDBToTest()
 	data := registerData{
 		Name:     "aaa",
 		Password: "bbb",
@@ -57,7 +57,7 @@ func TestRegisterNewAccountUserExists(t *testing.T) {
 }
 
 func TestRegisterNewAccountInvalidJoinCode(t *testing.T) {
-	newDB()
+	setDBToTest()
 	data := registerData{
 		Name:     "aaa",
 		Password: "bbb",
@@ -72,7 +72,7 @@ func TestRegisterNewAccountInvalidJoinCode(t *testing.T) {
 }
 
 func TestLoginNoUser(t *testing.T) {
-	newDB()
+	setDBToTest()
 	data := loginData{
 		Name:     "aaa",
 		Password: "bbb",
@@ -84,10 +84,10 @@ func TestLoginNoUser(t *testing.T) {
 }
 
 func TestLoinWithUser(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	data := loginData{
 		Name:     "username",
 		Password: "password",
@@ -99,18 +99,18 @@ func TestLoinWithUser(t *testing.T) {
 }
 
 func TestGetAllPostsNoPosts(t *testing.T) {
-	newDB()
+	setDBToTest()
 	posts, err := getAllPosts()
 	require.Nil(t, err)
 	require.Empty(t, posts, "Magically found posts")
 }
 
 func TestGetAllPosts(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
-	addPost(db)
+	addTestUser(db)
+	addTestPost(db)
 	posts, err := getAllPosts()
 	require.Nil(t, err)
 	require.Equal(t, len(posts), 1, "Incorrect number of posts returned")
@@ -118,10 +118,10 @@ func TestGetAllPosts(t *testing.T) {
 }
 
 func TestCreatePost(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	data := newPostData{
 		ID:      1,
 		Content: "Content",
@@ -131,10 +131,10 @@ func TestCreatePost(t *testing.T) {
 }
 
 func TestChangePasswordMismatch(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	data := newPasswordData{
 		ID:          1,
 		OldPassword: "",
@@ -146,10 +146,10 @@ func TestChangePasswordMismatch(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	data := updateUserData{
 		ID:           1,
 		Name:         "new-name",
@@ -167,11 +167,11 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestChangePassword(t *testing.T) {
-	newDB()
+	setDBToTest()
 	const newPass = "new-password"
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	data := newPasswordData{
 		ID:          1,
 		OldPassword: "password",
@@ -185,11 +185,11 @@ func TestChangePassword(t *testing.T) {
 }
 
 func TestAddingGettingDice(t *testing.T) {
-	newDB()
+	setDBToTest()
 	const roll = "1d20 + 3"
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	data := addRollData{
 		ID:     1,
 		String: roll,
@@ -201,10 +201,10 @@ func TestAddingGettingDice(t *testing.T) {
 }
 
 func TestSaveRollsOnPostCreate(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	pendingRollData := []addRollData{
 		{
 			ID:     1,
@@ -224,7 +224,7 @@ func TestSaveRollsOnPostCreate(t *testing.T) {
 		require.Nil(t, err)
 		require.Equal(t, len(accum), i+1)
 	}
-	addPost(db)
+	addTestPost(db)
 	posts, err := getAllPosts()
 	require.Nil(t, err)
 	require.Equal(t, len(posts), 1)
@@ -235,12 +235,38 @@ func TestSaveRollsOnPostCreate(t *testing.T) {
 }
 
 func TestGetPostByID(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
-	addPost(db)
+	addTestUser(db)
+	addTestPost(db)
 	post, err := getPostByID(1)
 	require.Nil(t, err)
 	require.Equal(t, post.ID, 1)
+}
+
+func TestClearLogins(t *testing.T) {
+	setDBToTest()
+	db := database()
+	defer db.Close()
+	addTestUser(db)
+	u, err := getUserByID(1)
+	require.Nil(t, err)
+	require.NotNil(t, u)
+	for i := 0; i < 3; i++ {
+		uuid, err := createSession(db, u)
+		require.Nil(t, err)
+		require.NotNil(t, uuid)
+	}
+	sessions := []Session{}
+	err = db.Select(&sessions, queryGetAllSessions)
+	require.Nil(t, err)
+	savedUUID := sessions[0].UUID
+	clearLogins(&invalidLoginsData{1, savedUUID})
+	newSessions := []Session{}
+	err = db.Select(&newSessions, queryGetAllSessions)
+	require.Nil(t, err)
+	require.Equal(t, len(newSessions), 1)
+	require.Equal(t, newSessions[0].ID, 1)
+	require.Equal(t, newSessions[0].UUID, savedUUID)
 }

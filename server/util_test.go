@@ -55,10 +55,10 @@ func TestCheckHashAgainstPassword(t *testing.T) {
 }
 
 func TestGetUserByID(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	u, err := getUserByID(1)
 	require.Nil(t, err)
 	require.NotNil(t, u)
@@ -66,7 +66,7 @@ func TestGetUserByID(t *testing.T) {
 }
 
 func TestGetUserByIDNoUser(t *testing.T) {
-	newDB()
+	setDBToTest()
 	u, err := getUserByID(1)
 	require.NotNil(t, err)
 	require.NotNil(t, u)
@@ -74,10 +74,10 @@ func TestGetUserByIDNoUser(t *testing.T) {
 }
 
 func TestGetUserByName(t *testing.T) {
-	newDB()
+	setDBToTest()
 	db := database()
 	defer db.Close()
-	addUser(db)
+	addTestUser(db)
 	u, err := getUserByName("username")
 	require.Nil(t, err)
 	require.NotNil(t, u)
@@ -85,7 +85,7 @@ func TestGetUserByName(t *testing.T) {
 }
 
 func TestGetUserByNameNoUser(t *testing.T) {
-	newDB()
+	setDBToTest()
 	u, err := getUserByName("username")
 	require.NotNil(t, err)
 	require.NotNil(t, u)
@@ -104,4 +104,16 @@ func TestRollDice(t *testing.T) {
 		_, err := rollDice(roll)
 		require.Nil(t, err)
 	}
+}
+
+func TestCreateSession(t *testing.T) {
+	setDBToTest()
+	db := database()
+	defer db.Close()
+	addTestUser(db)
+	u, err := getUserByID(1)
+	require.Nil(t, err)
+	uuid, err := createSession(db, u)
+	require.Nil(t, err)
+	require.NotNil(t, uuid)
 }

@@ -1,3 +1,5 @@
+.PHONY: run build test
+
 all: run
 
 run: build
@@ -5,3 +7,6 @@ run: build
 
 build:
 	@go build
+
+test:
+	@go test

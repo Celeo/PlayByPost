@@ -46,6 +46,7 @@ type Post struct {
 
 // A Session is used for authentication
 type Session struct {
+	ID     int    `json:"id"`
 	UserID int    `db:"user_id" json:"userID"`
 	UUID   string `db:"uuid" json:"uuid"`
 }
@@ -78,7 +79,8 @@ CREATE TABLE IF NOT EXISTS "post" (
 );
 
 CREATE TABLE IF NOT EXISTS "session" (
-	user_id INTEGER PRIMARY KEY REFERENCES "user" (id) NOT NULL,
+	id INTEGER PRIMARY KEY,
+	user_id INTEGER REFERENCES "user" (id) NOT NULL,
 	uuid TEXT NOT NULL
 );
 
@@ -98,7 +100,7 @@ const querySelectPosts string = `SELECT * FROM post`
 const querySelectSinglePost string = `SELECT * FROM post WHERE id=?`
 const querySelectUsers string = `SELECT * FROM user`
 const queryCreateUser string = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
-const queryCreateSession string = `INSERT INTO session VALUES (?, ?)`
+const queryCreateSession string = `INSERT INTO session (user_id, uuid) VALUES (?, ?)`
 const queryDeleteSessionsForUser string = `DELETE FROM session WHERE user_id=?`
 const queryCreatePost string = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
 const queryEditPost string = `UPDATE post SET content=? WHERE id=?`
@@ -108,3 +110,5 @@ const queryGetPendingRollsForUser string = `SELECT * FROM roll WHERE user_id=? A
 const queryInsertPendingRoll string = `INSERT INTO roll (user_id, string, value) VALUES (?, ?, ?)`
 const querySavePendingRoll string = `UPDATE roll SET pending=0, post_id=? WHERE user_id=? AND pending=1`
 const querySelectSavedRolls string = `SELECT * FROM roll WHERE pending=0`
+const queryInvalidLogins string = `DELETE FROM session WHERE user_id=? AND uuid!=?`
+const queryGetAllSessions string = `SELECT * FROM session`

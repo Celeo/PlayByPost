@@ -10,6 +10,10 @@ import (
 	"github.com/itsjamie/gin-cors"
 )
 
+const contextAuthID string = "authID"
+const contextAuthName string = "authName"
+const contextAuthUUID string = "uuid"
+
 // main is the entry point for the app
 func main() {
 	createTables()
@@ -33,26 +37,27 @@ func main() {
 	r.GET("/profile", middlewareLoggedIn(), viewGetProfile)
 	r.PUT("/profile", middlewareLoggedIn(), viewUpdateUser)
 	r.PUT("/profile/password", middlewareLoggedIn(), viewChangePassword)
+	r.POST("/profile/invalidate", middlewareLoggedIn(), viewInvalidLogins)
 
 	r.Run(":5000")
 }
 
 // middlewareLoggedIn returns a Gin handler function that asserts
-// the the incoming HTTP requests to the restricted endpoints are
+// that the incoming HTTP requests to the restricted endpoints are
 // from an authenticated user. If they aren't, the the request is aborted
 // with a HTTP status code that explains why the user was not allowed
 // access to that endpoint.
 func middlewareLoggedIn() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		header := c.GetHeader("Authorization")
-		if header == "" {
+		uuid := c.GetHeader("Authorization")
+		if uuid == "" {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 		s := Session{}
 		db := database()
 		defer db.Close()
-		if err := db.Get(&s, querySelectSessionByUUID, header); err != nil {
+		if err := db.Get(&s, querySelectSessionByUUID, uuid); err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -61,8 +66,9 @@ func middlewareLoggedIn() gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		c.Set("authName", u.Name)
-		c.Set("authID", u.ID)
+		c.Set(contextAuthID, u.ID)
+		c.Set(contextAuthName, u.Name)
+		c.Set(contextAuthUUID, uuid)
 		c.Next()
 	}
 }
@@ -139,7 +145,7 @@ func viewCreatePost(c *gin.Context) {
 	if err := c.BindJSON(&data); err != nil {
 		return
 	}
-	data.ID = c.GetInt("authID")
+	data.ID = c.GetInt(contextAuthID)
 	if err := createNewPost(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "New post could not be created",
@@ -154,7 +160,7 @@ func viewCreatePost(c *gin.Context) {
 
 // endpoint: GET /roll
 func viewGetPendingDice(c *gin.Context) {
-	authID := c.GetInt("authID")
+	authID := c.GetInt(contextAuthID)
 	rolls, err := getPendingDice(authID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -172,7 +178,7 @@ func viewRollDice(c *gin.Context) {
 	if err := c.BindJSON(&data); err != nil {
 		return
 	}
-	data.ID = c.GetInt("authID")
+	data.ID = c.GetInt(contextAuthID)
 	rolls, err := addPendingDie(&data)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -186,7 +192,7 @@ func viewRollDice(c *gin.Context) {
 
 // endpoint: GET /profile
 func viewGetProfile(c *gin.Context) {
-	u, err := getUserByID(c.GetInt("authID"))
+	u, err := getUserByID(c.GetInt(contextAuthID))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Could not get profile for user",
@@ -204,7 +210,7 @@ func viewUpdateUser(c *gin.Context) {
 		abortError(c, err)
 		return
 	}
-	data.ID = c.GetInt("authID")
+	data.ID = c.GetInt(contextAuthID)
 	u, err := updateUserInformation(&data)
 	if err != nil {
 		abortError(c, err)
@@ -220,10 +226,27 @@ func viewChangePassword(c *gin.Context) {
 		abortError(c, err)
 		return
 	}
-	data.ID = c.GetInt("authID")
+	data.ID = c.GetInt(contextAuthID)
 	if err := changePassword(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Updating password failed",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+// endpoint: POST /profile/invalidate
+func viewInvalidLogins(c *gin.Context) {
+	data := invalidLoginsData{
+		ID:   c.GetInt(contextAuthID),
+		UUID: c.GetString(contextAuthUUID),
+	}
+	err := clearLogins(&data)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not invalidate other logins",
 			"error":   err.Error(),
 		})
 		return
@@ -278,7 +301,7 @@ func viewEditPost(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	if p.UserID != c.GetInt("authID") {
+	if p.UserID != c.GetInt(contextAuthID) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
