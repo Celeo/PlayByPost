@@ -3,7 +3,7 @@
     div(v-if="!error")
       div(v-if="posts && posts.length > 0")
         div.text-xs-center(v-if="posts.length > postsPerPage")
-          v-pagination.mb-2(:length="Math.ceil(posts.length / postsPerPage)" v-model="page" :total-visible="7" circle)
+          v-pagination.mb-2(:length="paginationLength" v-model="page" :total-visible="7" circle)
         post(v-for="post in postsThisPage()" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
@@ -63,7 +63,8 @@ export default {
         this.newContent = ''
         window.localStorage.removeItem('post')
         this.$store.commit('CLEAR_PENDING_ROLLS')
-        this.loadData()
+        await this.loadData()
+        this.page = this.paginationLength
       } catch (err) {
         console.error(err)
         this.error = 'Error saving new post'
@@ -75,6 +76,11 @@ export default {
         ret = ret.reverse()
       }
       return ret.slice((this.page - 1) * this.postsPerPage, this.page * this.postsPerPage)
+    }
+  },
+  computed: {
+    paginationLength() {
+      return Math.ceil(this.posts.length / this.postsPerPage)
     }
   },
   created() {
