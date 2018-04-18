@@ -12,11 +12,13 @@
         div.px-1(v-html="post.content")
         div.px-1(v-if='post.rolls.length > 0')
           div.pt-4
-            div.green--text.text--darken-1(v-for="roll in post.rolls" :key="roll.id") {{ roll.string }} =&gt; {{ roll.value }}
+            div.green--text.text--darken-1(v-for="roll in post.rolls" :key="roll.id") {{ roll | formatRoll }}
     div.mt-2
 </template>
 
 <script>
+const SINGLE_D20_REGEX = /^.*: 1d20[^d]*$/
+
 export default {
   props: [
     'post'
@@ -24,6 +26,14 @@ export default {
   computed: {
     name() {
       return this.$store.getters.name
+    }
+  },
+  filters: {
+    formatRoll(roll) {
+      if (roll.string.match(SINGLE_D20_REGEX) && roll.value === 20) {
+        return `${roll.string} => ${roll.value} (crit!)`
+      }
+      return `${roll.string} => ${roll.value}`
     }
   }
 }
