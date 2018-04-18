@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -116,4 +117,43 @@ func TestCreateSession(t *testing.T) {
 	uuid, err := createSession(db, u)
 	require.Nil(t, err)
 	require.NotNil(t, uuid)
+}
+
+func TestInjectD20Crits(t *testing.T) {
+	yes := []Roll{
+		{
+			String: "something: 1d20",
+			Value:  20,
+		},
+		{
+			String: "something: 1d20 + 100",
+			Value:  120,
+		},
+		{
+			String: "something: 1d20 - 4",
+			Value:  16,
+		},
+	}
+	injectD20Crits(yes)
+	for index, roll := range yes {
+		require.True(t, roll.IsD20Crit, "index: "+strconv.Itoa(index))
+	}
+	no := []Roll{
+		{
+			String: "something: 1d6",
+			Value:  4,
+		},
+		{
+			String: "something: 1d20 + 1d4 + 1",
+			Value:  5,
+		},
+		{
+			String: "something: 1d20",
+			Value:  5,
+		},
+	}
+	injectD20Crits(no)
+	for _, roll := range no {
+		require.True(t, roll.IsD20Crit)
+	}
 }

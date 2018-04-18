@@ -53,12 +53,13 @@ type Session struct {
 
 // A Roll is the result of rolling some dice
 type Roll struct {
-	ID      int    `json:"id"`
-	UserID  int    `db:"user_id" json:"userID"`
-	PostID  int    `db:"post_id" json:"postID"`
-	Pending bool   `json:"pending"`
-	String  string `json:"string"`
-	Value   int    `json:"value"`
+	ID        int    `json:"id"`
+	UserID    int    `db:"user_id" json:"userID"`
+	PostID    int    `db:"post_id" json:"postID"`
+	Pending   bool   `json:"pending"`
+	String    string `json:"string"`
+	Value     int    `json:"value"`
+	IsD20Crit bool   `db:"-" json:"crit"`
 }
 
 const queryCreateTables = `

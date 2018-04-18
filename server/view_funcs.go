@@ -167,6 +167,8 @@ func getAllPosts() ([]formattedPost, error) {
 		}
 		if len(rollMap[p.ID]) == 0 {
 			rollMap[p.ID] = []Roll{}
+		} else {
+			injectD20Crits(rollMap[p.ID])
 		}
 		window[p.ID] = isPostWithinEditWindow(&p)
 	}

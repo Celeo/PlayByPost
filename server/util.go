@@ -17,6 +17,10 @@ import (
 const timeFormat string = "Jan _2, 2006 @ 15:04:05"
 const editWindow time.Duration = time.Duration(30) * time.Minute
 
+var regexDice = regexp.MustCompile(`(\d+)d(\d+)`)
+var regexMod = regexp.MustCompile(`([+-])(\d+)`)
+var regexD20 = regexp.MustCompile(`^.*: 1d20[^d]*$`)
+
 // abortError sets the Gin header and body with a generic
 // error message that includes the passed error's message.
 func abortError(c *gin.Context, err error) {
@@ -109,14 +113,6 @@ func rollDice(str string) (int, error) {
 	// declaration of vars and regex setup
 	finalValue := 0
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	regexDice, err := regexp.Compile(`(\d+)d(\d+)`)
-	if err != nil {
-		return 0, err
-	}
-	regexMod, err := regexp.Compile(`([+-])(\d+)`)
-	if err != nil {
-		return 0, err
-	}
 	// remove spaces from the string
 	str = strings.Replace(str, " ", "", -1)
 	// split into the separate groups of dice
@@ -157,4 +153,31 @@ func rollDice(str string) (int, error) {
 		finalValue += dieResult
 	}
 	return finalValue, nil
+}
+
+// injectD20Crits iterates through a list of roll structs and sets
+// the `IsD20Crit` boolean to true when the dice is a single d20 roll
+// with optional modifiers that yields a roll of 20.
+func injectD20Crits(rolls []Roll) {
+	for i := 0; i < len(rolls); i++ {
+		if regexD20.Match([]byte(rolls[i].String)) {
+			value := rolls[i].Value
+			diceString := strings.Replace(strings.Split(rolls[i].String, ":")[1], " ", "", -1)
+			groups := regexMod.FindStringSubmatch(diceString)
+			if len(groups) > 0 {
+				delta, err := strconv.Atoi(groups[2])
+				if err != nil {
+					continue
+				}
+				if groups[1] == "+" {
+					value -= delta
+				} else {
+					value += delta
+				}
+			}
+			if value == 20 {
+				rolls[i].IsD20Crit = true
+			}
+		}
+	}
 }

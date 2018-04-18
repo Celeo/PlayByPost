@@ -17,8 +17,6 @@
 </template>
 
 <script>
-const SINGLE_D20_REGEX = /^.*: 1d20[^d]*$/
-
 export default {
   props: [
     'post'
@@ -30,7 +28,7 @@ export default {
   },
   filters: {
     formatRoll(roll) {
-      if (roll.string.match(SINGLE_D20_REGEX) && roll.value === 20) {
+      if (roll.crit) {
         return `${roll.string} => ${roll.value} (crit!)`
       }
       return `${roll.string} => ${roll.value}`
