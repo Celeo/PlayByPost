@@ -3,7 +3,7 @@
     div(v-if="!error")
       div(v-if="posts && posts.length > 0")
         div.text-xs-center(v-if="posts.length > postsPerPage")
-          v-pagination.mb-2(:length="paginationLength" v-model="page" :total-visible="7" circle)
+          v-pagination.mb-2(:length="paginationLength" v-model="page" :total-visible="paginationButtonCount" circle)
         post(v-for="post in postsThisPage()" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
@@ -81,6 +81,12 @@ export default {
   computed: {
     paginationLength() {
       return Math.ceil(this.posts.length / this.postsPerPage)
+    },
+    paginationButtonCount() {
+      if (screen.width < 1000) {
+        return 5
+      }
+      return 7
     }
   },
   created() {
