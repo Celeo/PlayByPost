@@ -12,11 +12,13 @@
         div.px-1(v-html="post.content")
         div.px-1(v-if='post.rolls.length > 0')
           div.pt-4
-            div.green--text.text--darken-1(v-for="roll in post.rolls" :key="roll.id") {{ roll | formatRoll }}
+            div.green--text.text--darken-1(v-for="roll in post.rolls" :key="roll.id") {{ roll | filterRoll }}
     div.mt-2
 </template>
 
 <script>
+import { formatRoll } from '@/util.js'
+
 export default {
   props: [
     'post'
@@ -27,11 +29,8 @@ export default {
     }
   },
   filters: {
-    formatRoll(roll) {
-      if (roll.crit) {
-        return `${roll.string} => ${roll.value} (crit!)`
-      }
-      return `${roll.string} => ${roll.value}`
+    filterRoll(roll) {
+      return formatRoll(roll)
     }
   }
 }

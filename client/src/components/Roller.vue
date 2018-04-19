@@ -1,7 +1,7 @@
 <template lang="pug">
   div
-    h3.display-1.header.mb-1 Dice roller 
-    p.mb-2 For help with this, check the 
+    h3.display-1.header.mb-1 Dice roller
+    p.mb-2 For help with this, check the
       router-link(:to="{ name: 'help' }") help
       |  page.
     v-text-field(label="What for" v-model="what")
@@ -21,7 +21,7 @@
     div(v-if="rolled.length > 0")
       v-list.pt-0
         v-list-tile(v-for="roll in rolled" :key="roll.id")
-          v-list-tile-content.pt-0 {{ roll.string }} =&gt; {{ roll.value }}
+          v-list-tile-content.pt-0 {{ roll | filterRoll }}
     div(v-if="error")
       v-alert.mt-3.black--text(type="error" :value="true") An error occurred with the dice roller widget
 </template>
@@ -29,6 +29,7 @@
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+import { formatRoll } from '@/util.js'
 
 const formatDie = (die) => {
   let s = `${die.count}d${die.sides}`
@@ -105,6 +106,11 @@ export default {
         console.error(err)
         this.error = true
       }
+    }
+  },
+  filters: {
+    filterRoll(roll) {
+      return formatRoll(roll)
     }
   },
   async created() {
