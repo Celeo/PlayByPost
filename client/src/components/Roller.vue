@@ -2,8 +2,10 @@
   div
     h3.display-1.header.mb-1 Dice roller
     p.mb-2 For help with this, check the
+      = " "
       router-link(:to="{ name: 'help' }") help
-      |  page.
+      = " "
+      | page.
     v-text-field(label="What for" v-model="what")
     v-layout(row v-for="(die, index) in dice" :key="index")
       v-flex.pl-2(lg3 xs2)

@@ -3,7 +3,7 @@
     div(v-if="!error")
       div(v-if="posts && posts.length > 0")
         div.text-xs-center(v-if="posts.length > postsPerPage")
-          v-pagination.mb-2(:length="paginationLength" v-model="page" :total-visible="paginationButtonCount" circle)
+          v-pagination.mb-2(:length="paginationLength" v-model="currentPage" :total-visible="paginationButtonCount" circle)
         post(v-for="post in postsThisPage()" :key="post.id" :post="post")
       div(v-else)
         h1 No posts have been made
@@ -37,7 +37,7 @@ export default {
       posts: [],
       isLoading: true,
       error: null,
-      page: 1,
+      currentPage: 1,
       postsPerPage: null,
       newestAtTop: null,
       handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
@@ -64,7 +64,7 @@ export default {
         window.localStorage.removeItem('post')
         this.$store.commit('CLEAR_PENDING_ROLLS')
         await this.loadData()
-        this.page = this.paginationLength
+        this.currentPage = this.paginationLength
       } catch (err) {
         console.error(err)
         this.error = 'Error saving new post'
@@ -75,7 +75,7 @@ export default {
       if (this.newestAtTop) {
         ret = ret.reverse()
       }
-      return ret.slice((this.page - 1) * this.postsPerPage, this.page * this.postsPerPage)
+      return ret.slice((this.currentPage - 1) * this.postsPerPage, this.currentPage * this.postsPerPage)
     }
   },
   computed: {
@@ -89,7 +89,7 @@ export default {
       return 7
     }
   },
-  created() {
+  async created() {
     if (this.$store.getters.isLoggedIn) {
       this.postsPerPage = this.$store.getters.postsPerPage
       this.newestAtTop = this.$store.getters.newestAtTop
@@ -98,11 +98,15 @@ export default {
       this.newestAtTop = false
     }
   },
-  mounted() {
-    this.loadData()
+  async mounted() {
+    await this.loadData()
     const postAttempt = window.localStorage.getItem('post')
     if (postAttempt) {
       this.newContent = postAttempt
+    }
+    if (this.$store.getters.goToLastPage) {
+      this.$store.commit('SET_GO_TO_LAST_PAGE', false)
+      this.currentPage = this.paginationLength
     }
   },
   watch: {

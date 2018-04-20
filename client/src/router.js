@@ -49,6 +49,13 @@ const router = new Router({
       path: '/edit/:id',
       component: EditPost,
       name: 'edit'
+    },
+    {
+      path: '/last',
+      redirect: to => {
+        store.commit('SET_GO_TO_LAST_PAGE', true)
+        return { name: 'posts' }
+      }
     }
   ],
   mode: 'history'
