@@ -115,8 +115,12 @@ func rollDice(str string) (int, error) {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// remove spaces from the string
 	str = strings.Replace(str, " ", "", -1)
+	// extract just the dice section from the string
+	// (incoming value contains the description as well)
+	lastColonIndex := strings.LastIndex(str, ":")
+	diceSection := str[lastColonIndex+1:]
 	// split into the separate groups of dice
-	dice := strings.Split(str, ",")
+	dice := strings.Split(diceSection, ",")
 	// iterate through all dice groups
 	for _, die := range dice {
 		dieResult := 0

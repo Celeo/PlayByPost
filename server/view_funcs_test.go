@@ -186,7 +186,7 @@ func TestChangePassword(t *testing.T) {
 
 func TestAddingGettingDice(t *testing.T) {
 	setDBToTest()
-	const roll = "1d20 + 3"
+	const roll = "abc: 1d20 + 3"
 	db := database()
 	defer db.Close()
 	addTestUser(db)
@@ -208,15 +208,15 @@ func TestSaveRollsOnPostCreate(t *testing.T) {
 	pendingRollData := []addRollData{
 		{
 			ID:     1,
-			String: "1d20",
+			String: "abc: 1d20",
 		},
 		{
 			ID:     1,
-			String: "1d20 + 3",
+			String: "abc: 1d20 + 3",
 		},
 		{
 			ID:     1,
-			String: "2d6 + 3, 1d4 - 1",
+			String: "abc: 2d6 + 3, 1d4 - 1",
 		},
 	}
 	for i := 0; i < len(pendingRollData); i++ {

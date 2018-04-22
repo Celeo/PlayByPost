@@ -95,15 +95,16 @@ func TestGetUserByNameNoUser(t *testing.T) {
 
 func TestRollDice(t *testing.T) {
 	rolls := []string{
-		"1d20",
-		"2d20",
-		"1d6+3",
-		"1d4 + 1, 2d6 -3, 1d2",
-		"1d2- 100",
+		"abc: 1d20",
+		"abc: 2d20",
+		"abc: 1d6+3",
+		"abc: 1d4 + 1, 2d6 -3, 1d2",
+		"abc: 1d2- 100",
 	}
 	for _, roll := range rolls {
-		_, err := rollDice(roll)
+		r, err := rollDice(roll)
 		require.Nil(t, err)
+		require.NotNil(t, r)
 	}
 }
 
@@ -154,6 +155,6 @@ func TestInjectD20Crits(t *testing.T) {
 	}
 	injectD20Crits(no)
 	for _, roll := range no {
-		require.True(t, roll.IsD20Crit)
+		require.False(t, roll.IsD20Crit)
 	}
 }
