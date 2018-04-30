@@ -11,7 +11,7 @@
       v-flex.pl-2(lg3 xs2)
         v-text-field(label="Count" v-model="die.count" type="number" min="1")
       v-flex.pl-2(lg3 xs2)
-        v-text-field(label="Sides" v-model="die.sides" type="number" min="2" max="20")
+        v-text-field(label="Sides" v-model="die.sides" type="number" min="2" max="100")
       v-flex.pl-2(lg3 xs2)
         v-text-field(label="Mod" v-model="die.mod" type="number")
       v-flex
@@ -66,7 +66,7 @@ export default {
         return false
       }
       for (let die of this.dice) {
-        if (die.count < 1 || die.sides < 2 || die.sides > 20) {
+        if (die.count < 1 || die.sides < 2 || die.sides > 100) {
           return false
         }
       }

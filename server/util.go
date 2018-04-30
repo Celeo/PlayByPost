@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -17,7 +18,7 @@ import (
 const timeFormat string = "Jan _2, 2006 @ 15:04:05"
 const editWindow time.Duration = time.Duration(30) * time.Minute
 
-var regexDice = regexp.MustCompile(`(\d+)d(\d+)`)
+var regexDice = regexp.MustCompile(`([+-]?\d+)d([+-]?\d+)`)
 var regexMod = regexp.MustCompile(`([+-])(\d+)`)
 var regexD20 = regexp.MustCompile(`^.*: 1d20[^d]*$`)
 
@@ -130,9 +131,20 @@ func rollDice(str string) (int, error) {
 		if err != nil {
 			return 0, err
 		}
+		// sanity check - no sense in rolling a dice less than once
+		if count < 1 {
+			return 0, fmt.Errorf("Dice count minimum is 1, found %d", count)
+		}
 		sides, err := strconv.Atoi(groups[2])
 		if err != nil {
 			return 0, err
+		}
+		// sanity check - no sense in rolling a 1-sided die, and limit is 100
+		if sides < 2 {
+			return 0, fmt.Errorf("Dice side minimum is 2, found %d", sides)
+		}
+		if sides > 100 {
+			return 0, fmt.Errorf("Dice side maximum is 100, found %d", sides)
 		}
 		// "roll" the dice
 		for i := 0; i < count; i++ {

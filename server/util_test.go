@@ -95,7 +95,6 @@ func TestGetUserByNameNoUser(t *testing.T) {
 
 func TestRollDice(t *testing.T) {
 	rolls := []string{
-		"abc: 1d20",
 		"abc: 2d20",
 		"abc: 1d6+3",
 		"abc: 1d4 + 1, 2d6 -3, 1d2",
@@ -105,6 +104,21 @@ func TestRollDice(t *testing.T) {
 		r, err := rollDice(roll)
 		require.Nil(t, err)
 		require.NotNil(t, r)
+	}
+}
+
+func TestRollDiceBadValues(t *testing.T) {
+	rolls := []string{
+		"abc: 1d101",
+		"abc: 1d1",
+		"abc: 1d0",
+		"abc: 1d-1",
+		"abc: -1d10",
+	}
+	for _, roll := range rolls {
+		r, err := rollDice(roll)
+		require.NotNil(t, err, roll)
+		require.Equal(t, r, 0)
 	}
 }
 
@@ -151,6 +165,10 @@ func TestInjectD20Crits(t *testing.T) {
 		{
 			String: "something: 1d20",
 			Value:  5,
+		},
+		{
+			String: "something: 1d100",
+			Value:  50,
 		},
 	}
 	injectD20Crits(no)
