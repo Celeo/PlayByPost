@@ -156,14 +156,16 @@ func TestUpdateUser(t *testing.T) {
 		Email:        "new-email",
 		PostsPerPage: "5",
 		NewestAtTop:  true,
+		Tag:          "Human Cleric 5",
 	}
 	u, err := updateUserInformation(&data)
 	require.Nil(t, err)
 	require.Equal(t, u.ID, 1)
-	require.Equal(t, u.Name, "new-name")
-	require.Equal(t, u.Email, "new-email")
-	require.Equal(t, u.PostsPerPage, 5)
-	require.Equal(t, u.NewestAtTop, true)
+	require.Equal(t, "new-name", u.Name)
+	require.Equal(t, "new-email", u.Email)
+	require.Equal(t, 5, u.PostsPerPage)
+	require.Equal(t, true, u.NewestAtTop)
+	require.Equal(t, "Human Cleric 5", u.Tag)
 }
 
 func TestChangePassword(t *testing.T) {

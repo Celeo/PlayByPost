@@ -3,6 +3,7 @@
     v-card.elevation-5(light)
       div.clearfix.purple--text.text--darken-3
         h3.go-left {{ post.name }}
+          span.tag(v-if="post.tag.length > 0")  ({{ post.tag }})
         h4.go-right
           span(title="This is UTC time") {{ post.date }}
           span.ml-2.pb-3(v-if="post.name === name && post.canEdit")
@@ -55,4 +56,7 @@ export default {
 
 .no-deco
   text-decoration none
+
+.tag
+  font-size 75%
 </style>

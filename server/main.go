@@ -123,6 +123,7 @@ func viewLogin(c *gin.Context) {
 		"name":         data.Name,
 		"postsPerPage": user.PostsPerPage,
 		"newestAtTop":  user.NewestAtTop,
+		"tag":          user.Tag,
 	})
 }
 
@@ -146,6 +147,12 @@ func viewCreatePost(c *gin.Context) {
 		return
 	}
 	data.ID = c.GetInt(contextAuthID)
+	u, err := getUserByID(data.ID)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	data.Tag = u.Tag
 	if err := createNewPost(&data); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "New post could not be created",

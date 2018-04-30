@@ -42,7 +42,7 @@ func addTestUser(db *sqlx.DB) {
 }
 
 func addTestPost(db *sqlx.DB) {
-	_, err := db.Exec(queryCreatePost, "1", timestamp(), "New post content")
+	_, err := db.Exec(queryCreatePost, "1", timestamp(), "", "New post content")
 	if err != nil {
 		panic(err)
 	}

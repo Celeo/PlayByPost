@@ -26,6 +26,7 @@ type formattedPost struct {
 	ID            int    `json:"id"`
 	Name          string `json:"name"`
 	Date          string `json:"date"`
+	Tag           string `json:"tag"`
 	Content       string `json:"content"`
 	Rolls         []Roll `json:"rolls"`
 	EditingWindow bool   `json:"canEdit"`
@@ -34,6 +35,7 @@ type formattedPost struct {
 // newPostData is data required for creating a new post.
 type newPostData struct {
 	ID      int    `json:"-"`
+	Tag     string `json:"-"`
 	Content string `json:"content"`
 }
 
@@ -51,6 +53,7 @@ type updateUserData struct {
 	Email        string `json:"email"`
 	PostsPerPage string `json:"postsPerPage"`
 	NewestAtTop  bool   `json:"newestAtTop"`
+	Tag          string `json:"tag"`
 }
 
 // addRollData is data required for storing a new roll.
@@ -178,6 +181,7 @@ func getAllPosts() ([]formattedPost, error) {
 			Name:          userMap[p.UserID].Name,
 			Date:          p.Date,
 			Content:       p.Content,
+			Tag:           p.Tag,
 			Rolls:         rollMap[p.ID],
 			EditingWindow: window[p.ID],
 		})
@@ -190,7 +194,7 @@ func getAllPosts() ([]formattedPost, error) {
 func createNewPost(data *newPostData) error {
 	db := database()
 	defer db.Close()
-	impacted, err := db.Exec(queryCreatePost, data.ID, timestamp(), data.Content)
+	impacted, err := db.Exec(queryCreatePost, data.ID, timestamp(), data.Tag, data.Content)
 	newPostID, err := impacted.LastInsertId()
 	if err != nil {
 		return err
@@ -221,7 +225,7 @@ func updateUserInformation(data *updateUserData) (User, error) {
 	if len(name) == 0 {
 		name = existing.Name
 	}
-	_, err = db.Exec(queryUpdateUser, name, data.Email, ppp, data.NewestAtTop, data.ID)
+	_, err = db.Exec(queryUpdateUser, name, data.Email, ppp, data.NewestAtTop, data.Tag, data.ID)
 	if err != nil {
 		return User{}, err
 	}

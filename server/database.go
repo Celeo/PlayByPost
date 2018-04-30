@@ -34,6 +34,7 @@ type User struct {
 	Email        string `json:"email"`
 	PostsPerPage int    `json:"postsPerPage" db:"postsPerPage"`
 	NewestAtTop  bool   `json:"newestAtTop" db:"newestAtTop"`
+	Tag          string `json:"tag"`
 }
 
 // A Post is a message
@@ -41,6 +42,7 @@ type Post struct {
 	ID      int    `json:"id"`
 	UserID  int    `db:"user_id" json:"userID"`
 	Date    string `json:"date"`
+	Tag     string `json:"tag"`
 	Content string `json:"content"`
 }
 
@@ -69,13 +71,15 @@ CREATE TABLE IF NOT EXISTS "user" (
 	password TEXT NOT NULL,
 	email TEXT NOT NULL DEFAULT '',
 	postsPerPage INT NOT NULL DEFAULT 25,
-	newestAtTop INT NOT NULL DEFAULT 0
+	newestAtTop INT NOT NULL DEFAULT 0,
+	tag TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS "post" (
 	id INTEGER PRIMARY KEY,
 	user_id INTEGER REFERENCES "user" (id) NOT NULL,
 	date TEXT NOT NULL,
+	tag TEXT NOT NULL DEFAULT '',
 	content TEXT NOT NULL
 );
 
@@ -103,10 +107,10 @@ const querySelectUsers string = `SELECT * FROM user`
 const queryCreateUser string = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
 const queryCreateSession string = `INSERT INTO session (user_id, uuid) VALUES (?, ?)`
 const queryDeleteSessionsForUser string = `DELETE FROM session WHERE user_id=?`
-const queryCreatePost string = `INSERT INTO post (user_id, date, content) VALUES (?, ?, ?)`
+const queryCreatePost string = `INSERT INTO post (user_id, date, tag, content) VALUES (?, ?, ?, ?)`
 const queryEditPost string = `UPDATE post SET content=? WHERE id=?`
 const queryUpdatePassword string = `UPDATE user SET password=? WHERE id=?`
-const queryUpdateUser string = `UPDATE user SET name=?, email=?, postsPerPage=?, newestAtTop=? WHERE id=?`
+const queryUpdateUser string = `UPDATE user SET name=?, email=?, postsPerPage=?, newestAtTop=?, tag=? WHERE id=?`
 const queryGetPendingRollsForUser string = `SELECT * FROM roll WHERE user_id=? AND pending=1`
 const queryInsertPendingRoll string = `INSERT INTO roll (user_id, string, value) VALUES (?, ?, ?)`
 const querySavePendingRoll string = `UPDATE roll SET pending=0, post_id=? WHERE user_id=? AND pending=1`

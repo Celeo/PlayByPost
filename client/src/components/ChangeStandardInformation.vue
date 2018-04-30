@@ -26,6 +26,11 @@
         v-model="newestAtTop"
         color="blue"
       )
+      p Your 'tag' is what shows next to your name on your posts from now on.
+      v-text-field(
+        label="Tag"
+        v-model="tag"
+      )
     v-btn(
       @click="submit"
       :disabled="isLoading"
@@ -47,6 +52,7 @@ export default {
       email: '',
       postsPerPage: this.$store.getters.postsPerPage,
       newestAtTop: this.$store.getters.newestAtTop,
+      tag: this.$store.getters.tag,
       isLoading: false,
       error: null,
       successful: false,
@@ -61,7 +67,8 @@ export default {
           name: this.name,
           email: this.email,
           postsPerPage: this.postsPerPage.toString(),
-          newestAtTop: this.newestAtTop
+          newestAtTop: this.newestAtTop,
+          tag: this.tag
         }
         const response = await this.handler.put(`${Vue.config.SERVER_URL}profile`, updateData)
         this.successful = true
