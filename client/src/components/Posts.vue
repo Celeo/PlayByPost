@@ -64,7 +64,11 @@ export default {
         window.localStorage.removeItem('post')
         this.$store.commit('CLEAR_PENDING_ROLLS')
         await this.loadData()
-        this.currentPage = this.paginationLength
+        if (this.$store.getters.newestAtTop) {
+          this.currentPage = 1
+        } else {
+          this.currentPage = this.paginationLength
+        }
       } catch (err) {
         console.error(err)
         this.error = 'Error saving new post'
