@@ -57,20 +57,6 @@ export default {
         this.isLoading = false
       }
     },
-    async getPost(id) {
-      if (id in this.postMap) {
-        console.log(`Returning cached post ${id}`)
-        return this.postMap[id]
-      }
-      console.log(`Fetching data for post ${id}`)
-      try {
-        const response = await axios.get(`${Vue.config.SERVER_URL}post/${id}`)
-        this.postMap[id] = response.data
-        return this.postMap[id]
-      } catch (err) {
-        console.error(err)
-      }
-    },
     async save() {
       try {
         await this.handler.post(`${Vue.config.SERVER_URL}posts`, { content: this.newContent })
@@ -88,6 +74,12 @@ export default {
         console.error(err)
         this.error = 'Error saving new post'
       }
+    },
+    getPost(id) {
+      if (id in this.postMap) {
+        return this.postMap[id]
+      }
+      return axios.get(`${Vue.config.SERVER_URL}post/${id}`) // .then(res => res.dat)
     }
   },
   computed: {
@@ -95,10 +87,7 @@ export default {
       return Math.ceil(this.postIDs.length / this.postsPerPage)
     },
     paginationButtonCount() {
-      if (screen.width < 1000) {
-        return 5
-      }
-      return 7
+      return screen.width < 1000 ? 5 : 7
     }
   },
   asyncComputed: {
@@ -109,11 +98,24 @@ export default {
       }
       retIds = retIds.slice((this.currentPage - 1) * this.postsPerPage, this.currentPage * this.postsPerPage)
       let retPosts = []
+      let promises = []
       for (let id of retIds) {
-        const post = await this.getPost(id)
-        retPosts.push(post)
+        const res = this.getPost(id)
+        if (typeof res.then === 'function') {
+          promises.push(res)
+        } else {
+          retPosts.push(res)
+        }
       }
-      return retPosts
+      if (promises.length > 0) {
+        const postPromises = await Promise.all(promises)
+        for (let promise of postPromises) {
+          const post = promise.data
+          this.postMap[post.id] = post
+          retPosts.push(post)
+        }
+      }
+      return retPosts.sort((a, b) => b.id - a.id)
     }
   },
   async created() {
