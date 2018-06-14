@@ -14,7 +14,7 @@ const contextAuthID string = "authID"
 const contextAuthName string = "authName"
 const contextAuthUUID string = "uuid"
 
-// main is the entry point for the app
+// main is the entry point for the app.
 func main() {
 	createTables()
 	r := gin.Default()
@@ -28,10 +28,10 @@ func main() {
 	r.GET("/", viewIndex)
 	r.POST("/login", viewLogin)
 	r.POST("/register", viewRegister)
-	r.GET("/post", viewPosts)
-	r.GET("/post/:id", middlewareLoggedIn(), viewGetSinglePost)
+	r.GET("/posts", viewAllPostIDs)
+	r.POST("/posts", middlewareLoggedIn(), viewCreatePost)
+	r.GET("/post/:id", viewGetSinglePost)
 	r.PUT("/post/:id", middlewareLoggedIn(), viewEditPost)
-	r.POST("/post", middlewareLoggedIn(), viewCreatePost)
 	r.GET("/roll", middlewareLoggedIn(), viewGetPendingDice)
 	r.POST("/roll", middlewareLoggedIn(), viewRollDice)
 	r.GET("/profile", middlewareLoggedIn(), viewGetProfile)
@@ -128,16 +128,16 @@ func viewLogin(c *gin.Context) {
 }
 
 // endpoint: GET /post
-func viewPosts(c *gin.Context) {
-	posts, err := getAllPosts()
+func viewAllPostIDs(c *gin.Context) {
+	ids, err := getAllPostIDs()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Could not get all posts from the database",
+			"message": "Could not get all ids from the database",
 			"error":   err.Error(),
 		})
 		return
 	}
-	c.JSON(http.StatusOK, posts)
+	c.JSON(http.StatusOK, ids)
 }
 
 // endpoint: POST /post
@@ -280,9 +280,10 @@ func viewGetSinglePost(c *gin.Context) {
 		})
 		return
 	}
-	if !isPostWithinEditWindow(&post) {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
+	// If a post is no longer editable by users, it's highly unlikely that
+	// it's going to change, so add a caching header to the response.
+	if !post.EditingWindow {
+		c.Header("Cache-Control", "max-age=259200") // 3 days
 	}
 	c.JSON(http.StatusOK, post)
 }
@@ -303,7 +304,7 @@ func viewEditPost(c *gin.Context) {
 		return
 	}
 	data.ID = id
-	p, err := getPostByID(id)
+	p, err := getRawPostByID(id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return

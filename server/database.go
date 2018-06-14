@@ -101,9 +101,7 @@ CREATE TABLE IF NOT EXISTS "roll" (
 const querySelectSessionByUUID string = `SELECT * FROM session WHERE uuid=?`
 const querySelectUserByID string = `SELECT * FROM user WHERE id=?`
 const querySelectUserByName string = `SELECT * FROM user WHERE name=?`
-const querySelectPosts string = `SELECT * FROM post`
 const querySelectSinglePost string = `SELECT * FROM post WHERE id=?`
-const querySelectUsers string = `SELECT * FROM user`
 const queryCreateUser string = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
 const queryCreateSession string = `INSERT INTO session (user_id, uuid) VALUES (?, ?)`
 const queryDeleteSessionsForUser string = `DELETE FROM session WHERE user_id=?`
@@ -114,6 +112,7 @@ const queryUpdateUser string = `UPDATE user SET name=?, email=?, postsPerPage=?,
 const queryGetPendingRollsForUser string = `SELECT * FROM roll WHERE user_id=? AND pending=1`
 const queryInsertPendingRoll string = `INSERT INTO roll (user_id, string, value) VALUES (?, ?, ?)`
 const querySavePendingRoll string = `UPDATE roll SET pending=0, post_id=? WHERE user_id=? AND pending=1`
-const querySelectSavedRolls string = `SELECT * FROM roll WHERE pending=0`
 const queryInvalidLogins string = `DELETE FROM session WHERE user_id=? AND uuid!=?`
 const queryGetAllSessions string = `SELECT * FROM session`
+const querySelectAllPostIDs string = `SELECT id FROM post`
+const querySelectRollsForPostID string = `SELECT * FROM roll WHERE post_id=?`

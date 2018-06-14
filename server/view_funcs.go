@@ -136,57 +136,15 @@ func login(data *loginData) (string, User, error) {
 	return uuid, u, nil
 }
 
-// getAllPosts pulls all the posts out of the database, copies them
-// each into a new struct, injecting the poster's name instead of
-// their id, ties in the rolls for that post, and returns the
-// resulting slide of structs.
-func getAllPosts() ([]formattedPost, error) {
-	posts := []Post{}
-	users := []User{}
-	rolls := []Roll{}
-	userMap := make(map[int]User)
-	rollMap := make(map[int][]Roll)
-	window := make(map[int]bool)
-	retVal := []formattedPost{}
+// getAllPostIDs returns a slice of all the database post IDs.
+func getAllPostIDs() ([]int, error) {
 	db := database()
 	defer db.Close()
-	if err := db.Select(&posts, querySelectPosts); err != nil {
+	ids := []int{}
+	if err := db.Select(&ids, querySelectAllPostIDs); err != nil {
 		return nil, err
 	}
-	if err := db.Select(&users, querySelectUsers); err != nil {
-		return nil, err
-	}
-	if err := db.Select(&rolls, querySelectSavedRolls); err != nil {
-		return nil, err
-	}
-	for _, u := range users {
-		userMap[u.ID] = u
-	}
-	for _, p := range posts {
-		for _, r := range rolls {
-			if r.PostID == p.ID {
-				rollMap[p.ID] = append(rollMap[p.ID], r)
-			}
-		}
-		if len(rollMap[p.ID]) == 0 {
-			rollMap[p.ID] = []Roll{}
-		} else {
-			injectD20Crits(rollMap[p.ID])
-		}
-		window[p.ID] = isPostWithinEditWindow(&p)
-	}
-	for _, p := range posts {
-		retVal = append(retVal, formattedPost{
-			ID:            p.ID,
-			Name:          userMap[p.UserID].Name,
-			Date:          p.Date,
-			Content:       p.Content,
-			Tag:           p.Tag,
-			Rolls:         rollMap[p.ID],
-			EditingWindow: window[p.ID],
-		})
-	}
-	return retVal, nil
+	return ids, nil
 }
 
 // createNewPost takes a struct of data and creates a new post by that
@@ -278,13 +236,41 @@ func addPendingDie(data *addRollData) ([]Roll, error) {
 	return getPendingDice(data.ID)
 }
 
-// getPostByID returns a single Post struct from the database by its id.
-func getPostByID(id int) (Post, error) {
+// getRawPostByID returns the post struct matching the id.
+func getRawPostByID(id int) (Post, error) {
 	db := database()
 	defer db.Close()
 	p := Post{}
 	err := db.Get(&p, querySelectSinglePost, id)
 	return p, err
+}
+
+// getPostByID returns a single Post struct from the database by its id.
+func getPostByID(id int) (formattedPost, error) {
+	db := database()
+	defer db.Close()
+	post := Post{}
+	rolls := []Roll{}
+	user := User{}
+	if err := db.Get(&post, querySelectSinglePost, id); err != nil {
+		return formattedPost{}, err
+	}
+	if err := db.Select(&rolls, querySelectRollsForPostID, id); err != nil {
+		return formattedPost{}, err
+	}
+	if err := db.Get(&user, querySelectUserByID, post.UserID); err != nil {
+		return formattedPost{}, err
+	}
+	injectD20Crits(rolls)
+	return formattedPost{
+		ID:            post.ID,
+		Name:          user.Name,
+		Date:          post.Date,
+		Content:       post.Content,
+		Tag:           post.Tag,
+		Rolls:         rolls,
+		EditingWindow: isPostWithinEditWindow(&post),
+	}, nil
 }
 
 // editPost takes data to modify the content of a post, and saves the

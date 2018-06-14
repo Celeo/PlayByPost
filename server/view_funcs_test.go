@@ -83,7 +83,7 @@ func TestLoginNoUser(t *testing.T) {
 	require.Empty(t, uuid)
 }
 
-func TestLoinWithUser(t *testing.T) {
+func TestLoginWithUser(t *testing.T) {
 	setDBToTest()
 	db := database()
 	defer db.Close()
@@ -98,23 +98,15 @@ func TestLoinWithUser(t *testing.T) {
 	require.NotEmpty(t, uuid, "UUID is blank")
 }
 
-func TestGetAllPostsNoPosts(t *testing.T) {
-	setDBToTest()
-	posts, err := getAllPosts()
-	require.Nil(t, err)
-	require.Empty(t, posts, "Magically found posts")
-}
-
-func TestGetAllPosts(t *testing.T) {
+func TestGetAllPostIDs(t *testing.T) {
 	setDBToTest()
 	db := database()
 	defer db.Close()
 	addTestUser(db)
 	addTestPost(db)
-	posts, err := getAllPosts()
+	ids, err := getAllPostIDs()
 	require.Nil(t, err)
-	require.Equal(t, len(posts), 1, "Incorrect number of posts returned")
-	require.Equal(t, posts[0].Name, "username")
+	require.Equal(t, ids, []int{1})
 }
 
 func TestCreatePost(t *testing.T) {
@@ -227,13 +219,12 @@ func TestSaveRollsOnPostCreate(t *testing.T) {
 		require.Equal(t, len(accum), i+1)
 	}
 	addTestPost(db)
-	posts, err := getAllPosts()
+	post, err := getPostByID(1)
 	require.Nil(t, err)
-	require.Equal(t, len(posts), 1)
-	for _, roll := range posts[0].Rolls {
+	for _, roll := range post.Rolls {
 		require.Equal(t, roll.Pending, false)
 	}
-	require.True(t, posts[0].EditingWindow)
+	require.True(t, post.EditingWindow)
 }
 
 func TestGetPostByID(t *testing.T) {

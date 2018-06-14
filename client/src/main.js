@@ -6,8 +6,11 @@ import router from './router'
 import store from './store'
 
 import 'vuetify/src/stylus/main.styl'
+import AsyncComputed from 'vue-async-computed'
 
 Vue.use(Vuetify)
+
+Vue.use(AsyncComputed)
 
 Vue.config.productionTip = false
 
