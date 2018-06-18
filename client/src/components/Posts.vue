@@ -79,7 +79,7 @@ export default {
       if (id in this.postMap) {
         return this.postMap[id]
       }
-      return axios.get(`${Vue.config.SERVER_URL}post/${id}`) // .then(res => res.dat)
+      return axios.get(`${Vue.config.SERVER_URL}post/${id}`)
     }
   },
   computed: {
@@ -115,7 +115,11 @@ export default {
           retPosts.push(post)
         }
       }
-      return retPosts.sort((a, b) => b.id - a.id)
+      retPosts = retPosts.sort((a, b) => b.id - a.id)
+      if (!this.newestAtTop) {
+        retPosts = retPosts.reverse()
+      }
+      return retPosts
     }
   },
   async created() {
