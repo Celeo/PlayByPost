@@ -283,7 +283,7 @@ func viewGetSinglePost(c *gin.Context) {
 	// If a post is no longer editable by users, it's highly unlikely that
 	// it's going to change, so add a caching header to the response.
 	if !post.EditingWindow {
-		c.Header("Cache-Control", "max-age=259200") // 3 days
+		c.Header("Cache-Control", "max-age=604800") // 7 days
 	}
 	c.JSON(http.StatusOK, post)
 }
