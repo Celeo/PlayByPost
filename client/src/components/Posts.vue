@@ -18,9 +18,9 @@
 </template>
 
 <script>
-import debounce from 'lodash/debounce'
-import Vue from 'vue'
 import axios from 'axios'
+import { getAxios, buildEndpoint } from '@/util'
+import debounce from 'lodash/debounce'
 import Editor from '@/components/Editor'
 import Roller from '@/components/Roller'
 import Post from '@/components/Post'
@@ -40,14 +40,13 @@ export default {
       error: null,
       currentPage: 1,
       postsPerPage: null,
-      newestAtTop: null,
-      handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
+      newestAtTop: null
     }
   },
   methods: {
     async loadPostIDs() {
       try {
-        const response = await axios.get(`${Vue.config.SERVER_URL}posts`)
+        const response = await axios.get(buildEndpoint('posts'))
         this.postIDs = response.data
         this.error = null
       } catch (err) {
@@ -59,7 +58,7 @@ export default {
     },
     async save() {
       try {
-        await this.handler.post(`${Vue.config.SERVER_URL}posts`, { content: this.newContent })
+        await getAxios(this).post(buildEndpoint('posts'), { content: this.newContent })
         this.error = null
         this.newContent = ''
         window.localStorage.removeItem('post')
@@ -79,7 +78,7 @@ export default {
       if (id in this.postMap) {
         return this.postMap[id]
       }
-      return axios.get(`${Vue.config.SERVER_URL}post/${id}`)
+      return axios.get(buildEndpoint(`post/${id}`))
     }
   },
   computed: {

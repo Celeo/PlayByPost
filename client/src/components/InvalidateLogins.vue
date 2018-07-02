@@ -7,27 +7,25 @@
     span.grey--text(v-if="isLoading") Loading...
     v-alert.mt-3.black--text(type="error" :value="true" v-if="!!error") {{ error }}
     v-alert.mt-3.black--text(type="info" :value="true" v-if="successful") Logins invalidated successfully
-    
+
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
+import { getAxios, buildEndpoint } from '@/util'
 
 export default {
   data() {
     return {
       isLoading: null,
       error: null,
-      successful: false,
-      handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
+      successful: false
     }
   },
   methods: {
     async invalidate() {
       this.isLoading = true
       try {
-        await this.handler.post(`${Vue.config.SERVER_URL}profile/invalidate`)
+        await getAxios(this).post(buildEndpoint('profile/invalidate'))
         this.successful = true
         this.error = null
       } catch (err) {

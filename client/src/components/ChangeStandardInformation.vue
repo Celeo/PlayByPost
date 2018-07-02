@@ -42,8 +42,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
+import { getAxios, buildEndpoint } from '@/util'
 
 export default {
   data() {
@@ -55,8 +54,7 @@ export default {
       tag: this.$store.getters.tag,
       isLoading: false,
       error: null,
-      successful: false,
-      handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
+      successful: false
     }
   },
   methods: {
@@ -70,7 +68,7 @@ export default {
           newestAtTop: this.newestAtTop,
           tag: this.tag
         }
-        const response = await this.handler.put(`${Vue.config.SERVER_URL}profile`, updateData)
+        const response = await getAxios(this).put(buildEndpoint('profile'), updateData)
         this.successful = true
         this.error = null
         this.$store.commit('UPDATE_DATA', response.data)
@@ -86,7 +84,7 @@ export default {
   },
   async created() {
     try {
-      const response = await this.handler.get(`${Vue.config.SERVER_URL}profile`)
+      const response = await getAxios(this).get(buildEndpoint('profile'))
       this.email = response.data.email
     } catch (err) {
       console.error(err)

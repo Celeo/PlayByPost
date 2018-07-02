@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import axios from 'axios'
+import { buildEndpoint } from '@/util'
 
 export default {
   data() {
@@ -55,7 +55,7 @@ export default {
       this.isLoading = true
       const data = { name: this.name, password: this.password, email: this.email, code: this.code }
       try {
-        const response = await axios.post(`${Vue.config.SERVER_URL}register`, data)
+        const response = await axios.post(buildEndpoint('register'), data)
         const { name, uuid } = response.data
         const payload = { name, uuid }
         this.$store.commit('LOG_IN', payload)

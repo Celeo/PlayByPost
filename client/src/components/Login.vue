@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import axios from 'axios'
+import { buildEndpoint } from '@/util'
 
 export default {
   data() {
@@ -44,7 +44,7 @@ export default {
       this.isLoading = true
       const data = { name: this.name, password: this.password }
       try {
-        const response = await axios.post(`${Vue.config.SERVER_URL}login`, data)
+        const response = await axios.post(buildEndpoint('login'), data)
         this.$store.commit('LOG_IN', response.data)
         window.localStorage.setItem('login', JSON.stringify(response.data))
         this.$router.push({ name: 'posts' })

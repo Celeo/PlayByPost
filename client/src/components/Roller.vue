@@ -29,9 +29,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
-import { formatRoll } from '@/util.js'
+import { getAxios, buildEndpoint, formatRoll } from '@/util.js'
 
 const formatDie = (die) => {
   let s = `${die.count}d${die.sides}`
@@ -56,8 +54,7 @@ export default {
           sides: 20,
           mod: 0
         }
-      ],
-      handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
+      ]
     }
   },
   computed: {
@@ -90,7 +87,7 @@ export default {
       this.rolling = true
       try {
         const roll = this.what + ': ' + this.dice.map(e => formatDie(e)).join(', ')
-        await this.handler.post(`${Vue.config.SERVER_URL}roll`, { roll })
+        await getAxios(this).post(buildEndpoint('roll'), { roll })
         await this.loadPendingDice()
       } catch (err) {
         console.error(err)
@@ -102,7 +99,7 @@ export default {
     },
     async loadPendingDice() {
       try {
-        const response = await this.handler.get(`${Vue.config.SERVER_URL}roll`)
+        const response = await getAxios(this).get(buildEndpoint('roll'))
         this.$store.commit('SET_PENDING_ROLLS', response.data)
       } catch (err) {
         console.error(err)

@@ -12,8 +12,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
+import { getAxios, buildEndpoint } from '@/util'
 import Editor from '@/components/Editor'
 
 const editWindowError = 'Post is outside of edit window and can no longer be edited'
@@ -27,14 +26,13 @@ export default {
       post: null,
       newContent: '',
       error: null,
-      saved: false,
-      handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
+      saved: false
     }
   },
   methods: {
     async loadData() {
       try {
-        const response = await this.handler.get(`${Vue.config.SERVER_URL}post/${this.$route.params.id}`)
+        const response = await getAxios(this).get(buildEndpoint(`post/${this.$route.params.id}`))
         this.post = response.data
         this.newContent = this.post.content
         this.error = null
@@ -49,7 +47,7 @@ export default {
     },
     async save() {
       try {
-        await this.handler.put(`${Vue.config.SERVER_URL}post/${this.$route.params.id}`, { content: this.newContent })
+        await getAxios(this).put(buildEndpoint(`post/${this.$route.params.id}`), { content: this.newContent })
         this.$router.push({})
         this.error = null
         this.saved = true

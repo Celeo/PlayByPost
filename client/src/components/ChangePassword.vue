@@ -23,8 +23,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import axios from 'axios'
+import { getAxios, buildEndpoint } from '@/util'
 
 const mismatch = 'Old password does not match'
 
@@ -35,8 +34,7 @@ export default {
       newPassword: '',
       isLoading: false,
       error: null,
-      successful: false,
-      handler: axios.create({ headers: { Authorization: this.$store.getters.uuid } })
+      successful: false
     }
   },
   computed: {
@@ -49,7 +47,7 @@ export default {
       this.isLoading = true
       const data = { old: this.oldPassword, new: this.newPassword }
       try {
-        await this.handler.put(`${Vue.config.SERVER_URL}profile/password`, data)
+        await getAxios(this).put(buildEndpoint('profile/password'), data)
         this.successful = true
         this.error = null
         this.oldPassword = ''
