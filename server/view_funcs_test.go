@@ -263,3 +263,38 @@ func TestClearLogins(t *testing.T) {
 	require.Equal(t, newSessions[0].ID, 1)
 	require.Equal(t, newSessions[0].UUID, savedUUID)
 }
+
+func TestSearchPosts(t *testing.T) {
+	setDBToTest()
+	db := database()
+	defer db.Close()
+	addTestUser(db)
+	addTestPost(db)
+	tests := []struct {
+		Needle string
+		Match  bool
+	}{
+		{
+			"cont",
+			true,
+		},
+		{
+			"foobar",
+			false,
+		},
+		{
+			"",
+			false,
+		},
+	}
+	for _, test := range tests {
+		p, e := searchPosts(test.Needle)
+		require.Nil(t, e)
+		require.NotNil(t, p)
+		if test.Match {
+			require.Equal(t, len(p), 1)
+		} else {
+			require.Equal(t, len(p), 0)
+		}
+	}
+}

@@ -28,7 +28,7 @@ export default {
       default: () => { console.error('Unimplemented editor save') }
     }
   },
-  data() {
+  data () {
     return {
       innerValue: this.value,
       toolbar: [
@@ -40,15 +40,15 @@ export default {
     }
   },
   computed: {
-    hasWrittenContent() {
+    hasWrittenContent () {
       return this.innerValue.length > 0 && this.innerValue !== '<p><br></p>'
     }
   },
   watch: {
-    innerValue(val) {
+    innerValue (val) {
       this.$emit('input', val)
     },
-    value(val) {
+    value (val) {
       this.innerValue = val
     }
   }

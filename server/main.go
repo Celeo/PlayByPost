@@ -30,6 +30,7 @@ func main() {
 	r.POST("/register", viewRegister)
 	r.GET("/posts", viewAllPostIDs)
 	r.POST("/posts", middlewareLoggedIn(), viewCreatePost)
+	r.POST("/posts/search/:needle", middlewareLoggedIn(), viewSearchPosts)
 	r.GET("/post/:id", viewGetSinglePost)
 	r.PUT("/post/:id", middlewareLoggedIn(), viewEditPost)
 	r.GET("/roll", middlewareLoggedIn(), viewGetPendingDice)
@@ -73,14 +74,12 @@ func middlewareLoggedIn() gin.HandlerFunc {
 	}
 }
 
-// endpoint: GET /
 func viewIndex(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Index page",
 	})
 }
 
-// endpoint: GET /register
 func viewRegister(c *gin.Context) {
 	data := registerData{}
 	if err := c.BindJSON(&data); err != nil {
@@ -103,7 +102,6 @@ func viewRegister(c *gin.Context) {
 	})
 }
 
-// endpoint: GET /login
 func viewLogin(c *gin.Context) {
 	data := loginData{}
 	if err := c.BindJSON(&data); err != nil {
@@ -127,7 +125,6 @@ func viewLogin(c *gin.Context) {
 	})
 }
 
-// endpoint: GET /post
 func viewAllPostIDs(c *gin.Context) {
 	ids, err := getAllPostIDs()
 	if err != nil {
@@ -140,7 +137,6 @@ func viewAllPostIDs(c *gin.Context) {
 	c.JSON(http.StatusOK, ids)
 }
 
-// endpoint: POST /post
 func viewCreatePost(c *gin.Context) {
 	data := newPostData{}
 	if err := c.BindJSON(&data); err != nil {
@@ -165,7 +161,16 @@ func viewCreatePost(c *gin.Context) {
 	})
 }
 
-// endpoint: GET /roll
+func viewSearchPosts(c *gin.Context) {
+	needle := c.Param("needle")
+	posts, err := searchPosts(needle)
+	if err != nil {
+		abortError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, posts)
+}
+
 func viewGetPendingDice(c *gin.Context) {
 	authID := c.GetInt(contextAuthID)
 	rolls, err := getPendingDice(authID)
@@ -179,7 +184,6 @@ func viewGetPendingDice(c *gin.Context) {
 	c.JSON(http.StatusOK, rolls)
 }
 
-// endpoint: POST /roll
 func viewRollDice(c *gin.Context) {
 	data := addRollData{}
 	if err := c.BindJSON(&data); err != nil {
@@ -197,7 +201,6 @@ func viewRollDice(c *gin.Context) {
 	c.JSON(http.StatusOK, rolls)
 }
 
-// endpoint: GET /profile
 func viewGetProfile(c *gin.Context) {
 	u, err := getUserByID(c.GetInt(contextAuthID))
 	if err != nil {
@@ -210,7 +213,6 @@ func viewGetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, u)
 }
 
-// endpoint: PUT /profile
 func viewUpdateUser(c *gin.Context) {
 	data := updateUserData{}
 	if err := c.ShouldBindWith(&data, binding.JSON); err != nil {
@@ -226,7 +228,6 @@ func viewUpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, u)
 }
 
-// endpoint: PUT /profile/password
 func viewChangePassword(c *gin.Context) {
 	data := newPasswordData{}
 	if err := c.BindJSON(&data); err != nil {
@@ -244,7 +245,6 @@ func viewChangePassword(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// endpoint: POST /profile/invalidate
 func viewInvalidLogins(c *gin.Context) {
 	data := invalidLoginsData{
 		ID:   c.GetInt(contextAuthID),
@@ -261,7 +261,6 @@ func viewInvalidLogins(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// endpoint: GET /post/:id
 func viewGetSinglePost(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -288,7 +287,6 @@ func viewGetSinglePost(c *gin.Context) {
 	c.JSON(http.StatusOK, post)
 }
 
-// endpoint: PUT /post/:id
 func viewEditPost(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

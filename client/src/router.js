@@ -8,6 +8,7 @@ import Profile from '@/components/Profile'
 import Register from '@/components/Register'
 import Help from '@/components/Help'
 import EditPost from '@/components/EditPost'
+import Search from '@/components/Search'
 
 import store from './store'
 
@@ -49,6 +50,11 @@ const router = new Router({
       path: '/edit/:id',
       component: EditPost,
       name: 'edit'
+    },
+    {
+      path: '/search',
+      component: Search,
+      name: 'search'
     },
     {
       path: '/last',

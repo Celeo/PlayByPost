@@ -18,8 +18,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { getAxios, buildEndpoint } from '@/util'
+import API from '@/api'
 import debounce from 'lodash/debounce'
 import Editor from '@/components/Editor'
 import Roller from '@/components/Roller'
@@ -31,7 +30,7 @@ export default {
     Roller,
     Post
   },
-  data() {
+  data () {
     return {
       newContent: '',
       postIDs: [],
@@ -44,9 +43,9 @@ export default {
     }
   },
   methods: {
-    async loadPostIDs() {
+    async loadPostIDs () {
       try {
-        const response = await axios.get(buildEndpoint('posts'))
+        const response = await new API(this).getAllPostIDs()
         this.postIDs = response.data
         this.error = null
       } catch (err) {
@@ -56,9 +55,9 @@ export default {
         this.isLoading = false
       }
     },
-    async save() {
+    async save () {
       try {
-        await getAxios(this).post(buildEndpoint('posts'), { content: this.newContent })
+        await new API(this).saveNewPost(this.newContent)
         this.error = null
         this.newContent = ''
         window.localStorage.removeItem('post')
@@ -74,23 +73,23 @@ export default {
         this.error = 'Error saving new post'
       }
     },
-    getPost(id) {
+    getPost (id) {
       if (id in this.postMap) {
         return this.postMap[id]
       }
-      return axios.get(buildEndpoint(`post/${id}`))
+      return new API(this).getSinglePost(id)
     }
   },
   computed: {
-    paginationLength() {
+    paginationLength () {
       return Math.ceil(this.postIDs.length / this.postsPerPage)
     },
-    paginationButtonCount() {
+    paginationButtonCount () {
       return screen.width < 1000 ? 5 : 7
     }
   },
   asyncComputed: {
-    async postsInThisPage() {
+    async postsInThisPage () {
       let retIds = Object.values(this.postIDs).slice()
       if (this.newestAtTop) {
         retIds = retIds.reverse()
@@ -121,7 +120,7 @@ export default {
       return retPosts
     }
   },
-  async created() {
+  async created () {
     if (this.$store.getters.isLoggedIn) {
       this.postsPerPage = this.$store.getters.postsPerPage
       this.newestAtTop = this.$store.getters.newestAtTop
@@ -130,7 +129,7 @@ export default {
       this.newestAtTop = false
     }
   },
-  async mounted() {
+  async mounted () {
     await this.loadPostIDs()
     const postAttempt = window.localStorage.getItem('post')
     if (postAttempt) {

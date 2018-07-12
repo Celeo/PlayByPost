@@ -23,12 +23,12 @@
 </template>
 
 <script>
-import { getAxios, buildEndpoint } from '@/util'
+import API from '@/api'
 
 const mismatch = 'Old password does not match'
 
 export default {
-  data() {
+  data () {
     return {
       oldPassword: '',
       newPassword: '',
@@ -38,16 +38,15 @@ export default {
     }
   },
   computed: {
-    isValid() {
+    isValid () {
       return this.oldPassword !== '' && this.newPassword !== ''
     }
   },
   methods: {
-    async submit() {
+    async submit () {
       this.isLoading = true
-      const data = { old: this.oldPassword, new: this.newPassword }
       try {
-        await getAxios(this).put(buildEndpoint('profile/password'), data)
+        await new API(this).setPassword(this.oldPassword, this.newPassword)
         this.successful = true
         this.error = null
         this.oldPassword = ''

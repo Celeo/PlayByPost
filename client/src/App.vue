@@ -7,6 +7,11 @@
             v-icon fa-book
           v-list-tile-content
             v-list-tile-title Posts
+        v-list-tile(:exact="true" :to="{ name: 'search' }" v-if="loggedIn")
+          v-list-tile-action
+            v-icon fa-search
+          v-list-tile-content
+            v-list-tile-title Search
         v-list-tile(:exact="true" :to="{ name: 'help' }")
           v-list-tile-action
             v-icon fa-question
@@ -52,16 +57,16 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
       drawer: false
     }
   },
   computed: {
-    loggedIn() {
+    loggedIn () {
       return this.$store.getters.isLoggedIn
     },
-    username() {
+    username () {
       return this.$store.getters.name
     }
   }

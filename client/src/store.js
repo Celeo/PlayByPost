@@ -14,7 +14,7 @@ const state = {
 }
 
 const mutations = {
-  LOG_IN(state, payload) {
+  LOG_IN (state, payload) {
     const { uuid, name, postsPerPage, newestAtTop, tag } = payload
     state.name = name
     state.postsPerPage = postsPerPage
@@ -25,7 +25,7 @@ const mutations = {
     state.tag = tag
   },
 
-  LOG_OUT(state) {
+  LOG_OUT (state) {
     state.name = null
     state.postsPerPage = null
     state.newestAtTop = null
@@ -35,7 +35,7 @@ const mutations = {
     state.tag = null
   },
 
-  UPDATE_DATA(state, payload) {
+  UPDATE_DATA (state, payload) {
     const { name, postsPerPage, newestAtTop, tag } = payload
     state.name = name
     state.postsPerPage = postsPerPage
@@ -43,49 +43,49 @@ const mutations = {
     state.tag = tag
   },
 
-  SET_PENDING_ROLLS(state, rolls) {
+  SET_PENDING_ROLLS (state, rolls) {
     state.pendingRolls = rolls
   },
 
-  CLEAR_PENDING_ROLLS(state) {
+  CLEAR_PENDING_ROLLS (state) {
     state.pendingRolls = []
   },
 
-  SET_GO_TO_LAST_PAGE(state, go) {
+  SET_GO_TO_LAST_PAGE (state, go) {
     state.goToLastPage = go
   }
 }
 
 const getters = {
-  isLoggedIn(state) {
+  isLoggedIn (state) {
     return !!state.uuid && !!state.name
   },
 
-  uuid(state) {
+  uuid (state) {
     return state.uuid
   },
 
-  name(state) {
+  name (state) {
     return state.name
   },
 
-  postsPerPage(state) {
+  postsPerPage (state) {
     return state.postsPerPage
   },
 
-  newestAtTop(state) {
+  newestAtTop (state) {
     return state.newestAtTop
   },
 
-  tag(state) {
+  tag (state) {
     return state.tag
   },
 
-  pendingRolls(state) {
+  pendingRolls (state) {
     return state.pendingRolls
   },
 
-  goToLastPage(state) {
+  goToLastPage (state) {
     return state.goToLastPage
   }
 }

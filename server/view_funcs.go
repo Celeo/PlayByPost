@@ -4,6 +4,8 @@ import (
 	"errors"
 	"os"
 	"strconv"
+
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 // registerData is data required for creating a new user.
@@ -290,4 +292,24 @@ func clearLogins(data *invalidLoginsData) error {
 	defer db.Close()
 	_, err := db.Exec(queryInvalidLogins, data.ID, data.UUID)
 	return err
+}
+
+// Returns an array of all post ids that match the fuzzy search content string.
+func searchPosts(needle string) ([]int, error) {
+	allPosts := []Post{}
+	retPosts := make([]int, 0)
+	if len(needle) == 0 {
+		return retPosts, nil
+	}
+	db := database()
+	defer db.Close()
+	if err := db.Select(&allPosts, querySelectAllPosts); err != nil {
+		return retPosts, err
+	}
+	for _, post := range allPosts {
+		if fuzzy.Match(needle, post.Content) {
+			retPosts = append(retPosts, post.ID)
+		}
+	}
+	return retPosts, nil
 }

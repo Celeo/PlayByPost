@@ -42,10 +42,10 @@
 </template>
 
 <script>
-import { getAxios, buildEndpoint } from '@/util'
+import API from '@/api'
 
 export default {
-  data() {
+  data () {
     return {
       name: this.$store.getters.name,
       email: '',
@@ -58,22 +58,23 @@ export default {
     }
   },
   methods: {
-    async submit() {
+    async submit () {
       this.isLoading = true
       try {
-        let updateData = {
+        const response = await new API(this).saveStandardInformation(
+          this.name, this.email, this.postsPerPage.toString(), this.newestAtTop, this.tag
+        )
+        this.successful = true
+        this.error = null
+        this.$store.commit('UPDATE_DATA', response.data)
+        window.localStorage.setItem('login', JSON.stringify({
           name: this.name,
           email: this.email,
           postsPerPage: this.postsPerPage.toString(),
           newestAtTop: this.newestAtTop,
-          tag: this.tag
-        }
-        const response = await getAxios(this).put(buildEndpoint('profile'), updateData)
-        this.successful = true
-        this.error = null
-        this.$store.commit('UPDATE_DATA', response.data)
-        updateData['uuid'] = this.$store.getters.uuid
-        window.localStorage.setItem('login', JSON.stringify(updateData))
+          tag: this.tag,
+          uuid: this.$store.getters.uuid
+        }))
       } catch (err) {
         console.error(err)
         this.error = 'Could not change information'
@@ -82,9 +83,9 @@ export default {
       }
     }
   },
-  async created() {
+  async created () {
     try {
-      const response = await getAxios(this).get(buildEndpoint('profile'))
+      const response = await new API(this).getEmail()
       this.email = response.data.email
     } catch (err) {
       console.error(err)

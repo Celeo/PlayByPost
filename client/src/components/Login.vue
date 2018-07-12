@@ -21,11 +21,10 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { buildEndpoint } from '@/util'
+import API from '@/api'
 
 export default {
-  data() {
+  data () {
     return {
       name: '',
       password: '',
@@ -35,16 +34,15 @@ export default {
     }
   },
   computed: {
-    isValid() {
+    isValid () {
       return this.name !== '' && this.password !== ''
     }
   },
   methods: {
-    async submit() {
+    async submit () {
       this.isLoading = true
-      const data = { name: this.name, password: this.password }
       try {
-        const response = await axios.post(buildEndpoint('login'), data)
+        const response = await new API(this).login(this.name, this.password)
         this.$store.commit('LOG_IN', response.data)
         window.localStorage.setItem('login', JSON.stringify(response.data))
         this.$router.push({ name: 'posts' })

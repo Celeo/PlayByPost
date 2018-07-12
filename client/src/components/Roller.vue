@@ -29,7 +29,8 @@
 </template>
 
 <script>
-import { getAxios, buildEndpoint, formatRoll } from '@/util.js'
+import API from '@/api'
+import { formatRoll } from '@/util.js'
 
 const formatDie = (die) => {
   let s = `${die.count}d${die.sides}`
@@ -43,7 +44,7 @@ const formatDie = (die) => {
 }
 
 export default {
-  data() {
+  data () {
     return {
       rolling: false,
       error: false,
@@ -58,7 +59,7 @@ export default {
     }
   },
   computed: {
-    valid() {
+    valid () {
       if (this.what === '') {
         return false
       }
@@ -69,25 +70,24 @@ export default {
       }
       return true
     },
-    rolled() {
+    rolled () {
       return this.$store.getters.pendingRolls
     }
   },
   methods: {
-    addRow() {
+    addRow () {
       this.dice.push({ count: 1, sides: 20, mod: 0 })
     },
-    removeRow(index) {
+    removeRow (index) {
       this.dice.splice(index, 1)
     },
-    async roll() {
+    async roll () {
       if (this.rolling) {
         return
       }
       this.rolling = true
       try {
-        const roll = this.what + ': ' + this.dice.map(e => formatDie(e)).join(', ')
-        await getAxios(this).post(buildEndpoint('roll'), { roll })
+        await new API(this).rollDice(this.what + ': ' + this.dice.map(e => formatDie(e)).join(', '))
         await this.loadPendingDice()
       } catch (err) {
         console.error(err)
@@ -97,9 +97,9 @@ export default {
       this.dice = [{ count: 1, sides: 20, mod: 0 }]
       this.rolling = false
     },
-    async loadPendingDice() {
+    async loadPendingDice () {
       try {
-        const response = await getAxios(this).get(buildEndpoint('roll'))
+        const response = await new API(this).getPendingDice()
         this.$store.commit('SET_PENDING_ROLLS', response.data)
       } catch (err) {
         console.error(err)
@@ -108,11 +108,11 @@ export default {
     }
   },
   filters: {
-    filterRoll(roll) {
+    filterRoll (roll) {
       return formatRoll(roll)
     }
   },
-  async created() {
+  async created () {
     await this.loadPendingDice()
   }
 }

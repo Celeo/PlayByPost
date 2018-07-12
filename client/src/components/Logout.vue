@@ -5,7 +5,7 @@
 
 <script>
 export default {
-  created() {
+  created () {
     this.$store.commit('LOG_OUT')
     window.localStorage.removeItem('login')
     setInterval(() => {

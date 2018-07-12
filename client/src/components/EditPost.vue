@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { getAxios, buildEndpoint } from '@/util'
+import API from '@/api'
 import Editor from '@/components/Editor'
 
 const editWindowError = 'Post is outside of edit window and can no longer be edited'
@@ -21,7 +21,7 @@ export default {
   components: {
     Editor
   },
-  data() {
+  data () {
     return {
       post: null,
       newContent: '',
@@ -30,9 +30,9 @@ export default {
     }
   },
   methods: {
-    async loadData() {
+    async loadData () {
       try {
-        const response = await getAxios(this).get(buildEndpoint(`post/${this.$route.params.id}`))
+        const response = await new API(this).getSinglePost(this.$route.params.id)
         this.post = response.data
         this.newContent = this.post.content
         this.error = null
@@ -45,9 +45,9 @@ export default {
         }
       }
     },
-    async save() {
+    async save () {
       try {
-        await getAxios(this).put(buildEndpoint(`post/${this.$route.params.id}`), { content: this.newContent })
+        await new API(this).setPostContent(this.$route.params.id, this.newContent)
         this.$router.push({})
         this.error = null
         this.saved = true
@@ -61,7 +61,7 @@ export default {
       }
     }
   },
-  async created() {
+  async created () {
     await this.loadData()
   }
 }

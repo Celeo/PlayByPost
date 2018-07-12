@@ -11,10 +11,10 @@
 </template>
 
 <script>
-import { getAxios, buildEndpoint } from '@/util'
+import API from '@/api'
 
 export default {
-  data() {
+  data () {
     return {
       isLoading: null,
       error: null,
@@ -22,10 +22,10 @@ export default {
     }
   },
   methods: {
-    async invalidate() {
+    async invalidate () {
       this.isLoading = true
       try {
-        await getAxios(this).post(buildEndpoint('profile/invalidate'))
+        await new API(this).invalidateLogins()
         this.successful = true
         this.error = null
       } catch (err) {

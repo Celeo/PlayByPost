@@ -19,7 +19,6 @@ You can use `npm i(nstall)` instead of `yarn` if you don't use yarn.
 Back-end:
 
 ```bash
-cd server
 for p in \
         github.com/gin-gonic/gin \
         github.com/itsjamie/gin-cors \
@@ -27,7 +26,8 @@ for p in \
         github.com/nu7hatch/gouuid \
         golang.org/x/crypto/bcrypt \
         github.com/mattn/go-sqlite3 \
-        github.com/stretchr/testify
+        github.com/stretchr/testify \
+        github.com/lithammer/fuzzysearch
     do
     go get $p
 done

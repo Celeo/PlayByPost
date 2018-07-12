@@ -25,12 +25,12 @@ export default {
     'post'
   ],
   computed: {
-    name() {
+    name () {
       return this.$store.getters.name
     }
   },
   filters: {
-    filterRoll(roll) {
+    filterRoll (roll) {
       return formatRoll(roll)
     }
   }
