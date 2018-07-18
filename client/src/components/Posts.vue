@@ -4,7 +4,7 @@
       div(v-if="postIDs && postIDs.length > 0")
         div.text-xs-center(v-if="postIDs.length > postsPerPage")
           v-pagination.mb-2(:length="paginationLength" v-model="currentPage" :total-visible="paginationButtonCount" circle)
-        post(v-for="post in postsInThisPage" :key="post.id" :post="post")
+        post(v-for="id in postsInThisPage" :key="id" :id="id")
       div(v-else)
         h1 No posts have been made
       div.mt-5
@@ -34,7 +34,6 @@ export default {
     return {
       newContent: '',
       postIDs: [],
-      postMap: {},
       isLoading: true,
       error: null,
       currentPage: 1,
@@ -72,12 +71,6 @@ export default {
         console.error(err)
         this.error = 'Error saving new post'
       }
-    },
-    getPost (id) {
-      if (id in this.postMap) {
-        return this.postMap[id]
-      }
-      return new API(this).getSinglePost(id)
     }
   },
   computed: {
@@ -95,29 +88,7 @@ export default {
         retIds = retIds.reverse()
       }
       retIds = retIds.slice((this.currentPage - 1) * this.postsPerPage, this.currentPage * this.postsPerPage)
-      let retPosts = []
-      let promises = []
-      for (let id of retIds) {
-        const res = this.getPost(id)
-        if (typeof res.then === 'function') {
-          promises.push(res)
-        } else {
-          retPosts.push(res)
-        }
-      }
-      if (promises.length > 0) {
-        const postPromises = await Promise.all(promises)
-        for (let promise of postPromises) {
-          const post = promise.data
-          this.postMap[post.id] = post
-          retPosts.push(post)
-        }
-      }
-      retPosts = retPosts.sort((a, b) => b.id - a.id)
-      if (!this.newestAtTop) {
-        retPosts = retPosts.reverse()
-      }
-      return retPosts
+      return retIds
     }
   },
   async created () {

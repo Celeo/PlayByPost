@@ -1,5 +1,5 @@
 <template lang="pug">
-  div
+  div(v-if="loaded")
     v-card.elevation-5(light)
       div.clearfix.purple--text.text--darken-3
         h3.go-left {{ post.name }}
@@ -18,12 +18,19 @@
 </template>
 
 <script>
+import API from '@/api'
 import { formatRoll } from '@/util.js'
 
 export default {
   props: [
-    'post'
+    'id'
   ],
+  data () {
+    return {
+      loaded: false,
+      post: null
+    }
+  },
   computed: {
     name () {
       return this.$store.getters.name
@@ -32,6 +39,15 @@ export default {
   filters: {
     filterRoll (roll) {
       return formatRoll(roll)
+    }
+  },
+  async created () {
+    try {
+      const response = await new API(this).getSinglePost(this.id)
+      this.post = response.data
+      this.loaded = true
+    } catch (error) {
+      console.log(error)
     }
   }
 }
