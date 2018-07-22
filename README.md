@@ -26,7 +26,8 @@ for p in \
         github.com/nu7hatch/gouuid \
         golang.org/x/crypto/bcrypt \
         github.com/mattn/go-sqlite3 \
-        github.com/stretchr/testify
+        github.com/stretchr/testify \
+        golang.org/x/text/search
     do
     go get $p
 done

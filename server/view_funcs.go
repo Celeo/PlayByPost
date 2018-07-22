@@ -4,7 +4,9 @@ import (
 	"errors"
 	"os"
 	"strconv"
-	"strings"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/search"
 )
 
 // registerData is data required for creating a new user.
@@ -295,6 +297,7 @@ func clearLogins(data *invalidLoginsData) error {
 
 // Returns an array of all post ids that match the fuzzy search content string.
 func searchPosts(needle string) ([]int, error) {
+	se := search.New(language.English, search.IgnoreCase)
 	allPosts := []Post{}
 	retPosts := make([]int, 0)
 	if len(needle) == 0 {
@@ -306,7 +309,7 @@ func searchPosts(needle string) ([]int, error) {
 		return retPosts, err
 	}
 	for _, post := range allPosts {
-		if strings.Contains(post.Content, needle) {
+		if iS, iE := se.IndexString(post.Content, needle); iS != -1 && iE != -1 {
 			retPosts = append(retPosts, post.ID)
 		}
 	}

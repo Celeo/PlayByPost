@@ -279,6 +279,10 @@ func TestSearchPosts(t *testing.T) {
 			true,
 		},
 		{
+			"CONT",
+			true,
+		},
+		{
 			"foobar",
 			false,
 		},
