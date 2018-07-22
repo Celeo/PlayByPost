@@ -290,7 +290,6 @@ func TestSearchPosts(t *testing.T) {
 	for _, test := range tests {
 		p, e := searchPosts(test.Needle)
 		require.Nil(t, e)
-		require.NotNil(t, p)
 		if test.Match {
 			require.Equal(t, len(p), 1)
 		} else {

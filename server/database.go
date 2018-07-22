@@ -102,7 +102,7 @@ const querySelectSessionByUUID string = `SELECT * FROM session WHERE uuid=?`
 const querySelectUserByID string = `SELECT * FROM user WHERE id=?`
 const querySelectUserByName string = `SELECT * FROM user WHERE name=?`
 const querySelectSinglePost string = `SELECT * FROM post WHERE id=?`
-const querySelectAllPosts string = `SELECT * FROM post`
+const querySelectAllPosts string = `SELECT id, content FROM post`
 const queryCreateUser string = `INSERT INTO user (name, password, email) VALUES (?, ?, ?)`
 const queryCreateSession string = `INSERT INTO session (user_id, uuid) VALUES (?, ?)`
 const queryDeleteSessionsForUser string = `DELETE FROM session WHERE user_id=?`

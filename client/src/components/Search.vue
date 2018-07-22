@@ -10,16 +10,19 @@
       )
       v-btn(@click="submit" :disabled="!validSearch || isLoading" color="primary") Submit
     div.results(v-show="hasResults")
-      div(v-for="post in matches" :key="post.id")
-        p {{ post.id }}
+      post(v-for="id in matchingIds" :key="id" :id="id")
     div(v-if="error")
       v-alert.mt-3.black--text(type="error" :value="true") {{ error }}
 </template>
 
 <script>
 import API from '@/api'
+import Post from '@/components/Post'
 
 export default {
+  components: {
+    Post
+  },
   data () {
     return {
       term: '',
@@ -56,30 +59,6 @@ export default {
     },
     hasResults () {
       return this.matchingIds.length > 0
-    }
-  },
-  asyncComputed: {
-    async matches () {
-      let retPosts = []
-      let promises = []
-      for (let id of this.matchingIds) {
-        const res = this.getPost(id)
-        if (typeof res.then === 'function') {
-          promises.push(res)
-        } else {
-          retPosts.push(res)
-        }
-      }
-      if (promises.length > 0) {
-        const postPromies = await Promise.all(promises)
-        for (let promise of postPromies) {
-          const post = promise.data
-          this.postMap[post.id] = post
-          retPosts.push(post)
-        }
-      }
-      retPosts = retPosts.sort((a, b) => b.id - a.id)
-      return retPosts
     }
   }
 }

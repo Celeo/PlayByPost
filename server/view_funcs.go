@@ -4,8 +4,7 @@ import (
 	"errors"
 	"os"
 	"strconv"
-
-	"github.com/lithammer/fuzzysearch/fuzzy"
+	"strings"
 )
 
 // registerData is data required for creating a new user.
@@ -307,7 +306,7 @@ func searchPosts(needle string) ([]int, error) {
 		return retPosts, err
 	}
 	for _, post := range allPosts {
-		if fuzzy.Match(needle, post.Content) {
+		if strings.Contains(post.Content, needle) {
 			retPosts = append(retPosts, post.ID)
 		}
 	}
