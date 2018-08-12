@@ -301,3 +301,24 @@ func TestSearchPosts(t *testing.T) {
 		}
 	}
 }
+
+func TestGlossary(t *testing.T) {
+	setDBToTest()
+	db := database()
+	defer db.Close()
+	s := "some data"
+	g, e := getGlossary()
+	require.Nil(t, e)
+	require.NotNil(t, g)
+	require.Empty(t, g.Content)
+	require.Empty(t, g.Date)
+	data := glossaryData{
+		Content: s,
+	}
+	e = changeGlossary(&data)
+	require.Nil(t, e)
+	g, e = getGlossary()
+	require.Nil(t, e)
+	require.Equal(t, g.Content, s)
+	require.NotEmpty(t, g.Date)
+}

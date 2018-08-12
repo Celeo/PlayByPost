@@ -39,6 +39,8 @@ func main() {
 	r.PUT("/profile", middlewareLoggedIn(), viewUpdateUser)
 	r.PUT("/profile/password", middlewareLoggedIn(), viewChangePassword)
 	r.POST("/profile/invalidate", middlewareLoggedIn(), viewInvalidLogins)
+	r.GET("/glossary", viewGlossary)
+	r.PUT("/glossary", middlewareLoggedIn(), viewChangeGlossary)
 
 	r.Run(":5000")
 }
@@ -321,6 +323,30 @@ func viewEditPost(c *gin.Context) {
 			"message": "Could not save the modified post",
 			"error":   err.Error(),
 		})
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func viewGlossary(c *gin.Context) {
+	glossary, err := getGlossary()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Could not get glosary",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, glossary)
+}
+
+func viewChangeGlossary(c *gin.Context) {
+	data := glossaryData{}
+	if err := c.BindJSON(&data); err != nil {
+		return
+	}
+	if err := changeGlossary(&data); err != nil {
+		abortError(c, err)
 		return
 	}
 	c.Status(http.StatusOK)

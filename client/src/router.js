@@ -9,6 +9,7 @@ import Register from '@/components/Register'
 import Help from '@/components/Help'
 import EditPost from '@/components/EditPost'
 import Search from '@/components/Search'
+import Glossary from '@/components/Glossary'
 
 import store from './store'
 
@@ -55,6 +56,11 @@ const router = new Router({
       path: '/search',
       component: Search,
       name: 'search'
+    },
+    {
+      path: '/glossary',
+      component: Glossary,
+      name: 'glossary'
     },
     {
       path: '/last',

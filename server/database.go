@@ -64,6 +64,13 @@ type Roll struct {
 	IsD20Crit bool   `db:"-" json:"crit"`
 }
 
+// A Glossary is a DM scratchpad
+type Glossary struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+	Date    string `json:"date"`
+}
+
 const queryCreateTables = `
 CREATE TABLE IF NOT EXISTS "user" (
 	id INTEGER PRIMARY KEY,
@@ -97,6 +104,12 @@ CREATE TABLE IF NOT EXISTS "roll" (
 	string TEXT NOT NULL DEFAULT '',
 	value INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS "glossary" (
+	id INTEGER PRIMARY KEY,
+	content TEXT NOT NULL DEFAULT '',
+	date TEXT NOT NULL
+);
 `
 const querySelectSessionByUUID string = `SELECT * FROM session WHERE uuid=?`
 const querySelectUserByID string = `SELECT * FROM user WHERE id=?`
@@ -117,3 +130,5 @@ const queryInvalidLogins string = `DELETE FROM session WHERE user_id=? AND uuid!
 const queryGetAllSessions string = `SELECT * FROM session`
 const querySelectAllPostIDs string = `SELECT id FROM post`
 const querySelectRollsForPostID string = `SELECT * FROM roll WHERE post_id=?`
+const queryGetGlossary string = `SELECT * FROM glossary ORDER BY id DESC LIMIT 1`
+const queryAddGlossary string = `INSERT INTO glossary (content, date) VALUES (?, ?)`

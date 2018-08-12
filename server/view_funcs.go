@@ -77,6 +77,11 @@ type invalidLoginsData struct {
 	UUID string
 }
 
+// glossaryData is data required for updating the glossary.
+type glossaryData struct {
+	Content string `json:"content"`
+}
+
 // registerNewAccount takes a struct of data and creates a new user
 // account so long as one with the same name does not already exist.
 func registerNewAccount(data *registerData) (string, User, error) {
@@ -295,7 +300,7 @@ func clearLogins(data *invalidLoginsData) error {
 	return err
 }
 
-// Returns an array of all post ids that match the fuzzy search content string.
+// searchPosts returns an array of all post ids that match the fuzzy search content string.
 func searchPosts(needle string) ([]int, error) {
 	se := search.New(language.English, search.IgnoreCase)
 	allPosts := []Post{}
@@ -314,4 +319,26 @@ func searchPosts(needle string) ([]int, error) {
 		}
 	}
 	return retPosts, nil
+}
+
+// getGlossary returns the glossary data.
+func getGlossary() (Glossary, error) {
+	glossary := []Glossary{}
+	db := database()
+	defer db.Close()
+	if err := db.Select(&glossary, queryGetGlossary); err != nil {
+		return Glossary{}, err
+	}
+	if len(glossary) == 0 {
+		return Glossary{}, nil
+	}
+	return glossary[0], nil
+}
+
+// changeGlossary allows changing the glossary data.
+func changeGlossary(data *glossaryData) error {
+	db := database()
+	defer db.Close()
+	_, err := db.Exec(queryAddGlossary, data.Content, timestamp())
+	return err
 }

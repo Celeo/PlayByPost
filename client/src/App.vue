@@ -12,6 +12,11 @@
             v-icon fa-search
           v-list-tile-content
             v-list-tile-title Search
+        v-list-tile(:exact="true" :to="{ name: 'glossary' }")
+          v-list-tile-action
+            v-icon fa-user
+          v-list-tile-content
+            v-list-tile-title Glossay
         v-list-tile(:exact="true" :to="{ name: 'help' }")
           v-list-tile-action
             v-icon fa-question
@@ -98,4 +103,10 @@ export default {
 
 .container
   padding 10px
+
+.pad-bottom
+  padding-bottom 2rem
+
+.text-block
+  font-size 120%
 </style>

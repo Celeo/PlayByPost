@@ -1,5 +1,5 @@
 <template lang="pug">
-  div
+  div.text-block
     h2.mb-4 How to use this site
     p.
       Welcome to this <strong>Play by Post</strong> web app. It's used to play RPGs in a <i>post-by-post</i> format: each

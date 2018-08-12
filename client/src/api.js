@@ -68,4 +68,12 @@ export default class {
   rollDice (roll) {
     return this._axios.post(buildEndpoint('roll'), { roll })
   }
+
+  getGlossary () {
+    return this._axios.get(buildEndpoint('glossary'))
+  }
+
+  changeGlosary (content) {
+    return this._axios.put(buildEndpoint('glossary'), { content })
+  }
 }

@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    h1.display-2 Search
+    h1.display-2.pad-bottom Search
     p Type the words you're searching for in the box below (minimum 3 letters), and click the button.
     v-form(@submit.prevent="submit")
       v-text-field(
