@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     h1.display-2.pad-bottom Glossary
-    div(v-if="loaded && !error")
+    div(v-if="loaded")
       div(v-if="glossary.content")
         div.text-block(v-html="glossary.content")
       p(v-else) There's nothing here.
@@ -47,11 +47,11 @@ export default {
         const response = await new API(this).getGlossary()
         this.glossary = response.data
         this.newContent = this.glossary.content
+        this.error = null
+        this.loaded = true
       } catch (error) {
         console.log(error)
         this.error = 'Could not load glossary'
-      } finally {
-        this.loaded = true
       }
     }
   },
