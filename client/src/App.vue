@@ -16,7 +16,7 @@
           v-list-tile-action
             v-icon fa-user
           v-list-tile-content
-            v-list-tile-title Glossay
+            v-list-tile-title Glossary
         v-list-tile(:exact="true" :to="{ name: 'help' }")
           v-list-tile-action
             v-icon fa-question
