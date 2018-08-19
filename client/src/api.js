@@ -38,7 +38,7 @@ export default class {
   }
 
   setPostContent (id, content) {
-    return this._axios.post(buildEndpoint(`post/${id}`), { content })
+    return this._axios.put(buildEndpoint(`post/${id}`), { content })
   }
 
   invalidateLogins () {
