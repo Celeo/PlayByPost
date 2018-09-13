@@ -27,7 +27,8 @@ for p in \
         golang.org/x/crypto/bcrypt \
         github.com/mattn/go-sqlite3 \
         github.com/stretchr/testify \
-        golang.org/x/text/search
+        golang.org/x/text/search \
+        github.com/foolin/gin-template
     do
     go get $p
 done

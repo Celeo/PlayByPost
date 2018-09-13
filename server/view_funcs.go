@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"html/template"
 	"os"
 	"strconv"
 
@@ -26,13 +27,13 @@ type loginData struct {
 // formattedPost is a processed Post struct, suitable
 // for handing off to the front-end to show to the user.
 type formattedPost struct {
-	ID            int    `json:"id"`
-	Name          string `json:"name"`
-	Date          string `json:"date"`
-	Tag           string `json:"tag"`
-	Content       string `json:"content"`
-	Rolls         []Roll `json:"rolls"`
-	EditingWindow bool   `json:"canEdit"`
+	ID            int           `json:"id"`
+	Name          string        `json:"name"`
+	Date          string        `json:"date"`
+	Tag           string        `json:"tag"`
+	Content       template.HTML `json:"content"`
+	Rolls         []Roll        `json:"rolls"`
+	EditingWindow bool          `json:"canEdit"`
 }
 
 // newPostData is data required for creating a new post.
@@ -274,7 +275,7 @@ func getPostByID(id int) (formattedPost, error) {
 		ID:            post.ID,
 		Name:          user.Name,
 		Date:          post.Date,
-		Content:       post.Content,
+		Content:       template.HTML(post.Content),
 		Tag:           post.Tag,
 		Rolls:         rolls,
 		EditingWindow: isPostWithinEditWindow(&post),

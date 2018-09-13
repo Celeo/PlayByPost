@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3" // sqolite3 driver
+	_ "github.com/mattn/go-sqlite3" // sqlite3 driver
 )
 
 func database() *sqlx.DB {
