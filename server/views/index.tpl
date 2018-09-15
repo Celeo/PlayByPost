@@ -3,7 +3,7 @@
 <!-- TODO pagination -->
 
 {{range .posts}}
-  <div class="card rounded shadow">
+  <div class="card rounded shadow mb-2">
     <div class="card-body">
       <h5 class="card-title clearfix">
         <span class="float-left">{{.Name}} ({{.Tag}})</span>
@@ -19,7 +19,6 @@
       </div>
     </div>
   </div>
-  <br>
 {{end}}
 
 <!-- TODO new post widget -->
