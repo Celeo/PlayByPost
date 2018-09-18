@@ -50,6 +50,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTH_USER_MODEL = 'pbp.User'
+
 ROOT_URLCONF = 'playbypost.urls'
 
 TEMPLATES = [
