@@ -2,6 +2,59 @@
 
 {% block body %}
 
-<h2>Index page</h2>
+<div class="container">
+  <h2>Play by Post</h2>
+  <br><br>
+  <h4>What is "play by post"?</h4>
+  <p>
+    <a href="https://en.wikipedia.org/wiki/Play-by-post_role-playing_game">Wikipedia</a> describes it as:
+
+    <blockquote>
+       an online text-based role-playing game in which players interact with each other and a predefined environment via text
+    </blockquote>
+
+    It's a return to old-school forum-style communication, where people communicate serially and asynchronously, leaving their
+    writing for the next person to see when that person logs in.
+
+    <br><br>
+
+    This site is an example of that: people register for the site, create a character, and join campaigns. In a campaign, a DM
+    sets up a world, and the players interact with it. Usually, there is some sort of schedule where the DM posts, and players
+    are expected to make a post between occurrences of the DM posting. This collection of a DM post and posts from all the players
+    can constitute anything from a single round in combat, a few minutes thinking and planning, to a full day around town or more -
+    passage of time is up to the DM.
+
+    <br><br>
+
+    Unless the DM wishes to include links to pictures, music, or video, all communication is done in simple text with minimal formatting,
+    encouraging players to use their imaginations to make the world the DM has constructed really come alive in their minds.
+
+    <br><br>
+
+    If you're new, head over to the <a href="{{ url_for('base.campaigns') }}">campaign listing</a> to see the campaigns that
+    are going on, and take a look at some of the posts from those campaigns to get a feeling for what to expect.
+  </p>
+
+  <br>
+  <h4>Open Source</h4>
+  <p>
+    This site is <a href="https://en.wikipedia.org/wiki/Free_and_open-source_software">FOSS</a>: "free and open-source software." If you want to see what
+    makes this site run, you are free to do so, on GitLab <a href="https://gitlab.com/Celeo/PlayByPost">here</a>. This means that you can see how much
+    I'm tracking you (I'm not), how I'm handling your password (<a href="https://en.wikipedia.org/wiki/Bcrypt">securely</a>), request changes to the
+    code, or run this website on a server of your own.
+
+    <br><br>
+
+    Everything is licensed under <a href="https://en.wikipedia.org/wiki/MIT_License">MIT</a>.
+  </p>
+
+  <br>
+  <h4>TTRPGs</h4>
+  <p>
+    If you've never played a <a href="Tabletop role-playing game">TTRPG</a> before at all, there are a number of wildly successful groups playing these games
+    and recording themselves doing so. Search for "dungeons and dragons campaign" on your favorite video hosting site and see what's out there. Additionally,
+    check your local meet up sites for games that might be starting or looking for more players in your area.
+  </p>
+</div>
 
 {% endblock %}
