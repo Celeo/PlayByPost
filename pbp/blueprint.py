@@ -62,9 +62,11 @@ def profile_login():
 
 @blueprint.route('/profile/register', methods=['GET', 'POST'])
 def profile_register():
-    # TODO check if that email has already been used
     if request.method == 'POST':
         email = request.form['email']
+        if User.query.filter_by(email=email).first():
+            flash('Email already in use', 'error')
+            return redirect(url_for('.profile_register'))
         password = request.form['password']
         if not re.match(r'.+@(?:.+){2,}\.(?:.+){2,}', email):
             flash('Email does meet basic requirements', 'error')
