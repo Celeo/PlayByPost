@@ -16,9 +16,12 @@ class Campaign(db.Model):
     __tablename__ = 'campaigns'
 
     id = db.Column(db.Integer, primary_key=True)
+    dm_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String(100))
     created = db.Column(db.DateTime)
     locked = db.Column(db.Boolean, default=False)
+
+    dm_user = db.relationship('User', backref=db.backref('dm_campaigns', lazy=True))
 
 
 class Post(db.Model):
