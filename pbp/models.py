@@ -1,6 +1,11 @@
+import bcrypt
 from flask_login import UserMixin
 
 from .shared import db
+
+
+# Will need membership of characters to campaign
+# Will need ability to track requests (and (dis)approvals for those requests)
 
 
 class User(db.Model, UserMixin):
@@ -9,13 +14,20 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200))
+    password = db.Column(db.String)
     date_joined = db.Column(db.DateTime)
-    is_active = db.Column(db.Boolean, default=True)
+    is_banned = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
 
     @property
     def is_active(self):
-        return self.is_active
+        return not self.is_banned
+
+    def set_password(self, string):
+        self.password = bcrypt.hashpw(string.encode('utf8'), bcrypt.gensalt())
+
+    def check_password(self, string):
+        return bcrypt.checkpw(string.encode('utf8'), self.password)
 
 
 class Character(db.Model):
@@ -36,8 +48,10 @@ class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     dm_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(100))
-    created = db.Column(db.DateTime)
-    locked = db.Column(db.Boolean, default=False)
+    description = db.Column(db.String)
+    date_created = db.Column(db.DateTime)
+    js_locked = db.Column(db.Boolean, default=False)
+    is_public = db.Column(db.Boolean, default=True)
 
     dm_user = db.relationship('User', backref=db.backref('dm_campaigns', lazy=True))
 
