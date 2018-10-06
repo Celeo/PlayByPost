@@ -56,6 +56,7 @@ class Campaign(db.Model):
     __tablename__ = 'campaigns'
 
     id = db.Column(db.Integer, primary_key=True)
+    created_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     dm_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(100))
     description = db.Column(db.String)
@@ -63,7 +64,8 @@ class Campaign(db.Model):
     is_locked = db.Column(db.Boolean, default=False)
     is_posts_public = db.Column(db.Boolean, default=True)
 
-    dm_user = db.relationship('User', backref=db.backref('dm_campaigns', lazy=True))
+    created_by_user = db.relationship('User', foreign_keys=[created_by_user_id], backref=db.backref('created_campaigns', lazy=True))
+    dm_user = db.relationship('User', foreign_keys=[dm_user_id], backref=db.backref('dm_campaigns', lazy=True))
 
 
 class Post(db.Model):
