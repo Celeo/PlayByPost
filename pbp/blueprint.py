@@ -42,7 +42,16 @@ def help():
 
 @blueprint.route('/profile/login', methods=['GET', 'POST'])
 def profile_login():
-    return 'VIEW: profile/login'
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if not user or not user.check_password(password):
+            flash('Login failed', 'error')
+            return redirect(url_for('.profile_login'))
+        login_user(user)
+        return redirect(url_for('.profile_settings'))
+    return render_template('login.jinja2')
 
 
 @blueprint.route('/profile/register', methods=['GET', 'POST'])
