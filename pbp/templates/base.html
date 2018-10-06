@@ -17,22 +17,22 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
-          <li class="nav-item"><a href="{{ url_for('campaigns') }}" class="nav-link">Campaign selector</a></li>
+          <li class="nav-item"><a href="{{ url_for('base.campaigns') }}" class="nav-link">Campaign selector</a></li>
           <li class="nav-item dropdown">
             <a href="#" class="nav-item nav-link dropdown-toggle" data-toggle="dropdown">Tools</a>
             <div class="dropdown-menu bg-dark">
-              <a class="dropdown-item text-light" href="{{ url_for('search') }}">Search</a>
-              <a class="dropdown-item text-light" href="{{ url_for('glossary') }}">Glossary</a>
-              <a class="dropdown-item text-light" href="{{ url_for('help') }}">Help</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.search') }}">Search</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.glossary') }}">Glossary</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.help') }}">Help</a>
             </div>
           </li>
           <li class="nav-item dropdown">
             <a href="#" class="nav-item nav-link dropdown-toggle" data-toggle="dropdown">Profile</a>
             <div class="dropdown-menu bg-dark">
-              <a class="dropdown-item text-light" href="{{ url_for('profile_login') }}">Log in</a>
-              <a class="dropdown-item text-light" href="{{ url_for('profile_join') }}">Join</a>
-              <a class="dropdown-item text-light" href="{{ url_for('profile_settings') }}">Settings</a>
-              <a class="dropdown-item text-light" href="{{ url_for('profile_logout') }}">Log out</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.profile_login') }}">Log in</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.profile_join') }}">Join</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.profile_settings') }}">Settings</a>
+              <a class="dropdown-item text-light" href="{{ url_for('base.profile_logout') }}">Log out</a>
             </div>
           </li>
         </ul>
