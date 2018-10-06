@@ -6,7 +6,11 @@ from flask import (
     request,
     url_for
 )
-from flask_login import login_user, logout_user
+from flask_login import (
+    login_user,
+    login_required,
+    logout_user
+)
 import re
 
 from .shared import db
@@ -49,13 +53,16 @@ def profile_login():
         if not user or not user.check_password(password):
             flash('Login failed', 'error')
             return redirect(url_for('.profile_login'))
-        login_user(user)
+        flash('Login successful')
+        login_user(user, remember=True)
+        # TODO https://flask-login.readthedocs.io/en/latest/#login-example
         return redirect(url_for('.profile_settings'))
     return render_template('login.jinja2')
 
 
 @blueprint.route('/profile/register', methods=['GET', 'POST'])
 def profile_register():
+    # TODO check if that email has already been used
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -69,14 +76,18 @@ def profile_register():
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        login_user(new_user)
+        flash('Login successful')
+        login_user(new_user, remember=True)
         return redirect(url_for('.profile_settings'))
     return render_template('register.jinja2')
 
 
-@blueprint.route('/profile/settings')
+@blueprint.route('/profile/settings', methods=['GET', 'POST'])
+@login_required
 def profile_settings():
-    return 'VIEW: profile/settings'
+    if request.method == 'POST':
+        return 'TODO'
+    return render_template('profile_settings.jinja2')
 
 
 @blueprint.route('/profile/logout')
