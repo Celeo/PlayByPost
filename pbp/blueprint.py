@@ -26,22 +26,22 @@ def index():
 
 @blueprint.route('/campaigns')
 def campaigns():
-    return 'VIEW: campaigns'
+    return render_template('campaigns.jinja2')
 
 
 @blueprint.route('/search')
 def search():
-    return 'VIEW: search'
+    return render_template('search.jinja2')
 
 
 @blueprint.route('/glossary')
 def glossary():
-    return 'VIEW: glossary'
+    return render_template('glossary.jinja2')
 
 
 @blueprint.route('/help')
 def help():
-    return 'VIEW: help'
+    return render_template('help.jinja2')
 
 
 @blueprint.route('/profile/login', methods=['GET', 'POST'])
@@ -82,6 +82,13 @@ def profile_register():
         login_user(new_user, remember=True)
         return redirect(url_for('.profile_settings'))
     return render_template('register.jinja2')
+
+
+@blueprint.route('/profile/characters', methods=['GET', 'POST'])
+def profile_characters():
+    if request.method == 'POST':
+        return 'TODO'
+    return render_template('profile_characters.jinja2')
 
 
 @blueprint.route('/profile/settings', methods=['GET', 'POST'])

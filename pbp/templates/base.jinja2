@@ -33,6 +33,7 @@
             <a href="#" class="nav-item nav-link dropdown-toggle" data-toggle="dropdown">Profile</a>
             <div class="dropdown-menu bg-dark">
               {% if current_user.is_authenticated %}
+                <a class="dropdown-item text-light" href="{{ url_for('base.profile_characters') }}">Characters</a>
                 <a class="dropdown-item text-light" href="{{ url_for('base.profile_settings') }}">Settings</a>
                 <a class="dropdown-item text-light" href="{{ url_for('base.profile_logout') }}">Log out</a>
               {% else %}
