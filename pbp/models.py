@@ -1,14 +1,32 @@
+from flask_login import UserMixin
+
 from .shared import db
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
+    email = db.Column(db.String(200))
     date_joined = db.Column(db.DateTime)
+    is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    @property
+    def is_active(self):
+        return self.is_active
+
+
+class Character(db.Model):
+
+    __tablename__ = 'characters'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(100))
+
+    user = db.relationship('User', backref=db.backref('characters', lazy=True))
 
 
 class Campaign(db.Model):
@@ -16,7 +34,7 @@ class Campaign(db.Model):
     __tablename__ = 'campaigns'
 
     id = db.Column(db.Integer, primary_key=True)
-    dm_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    dm_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(100))
     created = db.Column(db.DateTime)
     locked = db.Column(db.Boolean, default=False)
