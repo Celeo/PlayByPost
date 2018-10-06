@@ -1,14 +1,37 @@
 from flask import Flask, render_template
+from flask_login import LoginManager
 
 from .shared import db
+from .models import User
 
 
+# ==============================
+# Base
+# ==============================
 app = Flask(__name__)
 app.config.from_json('config.json')
+
+# ==============================
+# DB
+# ==============================
 db.app = app
 db.init_app(app)
 
+# ==============================
+# User management
+# ==============================
+login_manager = LoginManager()
+login_manager.init_app(app)
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
+
+# ==============================
+# View routing
+# ==============================
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -34,7 +57,7 @@ def help():
     return 'VIEW: help'
 
 
-@app.route('/profile/login')
+@app.route('/profile/login', methods=['GET', 'POST'])
 def profile_login():
     return 'VIEW: profile/login'
 
