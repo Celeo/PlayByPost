@@ -6,7 +6,7 @@ blueprint = Blueprint('base', __name__, template_folder='templates')
 
 @blueprint.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.jinja2')
 
 
 @blueprint.route('/campaigns')
