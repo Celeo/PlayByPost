@@ -13,3 +13,9 @@ blockquote {
     margin-left: auto;
     margin-right: auto;
 }
+
+.subtitle {
+    font-size: 50%;
+}
+
+/* roll formatting */

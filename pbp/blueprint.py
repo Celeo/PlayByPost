@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 
 from flask import (
@@ -9,6 +10,7 @@ from flask import (
     url_for
 )
 from flask_login import (
+    current_user,
     login_user,
     login_required,
     logout_user
@@ -16,6 +18,7 @@ from flask_login import (
 
 from .models import (
     Campaign,
+    CampaignMembership,
     Post,
     User
 )
@@ -30,8 +33,20 @@ def index():
     return render_template('index.jinja2')
 
 
-@blueprint.route('/campaigns')
+@blueprint.route('/campaigns', methods=['GET', 'POST'])
 def campaigns():
+    if request.method == 'POST':
+        new_campaign = Campaign(
+            created_by_user_id=current_user.id,
+            dm_user_id=current_user.id,
+            name=request.form['name'],
+            description=request.form['description'],
+            date_created=datetime.utcnow()
+        )
+        db.session.add(new_campaign)
+        db.session.commit()
+        flash('New campaign created')
+        return redirect(url_for('.campaigns'))
     campaigns = Campaign.query.all()
     return render_template('campaigns.jinja2', campaigns=campaigns)
 
@@ -45,6 +60,36 @@ def campaign_posts(campaign_id):
         return redirect(url_for('.campaigns'))
     posts = Post.query.filter_by(campaign_id=campaign_id).all()
     return render_template('campaign_posts.jinja2', campaign=campaign, posts=posts)
+
+
+@blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
+def campaign_join(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    if request.method == 'POST':
+        existing_membership = (
+            CampaignMembership.query
+            .filter_by(
+                campaign_id=campaign_id,
+                character_id=request.form['character']
+            )
+            .first()
+        )
+        if existing_membership:
+            if existing_membership.is_pending:
+                flash('Your membership to that campaign is pending', 'error')
+                return redirect(url_for('.campaign_join', campaign_id=campaign_id))
+            flash('That character is already a member of that campaign')
+            return redirect(url_for('.campaign_join', campaign_id=campaign_id))
+        new_membership = CampaignMembership(
+            character_id=request.form['character'],
+            campaign_id=campaign_id,
+            notes=request.form['notes']
+        )
+        db.session.add(new_membership)
+        db.session.commit()
+        flash('Membership request submitted')
+        return redirect(url_for('.campaign_join', campaign_id=campaign_id))
+    return render_template('campaign_join.jinja2', campaign=campaign)
 
 
 @blueprint.route('/search')
@@ -94,7 +139,7 @@ def profile_register():
         if len(password) < 5:
             flash('Password must be at least 5 characters long', 'error')
             return redirect(url_for('.profile_register'))
-        new_user = User(email=email)
+        new_user = User(email=email, date_joined=datetime.utcnow())
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()

@@ -3,8 +3,15 @@
 {% block body %}
 
 <div class="container-medium">
-  <h2>{{ campaign.name }}</h2>
   {# TODO pagination #}
+  <div class="clearfix">
+    <h2 class="float-left">{{ campaign.name }}</h2>
+    {% if not current_user.is_member_of_campaign(campaign) %}
+      <div class="float-right">
+        <a href="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" class="btn btn-outline-primary">Join</a>
+      </div>
+    {% endif %}
+  </div>
   {% for post in posts %}
     <div class="card rounded shadow mb-2">
       <div class="card-body">
@@ -23,6 +30,11 @@
       </div>
     </div>
   {% endfor %}
+  {#
+    TODO editor form for making a new post
+    Need to make sure that the user has a character that's in the campaign
+      Right now, can assume that only 1 character is in the campaign per user
+  #}
 </div>
 
 {% endblock %}
