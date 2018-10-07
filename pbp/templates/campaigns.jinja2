@@ -4,7 +4,13 @@
 
 <div class="container">
   <h1>Campaigns</h1>
-  <p>TODO</p>
+  {# TODO order with the campaigns the user has characters in at the top, with some sort of identification of 'in this campaign' #}
+  <ul>
+    {% for campaign in campaigns %}
+      <li><a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}">{{ campaign.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {# TODO 'create campaign' form #}
 </div>
 
 {% endblock %}

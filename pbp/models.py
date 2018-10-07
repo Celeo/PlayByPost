@@ -73,14 +73,18 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    character_id = db.Column(db.Integer, db.ForeignKey('characters.id'), nullable=False)
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False)
     date = db.Column(db.DateTime)
     tag = db.Column(db.String(100))
     content = db.Column(db.String)
 
-    user = db.relationship('User', backref=db.backref('posts', lazy=True))
+    character = db.relationship('Character', backref=db.backref('posts', lazy=True))
     campaign = db.relationship('Campaign', backref=db.backref('posts', lazy=True))
+
+    @property
+    def user(self):
+        return self.character.user
 
 
 class Roll(db.Model):

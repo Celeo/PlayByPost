@@ -23,4 +23,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+@app.template_filter('format_date')
+def filter_format_date(dt):
+    return dt.strftime('%b %m, %y @ %I:%M:%S %p')
+
+
 app.register_blueprint(base_blueprint)

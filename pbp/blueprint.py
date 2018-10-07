@@ -1,3 +1,5 @@
+import re
+
 from flask import (
     Blueprint,
     flash,
@@ -11,10 +13,14 @@ from flask_login import (
     login_required,
     logout_user
 )
-import re
 
+from .models import (
+    Campaign,
+    Post,
+    User
+)
 from .shared import db
-from .models import User
+from .util import is_safe_url
 
 blueprint = Blueprint('base', __name__, template_folder='templates')
 
@@ -26,7 +32,19 @@ def index():
 
 @blueprint.route('/campaigns')
 def campaigns():
-    return render_template('campaigns.jinja2')
+    campaigns = Campaign.query.all()
+    return render_template('campaigns.jinja2', campaigns=campaigns)
+
+
+@blueprint.route('/campaign/<int:campaign_id>/posts')
+def campaign_posts(campaign_id):
+    # TODO pagination
+    campaign = Campaign.query.get(campaign_id)
+    if not campaign:
+        flash('Could not find campaign with that id', 'error')
+        return redirect(url_for('.campaigns'))
+    posts = Post.query.filter_by(campaign_id=campaign_id).all()
+    return render_template('campaign_posts.jinja2', campaign=campaign, posts=posts)
 
 
 @blueprint.route('/search')
@@ -55,8 +73,10 @@ def profile_login():
             return redirect(url_for('.profile_login'))
         flash('Login successful')
         login_user(user, remember=True)
-        # TODO https://flask-login.readthedocs.io/en/latest/#login-example
-        return redirect(url_for('.profile_settings'))
+        next_url = request.args.get('next')
+        if next_url and not is_safe_url(next_url):
+            return redirect(url_for('.profile_settings'))
+        return redirect(next_url or url_for('.profile_settings'))
     return render_template('login.jinja2')
 
 
