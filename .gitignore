@@ -5,3 +5,4 @@ env
 config.json
 .vscode
 *.dist.js
+widgets/dist

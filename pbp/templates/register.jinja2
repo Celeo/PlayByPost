@@ -19,23 +19,25 @@
 </div>
 
 <script>
-  new Vue({
-    el: '#form-app',
-    data: {
-      email: '',
-      password: ''
-    },
-    computed: {
-      valid_email() {
-        return /.+@(?:.+){2,}\.(?:.+){2,}/.test(this.email)
+  $(document).ready(function() {
+    new window.Vue({
+      el: '#form-app',
+      data: {
+        email: '',
+        password: ''
       },
-      valid_password() {
-        return this.password.length > 5
-      },
-      valid_input() {
-        return this.valid_email && this.valid_password
+      computed: {
+        valid_email() {
+          return /.+@(?:.+){2,}\.(?:.+){2,}/.test(this.email)
+        },
+        valid_password() {
+          return this.password.length > 5
+        },
+        valid_input() {
+          return this.valid_email && this.valid_password
+        }
       }
-    }
+    })
   })
 </script>
 

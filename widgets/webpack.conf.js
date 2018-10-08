@@ -1,6 +1,5 @@
 const path = require('path')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const WebpackDeletePlugin = require('webpack-delete-plugin')
+const WebpackShellPlugin = require('webpack-shell-plugin')
 
 module.exports = {
   entry: path.resolve(__dirname, 'index.js'),
@@ -8,14 +7,20 @@ module.exports = {
     path: __dirname,
     filename: 'index.dist.js'
   },
+  resolve: {
+    alias: {
+      vue: 'vue/dist/vue.js'
+    }
+  },
   performance: {
     hints: false
   },
   target: 'web',
   plugins: [
-    new CopyWebpackPlugin([
-      { from: 'index.dist.js', to: path.resolve(__dirname, '..', 'pbp', 'static', 'index.dist.js') }
-    ]),
-    new WebpackDeletePlugin(['index.dist.js'])
+    new WebpackShellPlugin({
+      onBuildEnd: [
+        'mv index.dist.js ../pbp/static'
+      ]
+    })
   ]
 }

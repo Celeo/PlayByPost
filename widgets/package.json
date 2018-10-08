@@ -9,13 +9,15 @@
     "copy-webpack-plugin": "^4.5.2",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.2",
-    "webpack-delete-plugin": "^0.1.1"
+    "webpack-delete-plugin": "^0.1.1",
+    "webpack-shell-plugin": "^0.5.0"
   },
   "dependencies": {
     "vue": "^2.5.17",
     "vue2-editor": "^2.6.6"
   },
   "scripts": {
-    "build": "webpack --config webpack.conf.js -p"
+    "build": "webpack --config webpack.conf.js -d",
+    "build_prod": "webpack --config webpack.conf.js -p"
   }
 }
