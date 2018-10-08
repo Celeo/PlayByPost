@@ -36,17 +36,20 @@ class User(db.Model):
         return bcrypt.checkpw(string.encode('utf8'), self.password)
 
     def is_member_of_campaign(self, campaign):
+        return self.get_character_in_campaign(campaign) is not None
+
+    def get_character_in_campaign(self, campaign):
         for character in self.characters:
-            memberships = (
+            membership = (
                 CampaignMembership.query.filter_by(
                     character_id=character.id,
                     campaign_id=campaign.id,
                     is_pending=False
-                ).all()
+                ).first()
             )
-            if memberships:
-                return True
-        return False
+            if membership:
+                return membership.character
+        return None
 
 
 class Character(db.Model):

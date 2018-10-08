@@ -16,7 +16,7 @@
     <div class="card rounded shadow mb-2">
       <div class="card-body">
         <div class="card-title clearfix post-title">
-          <h5 class="float-left">{{ post.character.name }} ({{ post.tag }})</h5>
+          <h5 class="float-left">{{ post.character.name }}{% if post.tag %} ({{ post.tag }}){% endif %}</h5>
           <h5 class="float-right">{{ post.date | format_date }}</h5>
         </div>
         {{ post.content }}
@@ -33,26 +33,43 @@
     <br><br>
     <h4>No posts have been made in this campaign yet.</h4>
   {% endfor %}
-  <br><br><br><hr>
-  <h4>New post</h4>
-  {#
-    TODO need a WYSIWYG editor
-      Quill - doesn't work
-      Summernote - can't configure the colors
-      Vue2Editor - need full webpack build
-  #}
-  <form action="{{ url_for('base.campaign_new_post', campaign_id=campaign.id) }}">
-    <textarea name="content"></textarea>
-    <br>
-    <button type="submit" class="btn btn-primary">Post</button>
-    {# TODO also going to need a widget for rolling dice, like before #}
-  </form>
+  {% if current_user.is_member_of_campaign(campaign) %}
+    <br><br><br><hr>
+    <h4>New post</h4>
+    <div id="app">
+      <form action="{{ url_for('base.campaign_new_post', campaign_id=campaign.id) }}" method="POST">
+        <input type="hidden" name="content" v-model="newPost">
+        <vue-editor v-model="newPost" :editor-toolbar="toolbar"></vue-editor>
+        <button type="submit" class="btn btn-primary" :disabled="!valid">Post</button>
+      </form>
+      {# TODO also going to need a widget for rolling dice just like before #}
+    </div>
 
-  {#
-    TODO editor form for making a new post
-    Need to make sure that the user has a character that's in the campaign
-      Right now, can assume that only 1 character is in the campaign per user
-  #}
+    <script>
+      $(document).ready(function() {
+        new Vue({
+          el: '#app',
+          components: {
+            'vue-editor': VueEditor
+          },
+          data: {
+            newPost: '',
+            toolbar: [
+              ['bold', 'italic'],
+              [{ 'header': [false, 3, 6] }],
+              [{ list: 'bullet' }],
+              [{ color: ['blue', 'black'] }, 'clean']
+            ]
+          },
+          computed: {
+            valid() {
+              return this.newPost.length > 0 && this.newPost !== '<p><br></p>'
+            }
+          }
+        })
+      })
+    </script>
+  {% endif %}
 </div>
 
 {% endblock %}

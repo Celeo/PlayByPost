@@ -68,8 +68,20 @@ def campaign_new_post(campaign_id):
     if not campaign:
         flash('Could not find campaign with that id', 'error')
         return redirect(url_for('.campaigns'))
-    # TODO check membership
+    if not current_user.is_member_of_campaign(campaign):
+        flash('You are not a member of that campaign', 'error')
+        return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
     # TODO save new post
+    post = Post(
+        character_id=current_user.get_character_in_campaign(campaign).id,
+        campaign_id=campaign.id,
+        date=datetime.utcnow(),
+        tag='',  # TODO
+        content=request.form['content']
+    )
+    db.session.add(post)
+    db.session.commit()
+    flash('New post added')
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
 
 
@@ -77,6 +89,10 @@ def campaign_new_post(campaign_id):
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if request.method == 'POST':
+        # TODO either need to not allow multiple characters from the same user
+        # to be in the same campaign, or need to have a dropdown to allow
+        # multiple characters from the same user when rolling and posting,
+        # which sounds like a good candidate for a much later addition.
         existing_membership = (
             CampaignMembership.query
             .filter_by(
