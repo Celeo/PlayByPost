@@ -2,9 +2,155 @@
 
 {% block body %}
 
-<div class="container">
-  <h1>Characters</h1>
-  <p>TODO</p>
+{#
+  TODO
+    - List characters, including which campaign they are in, if any
+    - Rename a character
+    - Set a character's tag
+    - Create a new character
+#}
+
+<div id="app">
+  <div class="container">
+    <h1>Characters</h1>
+    <br>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th colspan="2">Name</th>
+          <th colspan="2">Tag</th>
+          <th colspan="2">Campaign</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for character in characters %}
+          <tr>
+            <td>{{ character.name }}</td>
+            <td>
+              <button type="button" class="btn btn-outline-primary" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
+            </td>
+            <td>
+              {% if character.tag %}
+                {{ character.tag }}
+              {% endif %}
+            </td>
+            <td>
+              <button type="button" class="btn btn-outline-primary" @click="editTag({{ character.id }}, '{{ character.tag or '' }}')">Set tag</button>
+            </td>
+            <td>
+              {% if character.campaign %}
+                <a href="{{ url_for('base.campaign_posts', campaign_id=character.campaign.id) }}">character.campaign.name</a>
+              {% elif character.memberships %}
+                Membership pending
+              {% else %}
+                Not in a campaign
+              {% endif %}
+            </td>
+            <td>
+              {% if not character.memberships %}
+                <form action="{{ url_for('base.profile_characters') }}" method="POST">
+                  <input type="hidden" name="field" value="delete">
+                  <input type="hidden" name="character_id" value="{{ character.id }}">
+                  <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="text-75-percent"><i>Note</i>: you cannot delete a character that is in or has applied to a campaign.</p>
+
+    <br>
+    <hr>
+    <h3>Create a new character</h3>
+    <form action="{{ url_for('base.profile_characters') }}" method="POST">
+      <input type="hidden" name="field" value="new_character">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" name="value" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+  </div>
+
+  <div class="modal fade" id="nameModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form action="{{ url_for('base.profile_characters') }}" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title">Rename character</h5>
+            <button class="close" type="button" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input type="hidden" name="field" value="name">
+              <input type="hidden" v-model="charId" name="character_id">
+              <input type="text" class="form-control" name="value" v-model="newName" placeholder="Name">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="tagModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form action="{{ url_for('base.profile_characters') }}" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title">Set character tag</h5>
+            <button class="close" type="button" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input type="hidden" name="field" value="tag">
+              <input type="hidden" v-model="charId" name="character_id">
+              <input type="text" class="form-control" name="value" v-model="newTag" placeholder="Tag">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+  $(document).ready(function() {
+    new Vue({
+      el: '#app',
+      data: {
+        charId: '',
+        newTag: '',
+        newName: ''
+      },
+      methods: {
+        editName(id, current) {
+          this.charId = id
+          this.newName = current
+          $('#nameModal').modal()
+        },
+        editTag(id, current) {
+          this.charId = id
+          this.newTag = current
+          $('#tagModal').modal()
+        }
+      }
+    })
+  })
+</script>
 
 {% endblock %}

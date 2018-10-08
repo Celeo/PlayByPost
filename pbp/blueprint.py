@@ -19,6 +19,7 @@ from flask_login import (
 from .models import (
     Campaign,
     CampaignMembership,
+    Character,
     Post,
     User
 )
@@ -71,12 +72,12 @@ def campaign_new_post(campaign_id):
     if not current_user.is_member_of_campaign(campaign):
         flash('You are not a member of that campaign', 'error')
         return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
-    # TODO save new post
+    character = current_user.get_character_in_campaign(campaign)
     post = Post(
-        character_id=current_user.get_character_in_campaign(campaign).id,
+        character_id=character.id,
         campaign_id=campaign.id,
         date=datetime.utcnow(),
-        tag='',  # TODO
+        tag=character.tag,
         content=request.form['content']
     )
     db.session.add(post)
@@ -107,6 +108,9 @@ def campaign_join(campaign_id):
                 return redirect(url_for('.campaign_join', campaign_id=campaign_id))
             flash('That character is already a member of that campaign')
             return redirect(url_for('.campaign_join', campaign_id=campaign_id))
+        # TODO need to make sure the character requesting to join does not have
+        # the same name as a character already in that campaign. Tell them to
+        # rename their character if this is the case.
         new_membership = CampaignMembership(
             character_id=request.form['character'],
             campaign_id=campaign_id,
@@ -179,8 +183,50 @@ def profile_register():
 @blueprint.route('/profile/characters', methods=['GET', 'POST'])
 def profile_characters():
     if request.method == 'POST':
-        return 'TODO'
-    return render_template('profile_characters.jinja2')
+        form_field = request.form.get('field')
+        new_value = request.form.get('value')
+        character_id = request.form.get('character_id', 0, type=int)
+        if form_field == 'new_character':
+            character = Character(user_id=current_user.id, name=new_value)
+            db.session.add(character)
+            db.session.commit()
+            flash('New character created')
+            return redirect(url_for('.profile_characters'))
+        elif form_field == 'delete':
+            character = Character.query.get(character_id)
+            if not character:
+                flash('Unknown character', 'error')
+                return redirect(url_for('.profile_characters'))
+            if not character.user_id == current_user.id:
+                flash('You are not the owner of that character', 'error')
+                return redirect(url_for('.profile_characters'))
+            db.session.delete(character)
+            db.session.commit()
+            flash('Character deleted')
+            return redirect(url_for('.profile_characters'))
+        else:
+            character = Character.query.get(character_id)
+            if not character:
+                flash('Unknown character', 'error')
+                return redirect(url_for('.profile_characters'))
+            if not character.user_id == current_user.id:
+                flash('You are not the owner of that character', 'error')
+                return redirect(url_for('.profile_characters'))
+            if form_field == 'name':
+                if character.memberships:
+                    for membership in CampaignMembership.query.filter_by(campaign_id=character.memberships[0].id):
+                        if membership.character.name == new_value:
+                            flash('A character with that name is already in the same campaign', 'error')
+                            return redirect(url_for('.profile_characters'))
+                character.name = new_value
+            elif form_field == 'tag':
+                character.tag = new_value
+            else:
+                flash('An error occurred', 'error')
+            db.session.commit()
+            return redirect(url_for('.profile_characters'))
+    characters = Character.query.filter_by(user_id=current_user.id).all()
+    return render_template('profile_characters.jinja2', characters=characters)
 
 
 @blueprint.route('/profile/settings', methods=['GET', 'POST'])

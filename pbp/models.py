@@ -59,6 +59,7 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(100))
+    tag = db.Column(db.String(100))
 
     user = db.relationship('User', backref=db.backref('characters', lazy=True))
 
@@ -80,6 +81,7 @@ class Campaign(db.Model):
     dm_user = db.relationship('User', foreign_keys=[dm_user_id], backref=db.backref('dm_campaigns', lazy=True))
 
 
+# TODO turn the membership into a one-to-one for character_id
 class CampaignMembership(db.Model):
 
     __tablename__ = 'memberships'
