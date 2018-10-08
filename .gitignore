@@ -4,3 +4,4 @@ env
 *.db
 config.json
 .vscode
+*.dist.js
