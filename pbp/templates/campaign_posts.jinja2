@@ -29,7 +29,25 @@
         </div>
       </div>
     </div>
+  {% else %}
+    <br><br>
+    <h4>No posts have been made in this campaign yet.</h4>
   {% endfor %}
+  <br><br><br><hr>
+  <h4>New post</h4>
+  {#
+    TODO need a WYSIWYG editor
+      Quill - doesn't work
+      Summernote - can't configure the colors
+      Vue2Editor - need full webpack build
+  #}
+  <form action="{{ url_for('base.campaign_new_post', campaign_id=campaign.id) }}">
+    <textarea name="content"></textarea>
+    <br>
+    <button type="submit" class="btn btn-primary">Post</button>
+    {# TODO also going to need a widget for rolling dice, like before #}
+  </form>
+
   {#
     TODO editor form for making a new post
     Need to make sure that the user has a character that's in the campaign

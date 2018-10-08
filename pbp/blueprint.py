@@ -62,6 +62,17 @@ def campaign_posts(campaign_id):
     return render_template('campaign_posts.jinja2', campaign=campaign, posts=posts)
 
 
+@blueprint.route('/campaign/<int:campaign_id>/new_post', methods=['POST'])
+def campaign_new_post(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    if not campaign:
+        flash('Could not find campaign with that id', 'error')
+        return redirect(url_for('.campaigns'))
+    # TODO check membership
+    # TODO save new post
+    return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
+
+
 @blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)
