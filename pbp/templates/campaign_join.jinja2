@@ -9,21 +9,27 @@
     {{ campaign.description }}
   </blockquote>
   <br>
-  <form action="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" method="POST">
-    <div class="form-group">
-      <label for="character">Character to join with</label>
-      <select name="character" class="form-control" required>
-        {% for character in current_user.characters %}
-          <option value="{{ character.id }}">{{ character.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="notes">Anything you want to add?</label>
-      <textarea name="notes" class="form-control"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Request to join</button>
-  </form>
+  {% if current_user.characters %}
+    <form action="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" method="POST">
+      <div class="form-group">
+        <label for="character">Character to join with</label>
+        <select name="character" class="form-control" required>
+          {% for character in current_user.characters %}
+            {% if not character.campaign_id %}
+              <option value="{{ character.id }}">{{ character.name }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="notes">Anything you want to add?</label>
+        <textarea name="notes" class="form-control"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Request to join</button>
+    </form>
+  {% else %}
+    <h4>You don't have any characters. Click <a href="{{ url_for('base.profile_characters') }}">here</a> to make one.</h4>
+  {% endif %}
 </div>
 
 {% endblock %}

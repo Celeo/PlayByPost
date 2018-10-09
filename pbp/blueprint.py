@@ -18,7 +18,6 @@ from flask_login import (
 
 from .models import (
     Campaign,
-    CampaignMembership,
     Character,
     Post,
     User
@@ -69,10 +68,10 @@ def campaign_new_post(campaign_id):
     if not campaign:
         flash('Could not find campaign with that id', 'error')
         return redirect(url_for('.campaigns'))
-    if not current_user.is_member_of_campaign(campaign):
+    character = current_user.get_character_in_campaign(campaign)
+    if not character:
         flash('You are not a member of that campaign', 'error')
         return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
-    character = current_user.get_character_in_campaign(campaign)
     post = Post(
         character_id=character.id,
         campaign_id=campaign.id,
@@ -90,33 +89,18 @@ def campaign_new_post(campaign_id):
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if request.method == 'POST':
-        # TODO either need to not allow multiple characters from the same user
-        # to be in the same campaign, or need to have a dropdown to allow
-        # multiple characters from the same user when rolling and posting,
-        # which sounds like a good candidate for a much later addition.
-        existing_membership = (
-            CampaignMembership.query
-            .filter_by(
-                campaign_id=campaign_id,
-                character_id=request.form['character']
-            )
-            .first()
-        )
-        if existing_membership:
-            if existing_membership.is_pending:
+        character = Character.query.get(int(request.form['character']))
+        if character.campaign_id:
+            if not character.campaign_approved:
                 flash('Your membership to that campaign is pending', 'error')
                 return redirect(url_for('.campaign_join', campaign_id=campaign_id))
             flash('That character is already a member of that campaign')
             return redirect(url_for('.campaign_join', campaign_id=campaign_id))
-        # TODO need to make sure the character requesting to join does not have
-        # the same name as a character already in that campaign. Tell them to
-        # rename their character if this is the case.
-        new_membership = CampaignMembership(
-            character_id=request.form['character'],
-            campaign_id=campaign_id,
-            notes=request.form['notes']
-        )
-        db.session.add(new_membership)
+        for other_character in campaign.characters:
+            if other_character.name == character.name:
+                flash('There is already a character in that campaign with that name', 'error')
+                return redirect(url_for('.campaign_join', campaign_id=campaign_id))
+        character.campaign_id = campaign_id
         db.session.commit()
         flash('Membership request submitted')
         return redirect(url_for('.campaign_join', campaign_id=campaign_id))
@@ -213,9 +197,9 @@ def profile_characters():
                 flash('You are not the owner of that character', 'error')
                 return redirect(url_for('.profile_characters'))
             if form_field == 'name':
-                if character.memberships:
-                    for membership in CampaignMembership.query.filter_by(campaign_id=character.memberships[0].id):
-                        if membership.character.name == new_value:
+                if character.campaign_id:
+                    for other_character in Character.query.filter_by(campaign_id=character.campaign_id):
+                        if other_character.character.name == new_value:
                             flash('A character with that name is already in the same campaign', 'error')
                             return redirect(url_for('.profile_characters'))
                 character.name = new_value

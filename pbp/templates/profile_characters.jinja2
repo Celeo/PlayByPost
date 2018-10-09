@@ -14,55 +14,58 @@
   <div class="container">
     <h1>Characters</h1>
     <br>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th colspan="2">Name</th>
-          <th colspan="2">Tag</th>
-          <th colspan="2">Campaign</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for character in characters %}
+    {% if characters %}
+      <table class="table table-striped">
+        <thead>
           <tr>
-            <td>{{ character.name }}</td>
-            <td>
-              <button type="button" class="btn btn-outline-primary" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
-            </td>
-            <td>
-              {% if character.tag %}
-                {{ character.tag }}
-              {% endif %}
-            </td>
-            <td>
-              <button type="button" class="btn btn-outline-primary" @click="editTag({{ character.id }}, '{{ character.tag or '' }}')">Set tag</button>
-            </td>
-            <td>
-              {% if character.campaign %}
-                <a href="{{ url_for('base.campaign_posts', campaign_id=character.campaign.id) }}">character.campaign.name</a>
-              {% elif character.memberships %}
-                Membership pending
-              {% else %}
-                Not in a campaign
-              {% endif %}
-            </td>
-            <td>
-              {% if not character.memberships %}
-                <form action="{{ url_for('base.profile_characters') }}" method="POST">
-                  <input type="hidden" name="field" value="delete">
-                  <input type="hidden" name="character_id" value="{{ character.id }}">
-                  <button type="submit" class="btn btn-outline-danger">Delete</button>
-                </form>
-              {% endif %}
-            </td>
+            <th colspan="2">Name</th>
+            <th colspan="2">Tag</th>
+            <th colspan="2">Campaign</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for character in characters %}
+            <tr>
+              <td>{{ character.name }}</td>
+              <td>
+                <button type="button" class="btn btn-outline-primary" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
+              </td>
+              <td>
+                {% if character.tag %}
+                  {{ character.tag }}
+                {% endif %}
+              </td>
+              <td>
+                <button type="button" class="btn btn-outline-primary" @click="editTag({{ character.id }}, '{{ character.tag or '' }}')">Set tag</button>
+              </td>
+              <td>
+                {% if character.campaign_id and character.campaign_approved %}
+                  <a href="{{ url_for('base.campaign_posts', campaign_id=character.campaign.id) }}">{{ character.campaign.name }}</a>
+                {% elif character.campaign_id and not character.campaign_approved %}
+                  Membership pending
+                {% else %}
+                  Not in a campaign
+                {% endif %}
+              </td>
+              <td>
+                {% if not character.campaign_id %}
+                  <form action="{{ url_for('base.profile_characters') }}" method="POST">
+                    <input type="hidden" name="field" value="delete">
+                    <input type="hidden" name="character_id" value="{{ character.id }}">
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p class="text-75-percent"><i>Note</i>: you cannot delete a character that is in or has applied to a campaign.</p>
+      <br>
+    {% else %}
+      <p>No created characters</p>
+    {% endif %}
 
-    <p class="text-75-percent"><i>Note</i>: you cannot delete a character that is in or has applied to a campaign.</p>
-
-    <br>
     <hr>
     <h3>Create a new character</h3>
     <form action="{{ url_for('base.profile_characters') }}" method="POST">

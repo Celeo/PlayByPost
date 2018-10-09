@@ -6,7 +6,7 @@
   {# TODO pagination #}
   <div class="clearfix">
     <h2 class="float-left">{{ campaign.name }}</h2>
-    {% if not current_user.is_member_of_campaign(campaign) %}
+    {% if current_user.should_show_join_link(campaign) %}
       <div class="float-right">
         <a href="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" class="btn btn-outline-primary">Join</a>
       </div>
@@ -16,6 +16,7 @@
     <div class="card rounded shadow mb-2">
       <div class="card-body">
         <div class="card-title clearfix post-title">
+          {# TODO post editing #}
           <h5 class="float-left">{{ post.character.name }}{% if post.tag %} ({{ post.tag }}){% endif %}</h5>
           <h5 class="float-right">{{ post.date | format_date }}</h5>
         </div>
@@ -33,7 +34,7 @@
     <br><br>
     <h4>No posts have been made in this campaign yet.</h4>
   {% endfor %}
-  {% if current_user.is_member_of_campaign(campaign) %}
+  {% if current_user.get_character_in_campaign(campaign) %}
     <br><br><br><hr>
     <h4>New post</h4>
     <div id="app">

@@ -35,33 +35,23 @@ class User(db.Model):
     def check_password(self, string):
         return bcrypt.checkpw(string.encode('utf8'), self.password)
 
-    def is_member_of_campaign(self, campaign):
-        return self.get_character_in_campaign(campaign) is not None
-
     def get_character_in_campaign(self, campaign):
         for character in self.characters:
-            membership = (
-                CampaignMembership.query.filter_by(
-                    character_id=character.id,
-                    campaign_id=campaign.id,
-                    is_pending=False
-                ).first()
-            )
-            if membership:
-                return membership.character
+            if character.campaign_id == campaign.id and character.campaign_approved:
+                return character
         return None
 
+    def get_character_applied_to_campaign(self, campaign):
+        for character in self.characters:
+            if character.campaign_id == campaign.id and not character.campaign_approved:
+                return character
+        return None
 
-class Character(db.Model):
-
-    __tablename__ = 'characters'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    name = db.Column(db.String(100))
-    tag = db.Column(db.String(100))
-
-    user = db.relationship('User', backref=db.backref('characters', lazy=True))
+    def should_show_join_link(self, campaign):
+        for character in self.characters:
+            if character.campaign_id == campaign.id:
+                return False
+        return True
 
 
 class Campaign(db.Model):
@@ -81,24 +71,19 @@ class Campaign(db.Model):
     dm_user = db.relationship('User', foreign_keys=[dm_user_id], backref=db.backref('dm_campaigns', lazy=True))
 
 
-# TODO turn the membership into a one-to-one for character_id
-class CampaignMembership(db.Model):
+class Character(db.Model):
 
-    __tablename__ = 'memberships'
+    __tablename__ = 'characters'
 
     id = db.Column(db.Integer, primary_key=True)
-    character_id = db.Column(db.Integer, db.ForeignKey('characters.id'), nullable=False)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False)
-    notes = db.Column(db.String)
-    is_pending = db.Column(db.Boolean, default=True)
-    approved_by = db.Column(db.String(100))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'))
+    name = db.Column(db.String(100))
+    tag = db.Column(db.String(100))
+    campaign_approved = db.Column(db.Boolean, default=False)
 
-    character = db.relationship('Character', backref=db.backref('memberships', lazy=True))
-    campaign = db.relationship('Campaign', backref=db.backref('memberships', lazy=True))
-
-    @property
-    def user(self):
-        return self.character.user
+    user = db.relationship('User', backref=db.backref('characters', lazy=True))
+    campaign = db.relationship('Campaign', backref=db.backref('characters', lazy=True))
 
 
 class Post(db.Model):
