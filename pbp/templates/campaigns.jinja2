@@ -5,11 +5,38 @@
 <div class="container">
   <h1>Campaigns</h1>
   <br>
-  {# TODO order with the campaigns the user has characters in at the top, with some sort of identification of 'in this campaign' #}
-  {# TODO better styling #}
-  {% for campaign in campaigns %}
-    <h4><a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}">{{ campaign.name }}</a></h4>
-  {% endfor %}
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Last post</th>
+        <th>Your character</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for campaign in campaigns %}
+        <tr>
+          <td><a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}" class="btn btn-outline-primary">{{ campaign.name }}</a></td>
+          <td>
+            {% if campaign.posts %}
+              {{ campaign.posts[-1].date | format_date }}
+            {% else %}
+              Never
+            {% endif %}
+          </td>
+          <td>
+            {% with campaign_char = current_user.get_character_in_campaign(campaign) %}
+              {% if campaign_char %}
+                {{ campaign_char.name }}
+              {% endif %}
+            {% endwith %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <br>
   <hr style="margin-top: 3rem;">
   <h3>Create a new campaign</h3>
   <form action="{{ url_for('base.campaigns') }}" method="POST">

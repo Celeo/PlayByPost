@@ -120,16 +120,6 @@ def campaign_join(campaign_id):
     return render_template('campaign_join.jinja2', campaign=campaign)
 
 
-@blueprint.route('/search')
-def search():
-    return render_template('search.jinja2')
-
-
-@blueprint.route('/glossary')
-def glossary():
-    return render_template('glossary.jinja2')
-
-
 @blueprint.route('/help')
 def help():
     return render_template('help.jinja2')

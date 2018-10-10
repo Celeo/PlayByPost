@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_login import LoginManager
 
 from .shared import db
@@ -29,3 +29,21 @@ def filter_format_date(dt):
 
 
 app.register_blueprint(base_blueprint)
+
+
+@app.errorhandler(404)
+def error_404(error):
+    print(f'404 ERROR: {error}')
+    return render_template('error_404.jinja2')
+
+
+@app.errorhandler(400)
+def error_400(error):
+    print(f'400 ERROR: {error}')
+    return render_template('error_400.jinja2')
+
+
+@app.errorhandler(500)
+def error_500(error):
+    print(f'500 ERROR: {error}')
+    return render_template('error_500.jinja2')

@@ -24,8 +24,6 @@
           <li class="nav-item dropdown">
             <a href="#" class="nav-item nav-link dropdown-toggle" data-toggle="dropdown">Tools</a>
             <div class="dropdown-menu bg-dark">
-              <a class="dropdown-item text-light" href="{{ url_for('base.search') }}">Search</a>
-              <a class="dropdown-item text-light" href="{{ url_for('base.glossary') }}">Glossary</a>
               <a class="dropdown-item text-light" href="{{ url_for('base.help') }}">Help</a>
             </div>
           </li>
@@ -54,9 +52,19 @@
           {% if messages %}
             {% for category, message in messages %}
               {% if category == 'error' %}
-                <div class="alert alert-danger">{{ message }}</div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                  </button>
+                </div>
               {% else %}
-                <div class="alert alert-primary">{{ message }}</div>
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                  </button>
+                </div>
               {% endif %}
             {% endfor %}
           {% endif %}

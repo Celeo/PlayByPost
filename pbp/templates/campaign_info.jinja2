@@ -32,12 +32,18 @@
       </tr>
       <tr>
         <th>Last post</th>
-        <td>{{ campaign.posts[-1].date | format_date }}</td>
+        <td>
+          {% if campaign.posts %}
+            {{ campaign.posts[-1].date | format_date }}
+          {% else %}
+            Never
+          {% endif %}
+        </td>
       </tr>
     </tbody>
   </table>
   <blockquote>
-    {{ campaign.description }}
+    {{ campaign.description or '*No description set*' }}
   </blockquote>
 </div>
 
