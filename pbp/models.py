@@ -70,6 +70,10 @@ class Campaign(db.Model):
     created_by_user = db.relationship('User', foreign_keys=[created_by_user_id], backref=db.backref('created_campaigns', lazy=True))
     dm_user = db.relationship('User', foreign_keys=[dm_user_id], backref=db.backref('dm_campaigns', lazy=True))
 
+    @property
+    def dm_posts(self):
+        return [post for post in self.posts if post.character.user_id == self.dm_user_id]
+
 
 class Character(db.Model):
 

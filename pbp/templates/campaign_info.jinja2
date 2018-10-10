@@ -1,0 +1,44 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+
+<div class="container">
+  <div class="clearfix">
+    <h2 class="float-left">Campaign info</h2>
+    <a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}" class="float-right btn btn-outline-secondary">Back to posts</a>
+  </div>
+  <br>
+  <table class="table">
+    <tbody>
+      <tr>
+        <th>Name</th>
+        <td>{{ campaign.name }}</td>
+      </tr>
+      <tr>
+        <th>DM</th>
+        <td>{{ campaign.dm_user.name }}</td>
+      </tr>
+      <tr>
+        <th>Created on</th>
+        <td>{{ campaign.date_created | format_date }}</td>
+      </tr>
+      <tr>
+        <th>Number of posts</th>
+        <td>{{ campaign.posts | length }}</td>
+      </tr>
+      <tr>
+        <th>Number of DM posts</th>
+        <td>{{ campaign.dm_posts | length }}</td>
+      </tr>
+      <tr>
+        <th>Last post</th>
+        <td>{{ campaign.posts[-1].date | format_date }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <blockquote>
+    {{ campaign.description }}
+  </blockquote>
+</div>
+
+{% endblock %}

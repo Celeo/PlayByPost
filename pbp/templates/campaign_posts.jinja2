@@ -6,11 +6,12 @@
   {# TODO pagination #}
   <div class="clearfix">
     <h2 class="float-left">{{ campaign.name }}</h2>
-    {% if current_user.should_show_join_link(campaign) %}
-      <div class="float-right">
+    <div class="float-right">
+      {% if current_user.should_show_join_link(campaign) %}
         <a href="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" class="btn btn-outline-primary">Join</a>
-      </div>
-    {% endif %}
+      {% endif %}
+      <a href="{{ url_for('base.campaign_info', campaign_id=campaign.id) }}" class='btn btn-outline-secondary'>Info</a>
+    </div>
   </div>
   {% for post in posts %}
     <div class="card rounded shadow mb-2">

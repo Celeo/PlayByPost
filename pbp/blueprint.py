@@ -35,6 +35,9 @@ def index():
 
 @blueprint.route('/campaigns', methods=['GET', 'POST'])
 def campaigns():
+    # TODO when the user goes and makes the campaign, create for them a "DM"
+    # user that's automatically tied to the campaign without having to join,
+    # and set that character as the DM.
     if request.method == 'POST':
         new_campaign = Campaign(
             created_by_user_id=current_user.id,
@@ -52,7 +55,8 @@ def campaigns():
 
 
 @blueprint.route('/campaign/<int:campaign_id>/posts')
-def campaign_posts(campaign_id):
+@blueprint.route('/campaign/<int:campaign_id>/posts/<int:page>')
+def campaign_posts(campaign_id, page=1):
     # TODO pagination
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
@@ -60,6 +64,15 @@ def campaign_posts(campaign_id):
         return redirect(url_for('.campaigns'))
     posts = Post.query.filter_by(campaign_id=campaign_id).all()
     return render_template('campaign_posts.jinja2', campaign=campaign, posts=posts)
+
+
+@blueprint.route('/campaign/<int:campaign_id>/info')
+def campaign_info(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    if not campaign:
+        flash('Could not find campaign with that id', 'error')
+        return redirect(url_for('.campaigns'))
+    return render_template('campaign_info.jinja2', campaign=campaign)
 
 
 @blueprint.route('/campaign/<int:campaign_id>/new_post', methods=['POST'])
