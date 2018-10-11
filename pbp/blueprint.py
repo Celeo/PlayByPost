@@ -35,18 +35,24 @@ def index():
 
 @blueprint.route('/campaigns', methods=['GET', 'POST'])
 def campaigns():
-    # TODO when the user goes and makes the campaign, create for them a "DM"
-    # user that's automatically tied to the campaign without having to join,
-    # and set that character as the DM.
     if request.method == 'POST':
         new_campaign = Campaign(
-            created_by_user_id=current_user.id,
-            dm_user_id=current_user.id,
+            creator_user_id=current_user.id,
             name=request.form['name'],
             description=request.form['description'],
             date_created=datetime.utcnow()
         )
+        new_dm = Character(
+            user_id=current_user.id,
+            name='DM',
+            tag='Dungeon Master',
+            campaign_approved=True,
+        )
+        new_campaign.dm_character = new_dm
         db.session.add(new_campaign)
+        db.session.add(new_dm)
+        db.session.commit()
+        new_dm.campaign_id = new_campaign.id
         db.session.commit()
         flash('New campaign created')
         return redirect(url_for('.campaigns'))
@@ -98,6 +104,8 @@ def campaign_new_post(campaign_id):
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
 
 
+# This is still letting me manually go to this url and submit a new char
+# to join the campaign; no non-template blocks in place.
 @blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)
@@ -200,6 +208,9 @@ def profile_characters():
                 flash('You are not the owner of that character', 'error')
                 return redirect(url_for('.profile_characters'))
             if form_field == 'name':
+                if character.name == 'DM':
+                    flash('You cannot rename a DM character', 'error')
+                    return redirect(url_for('.profile_characters'))
                 if character.campaign_id:
                     for other_character in Character.query.filter_by(campaign_id=character.campaign_id):
                         if other_character.character.name == new_value:

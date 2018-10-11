@@ -10,7 +10,10 @@
       {% if current_user.should_show_join_link(campaign) %}
         <a href="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" class="btn btn-outline-primary">Join</a>
       {% endif %}
-      <a href="{{ url_for('base.campaign_info', campaign_id=campaign.id) }}" class='btn btn-outline-secondary'>Info</a>
+      <a href="{{ url_for('base.campaign_info', campaign_id=campaign.id) }}" class='btn btn-outline-primary'>Info</a>
+      {% if current_user.is_dm_to_campaign(campaign) %}
+        <a href="#" class="btn btn-outline-secondary" disabled>DM controls</a>
+      {% endif %}
     </div>
   </div>
   {% for post in posts %}
@@ -44,7 +47,7 @@
         <vue-editor v-model="newPost" :editor-toolbar="toolbar"></vue-editor>
         <button type="submit" class="btn btn-primary" :disabled="!valid">Post</button>
       </form>
-      {# TODO also going to need a widget for rolling dice just like before #}
+      {# TODO also going to need a widget for rolling dice just like before, so this is only half finished #}
     </div>
 
     <script>

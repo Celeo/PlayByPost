@@ -2,14 +2,6 @@
 
 {% block body %}
 
-{#
-  TODO
-    - List characters, including which campaign they are in, if any
-    - Rename a character
-    - Set a character's tag
-    - Create a new character
-#}
-
 <div id="app">
   <div class="container">
     <h1>Characters</h1>
@@ -28,7 +20,11 @@
             <tr>
               <td>{{ character.name }}</td>
               <td>
-                <button type="button" class="btn btn-outline-primary" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
+                {% if not character.name == 'DM' %}
+                  <button type="button" class="btn btn-outline-primary" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
+                {% else %}
+                  <button type="button" class="btn btn-outline-secondary" disabled>Rename</button>
+                {% endif %}
               </td>
               <td>
                 {% if character.tag %}

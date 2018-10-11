@@ -5,7 +5,9 @@
 <div class="container">
   <div class="clearfix">
     <h2 class="float-left">Campaign info</h2>
-    <a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}" class="float-right btn btn-outline-secondary">Back to posts</a>
+    <div class="float-right">
+      <a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}" class="btn btn-outline-primary">Back to posts</a>
+    </div>
   </div>
   <br>
   <table class="table">
@@ -13,10 +15,6 @@
       <tr>
         <th>Name</th>
         <td>{{ campaign.name }}</td>
-      </tr>
-      <tr>
-        <th>DM</th>
-        <td>{{ campaign.dm_user.name }}</td>
       </tr>
       <tr>
         <th>Created on</th>

@@ -53,26 +53,29 @@ class User(db.Model):
                 return False
         return True
 
+    def is_dm_to_campaign(self, campaign):
+        return campaign.dm_character.user_id == self.id
+
 
 class Campaign(db.Model):
 
     __tablename__ = 'campaigns'
 
     id = db.Column(db.Integer, primary_key=True)
-    created_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    dm_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    name = db.Column(db.String(100))
+    creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    dm_character_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
+    name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String)
     date_created = db.Column(db.DateTime)
     is_locked = db.Column(db.Boolean, default=False)
     is_posts_public = db.Column(db.Boolean, default=True)
 
-    created_by_user = db.relationship('User', foreign_keys=[created_by_user_id], backref=db.backref('created_campaigns', lazy=True))
-    dm_user = db.relationship('User', foreign_keys=[dm_user_id], backref=db.backref('dm_campaigns', lazy=True))
+    created_by_user = db.relationship('User', foreign_keys=[creator_user_id], backref=db.backref('created_campaigns', lazy=True))
+    dm_character = db.relationship('Character', uselist=False, foreign_keys=[dm_character_id], backref=db.backref('dm_campaign', lazy=True))
 
     @property
     def dm_posts(self):
-        return [post for post in self.posts if post.character.user_id == self.dm_user_id]
+        return [post for post in self.posts if post.character.user_id == self.dm_character_id]
 
 
 class Character(db.Model):
@@ -86,8 +89,8 @@ class Character(db.Model):
     tag = db.Column(db.String(100))
     campaign_approved = db.Column(db.Boolean, default=False)
 
-    user = db.relationship('User', backref=db.backref('characters', lazy=True))
-    campaign = db.relationship('Campaign', backref=db.backref('characters', lazy=True))
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('characters', lazy=True))
+    campaign = db.relationship('Campaign', foreign_keys=[campaign_id], backref=db.backref('characters', lazy=True))
 
 
 class Post(db.Model):
@@ -114,6 +117,7 @@ class Roll(db.Model):
     __tablename__ = 'rolls'
 
     id = db.Column(db.Integer, primary_key=True)
+    # TODO link rolls to a _character_, not a _user_
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
     pending = db.Column(db.Boolean, default=True)
