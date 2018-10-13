@@ -33,8 +33,14 @@ def index():
     return render_template('index.jinja2')
 
 
-@blueprint.route('/campaigns', methods=['GET', 'POST'])
+@blueprint.route('/campaigns')
 def campaigns():
+    campaigns = Campaign.query.all()
+    return render_template('campaigns.jinja2', campaigns=campaigns)
+
+
+@blueprint.route('/campaigns/create', methods=['GET', 'POST'])
+def campaign_create():
     if request.method == 'POST':
         new_campaign = Campaign(
             creator_user_id=current_user.id,
@@ -57,7 +63,7 @@ def campaigns():
         flash('New campaign created')
         return redirect(url_for('.campaigns'))
     campaigns = Campaign.query.all()
-    return render_template('campaigns.jinja2', campaigns=campaigns)
+    return render_template('campaigns_create.jinja2', campaigns=campaigns)
 
 
 @blueprint.route('/campaign/<int:campaign_id>/posts')
@@ -104,11 +110,11 @@ def campaign_new_post(campaign_id):
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
 
 
-# This is still letting me manually go to this url and submit a new char
-# to join the campaign; no non-template blocks in place.
 @blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)
+    if not current_user.should_show_join_link(campaign):
+        return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
     if request.method == 'POST':
         character = Character.query.get(int(request.form['character']))
         if character.campaign_id:
@@ -194,6 +200,9 @@ def profile_characters():
                 return redirect(url_for('.profile_characters'))
             if not character.user_id == current_user.id:
                 flash('You are not the owner of that character', 'error')
+                return redirect(url_for('.profile_characters'))
+            if character.campaign_approved:
+                flash('You cannot delete a character that\'s part of a campaign', 'error')
                 return redirect(url_for('.profile_characters'))
             db.session.delete(character)
             db.session.commit()

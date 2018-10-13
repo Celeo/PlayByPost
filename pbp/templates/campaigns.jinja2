@@ -3,7 +3,12 @@
 {% block body %}
 
 <div class="container">
-  <h1>Campaigns</h1>
+  <div class="clearfix">
+    <h1 class="float-left">Campaigns</h1>
+    <div class="float-right">
+      <a href="{{ url_for('base.campaign_create') }}" class="btn btn-outline-success">Create</a>
+    </div>
+  </div>
   <br>
 
   <table class="table">
@@ -36,20 +41,6 @@
       {% endfor %}
     </tbody>
   </table>
-  <br>
-  <hr style="margin-top: 3rem;">
-  <h3>Create a new campaign</h3>
-  <form action="{{ url_for('base.campaigns') }}" method="POST">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" class="form-control" name="name" placeholder="Name of campaign" required>
-    </div>
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea class="form-control" name="description"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Create new</button>
-  </form>
 </div>
 
 {% endblock %}

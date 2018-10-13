@@ -12,7 +12,7 @@
       {% endif %}
       <a href="{{ url_for('base.campaign_info', campaign_id=campaign.id) }}" class='btn btn-outline-primary'>Info</a>
       {% if current_user.is_dm_to_campaign(campaign) %}
-        <a href="#" class="btn btn-outline-secondary" disabled>DM controls</a>
+        <a href="#" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="bottom" title="Not yet enabled" disabled>DM controls</a>
       {% endif %}
     </div>
   </div>
@@ -45,7 +45,7 @@
       <form action="{{ url_for('base.campaign_new_post', campaign_id=campaign.id) }}" method="POST">
         <input type="hidden" name="content" v-model="newPost">
         <vue-editor v-model="newPost" :editor-toolbar="toolbar"></vue-editor>
-        <button type="submit" class="btn btn-primary" :disabled="!valid">Post</button>
+        <button type="submit" class="btn btn-outline-success" :disabled="!valid" style="margin-top: 5px;">Post</button>
       </form>
       {# TODO also going to need a widget for rolling dice just like before, so this is only half finished #}
     </div>

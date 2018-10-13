@@ -14,7 +14,7 @@
       <label for="password">Password (at least 5 characters)</label>
       <input type="password" :class="{'form-control': true, 'is-valid': valid_password, 'is-invalid': !valid_password}" name="password" placeholder="password" v-model="password" required>
     </div>
-    <button type="submit" class="btn btn-primary" :disabled="!valid_input">Register</button>
+    <button type="submit" class="btn btn-outline-success" :disabled="!valid_input">Register</button>
   </form>
 </div>
 

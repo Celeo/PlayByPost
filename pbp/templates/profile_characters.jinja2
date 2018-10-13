@@ -21,9 +21,9 @@
               <td>{{ character.name }}</td>
               <td>
                 {% if not character.name == 'DM' %}
-                  <button type="button" class="btn btn-outline-primary" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
+                  <button type="button" class="btn btn-outline-success" @click="editName({{ character.id }}, '{{ character.name }}')">Rename</button>
                 {% else %}
-                  <button type="button" class="btn btn-outline-secondary" disabled>Rename</button>
+                  <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="You cannot rename a DM character" disabled>Rename</button>
                 {% endif %}
               </td>
               <td>
@@ -32,19 +32,19 @@
                 {% endif %}
               </td>
               <td>
-                <button type="button" class="btn btn-outline-primary" @click="editTag({{ character.id }}, '{{ character.tag or '' }}')">Set tag</button>
+                <button type="button" class="btn btn-outline-success" @click="editTag({{ character.id }}, '{{ character.tag or '' }}')">Set tag</button>
               </td>
               <td>
                 {% if character.campaign_id and character.campaign_approved %}
-                  <a href="{{ url_for('base.campaign_posts', campaign_id=character.campaign.id) }}">{{ character.campaign.name }}</a>
+                  <a href="{{ url_for('base.campaign_posts', campaign_id=character.campaign.id) }}" class="btn btn-outline-primary">{{ character.campaign.name }}</a>
                 {% elif character.campaign_id and not character.campaign_approved %}
-                  Membership pending
+                  Membership pending to "{{ character.campaign.name }}"
                 {% else %}
                   Not in a campaign
                 {% endif %}
               </td>
               <td>
-                {% if not character.campaign_id %}
+                {% if not character.campaign_approved %}
                   <form action="{{ url_for('base.profile_characters') }}" method="POST">
                     <input type="hidden" name="field" value="delete">
                     <input type="hidden" name="character_id" value="{{ character.id }}">
@@ -56,7 +56,7 @@
           {% endfor %}
         </tbody>
       </table>
-      <p class="text-75-percent"><i>Note</i>: you cannot delete a character that is in or has applied to a campaign.</p>
+      <p class="text-75-percent"><i>Note: you cannot delete a character that is in a campaign.</i></p>
       <br>
     {% else %}
       <p>No created characters</p>
@@ -70,7 +70,7 @@
         <label for="name">Name</label>
         <input type="text" name="value" class="form-control">
       </div>
-      <button type="submit" class="btn btn-primary">Create</button>
+      <button type="submit" class="btn btn-outline-primary">Create</button>
     </form>
   </div>
 
@@ -93,7 +93,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-success">Save</button>
           </div>
         </form>
       </div>
@@ -119,7 +119,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-success">Save</button>
           </div>
         </form>
       </div>
