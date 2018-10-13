@@ -4,6 +4,12 @@ from .shared import db
 
 
 class User(db.Model):
+    """A site user.
+
+    This represents a single real person using the site.
+
+    A user can have multiple characters.
+    """
 
     __tablename__ = 'users'
 
@@ -58,6 +64,13 @@ class User(db.Model):
 
 
 class Campaign(db.Model):
+    """A collection of posts.
+
+    A campaign is a series of posts both from a DM and other characters
+    telling a story.
+
+    A campaign can have multiple posts and multiple characters.
+    """
 
     __tablename__ = 'campaigns'
 
@@ -79,6 +92,14 @@ class Campaign(db.Model):
 
 
 class Character(db.Model):
+    """A fictional persona.
+
+    A character is a persona that a person "steps into" in order
+    to participate in a story.
+
+    A character can have multiple posts and multiple rolls, and
+    is a member of either no or one campaign.
+    """
 
     __tablename__ = 'characters'
 
@@ -94,6 +115,13 @@ class Character(db.Model):
 
 
 class Post(db.Model):
+    """An article.
+
+    A post is a collection of text and rolls that represents a character
+    taking action in the story.
+
+    A post can have multiple rolls and is in a single campaign by a single character.
+    """
 
     __tablename__ = 'posts'
 
@@ -113,17 +141,36 @@ class Post(db.Model):
 
 
 class Roll(db.Model):
+    """A random chance.
+
+    A roll is the random representation of resolving success or failure.
+
+    A roll is part of a single post and is made by a single character.
+    """
 
     __tablename__ = 'rolls'
 
     id = db.Column(db.Integer, primary_key=True)
-    # TODO link rolls to a _character_, not a _user_
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
-    pending = db.Column(db.Boolean, default=True)
+    character_id = db.Column(db.Integer, db.ForeignKey('characters.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     string = db.Column(db.String(100))
     value = db.Column(db.Integer, default=0)
     is_crit = db.Column(db.Boolean, default=False)
 
     post = db.relationship('Post', backref=db.backref('rolls', lazy=True))
-    user = db.relationship('User', backref=db.backref('rolls', lazy=True))
+    character = db.relationship('Character', backref=db.backref('rolls', lazy=True))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'character_id': self.character_id,
+            'post_id': self.post_id,
+            'pending': self.pending,
+            'string': self.string,
+            'value': self.value,
+            'is_crit': self.is_crit
+        }
+
+    @property
+    def pending(self):
+        return self.post_id is None

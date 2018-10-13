@@ -21,7 +21,11 @@ database, update 'config.json' accordingly and install any required libraries.
 
 ## Running
 
-1. Run './run.sh' for local development and './run_prod.sh' for production.
+1. Run './run.sh' for local development and './run.sh prod' for production.
+
+### Running tests
+
+1. Run './run.sh tests'
 
 ## Deploying
 

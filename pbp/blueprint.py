@@ -4,6 +4,7 @@ import re
 from flask import (
     Blueprint,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -20,10 +21,14 @@ from .models import (
     Campaign,
     Character,
     Post,
-    User
+    User,
+    Roll
 )
 from .shared import db
-from .util import is_safe_url
+from .util import (
+    is_safe_url,
+    roll_dice
+)
 
 blueprint = Blueprint('base', __name__, template_folder='templates')
 
@@ -108,6 +113,27 @@ def campaign_new_post(campaign_id):
     db.session.commit()
     flash('New post added')
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
+
+
+@blueprint.route('/campaign/<int:campaign_id>/roll', methods=['GET', 'POST'])
+def campaign_rolls(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    if not campaign:
+        flash('Could not find campaign with that id', 'error')
+        return redirect(url_for('.campaigns'))
+    character = current_user.get_character_in_campaign(campaign)
+    if not character:
+        flash('You are not a member of that campaign', 'error')
+        return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
+    if request.method == 'POST':
+        roll = request.json.get('roll')
+        if not roll:
+            return '', 400
+        roll = roll_dice(character, roll)
+        db.session.add(roll)
+        db.session.commit()
+    rolls = Roll.query.filter_by(character_id=current_user.get_character_in_campaign(campaign).id).all()
+    return jsonify([r.to_dict() for r in rolls])
 
 
 @blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
