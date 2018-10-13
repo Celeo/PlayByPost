@@ -21,7 +21,7 @@
       <div class="card-body">
         <div class="card-title clearfix post-title">
           {# TODO post editing #}
-          <h5 class="float-left">{{ post.character.name }}{% if post.tag %} ({{ post.tag }}){% endif %}</h5>
+          <h5 class="float-left">{{ post.character.name }}{% if post.tag %} <span class="text-75-percent">({{ post.tag }})</span>{% endif %}</h5>
           <h5 class="float-right">{{ post.date | format_date }}</h5>
         </div>
         {{ post.content }}

@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.conf.js -d",
-    "_comment": "This isn't working for getting Vue to run in production mode: it's always running in development mode; https://vuejs.org/v2/guide/deployment.html",
+    "_comment": "TODO This isn't working for getting Vue to run in production mode: it's always running in development mode; https://vuejs.org/v2/guide/deployment.html",
     "build_prod": "NODE_ENV=production webpack --config webpack.conf.js -p"
   }
 }
