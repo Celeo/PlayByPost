@@ -25,13 +25,11 @@
           <h5 class="float-right">{{ post.date | format_date }}</h5>
         </div>
         {{ post.content }}
-        <div id="rolls">
-          {% for roll in post.rolls %}
-            <div class="roll">
-              {{ roll.string }} => {{ roll.value }}{% if roll.is_crit %} (crit){% endif %}
-            </div>
-          {% endfor %}
-        </div>
+        {% for roll in post.rolls %}
+          <div class="roll">
+            {{ roll.string }} => {{ roll.value }}{% if roll.is_crit %} (crit){% endif %}
+          </div>
+        {% endfor %}
       </div>
     </div>
   {% else %}
@@ -41,40 +39,23 @@
   {% if current_user.get_character_in_campaign(campaign) %}
     <br><br><br><hr>
     <h4>New post</h4>
-    <div id="app">
-      <form action="{{ url_for('base.campaign_new_post', campaign_id=campaign.id) }}" method="POST">
-        <input type="hidden" name="content" v-model="newPost">
-        <vue-editor v-model="newPost" :editor-toolbar="toolbar"></vue-editor>
-        <button type="submit" class="btn btn-outline-success" :disabled="!valid" style="margin-top: 5px;">Post</button>
-      </form>
-      {# TODO also going to need a widget for rolling dice just like before, so this is only half finished #}
+    <div class="row" id="editorArea" style="display: none;">
+      <div class="col-lg-8 col-md-12">
+        {% include 'parts/editor.jinja2' %}
+      </div>
+      <div class="col-lg-4 col-md-12">
+        {% include 'parts/roller.jinja2' %}
+      </div>
     </div>
-
-    <script>
-      $(document).ready(function() {
-        new Vue({
-          el: '#app',
-          components: {
-            'vue-editor': VueEditor
-          },
-          data: {
-            newPost: '',
-            toolbar: [
-              ['bold', 'italic'],
-              [{ 'header': [false, 3, 6] }],
-              [{ list: 'bullet' }],
-              [{ color: ['blue', 'black'] }, 'clean']
-            ]
-          },
-          computed: {
-            valid() {
-              return this.newPost.length > 0 && this.newPost !== '<p><br></p>'
-            }
-          }
-        })
-      })
-    </script>
   {% endif %}
 </div>
+
+<script src="{{ url_for('static', filename='roller.js') }}"></script>
+<script>
+  $(document).ready(() => {
+    window.loadRoller({{ campaign.id }})
+    $('#editorArea').show()
+  })
+</script>
 
 {% endblock %}

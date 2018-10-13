@@ -110,6 +110,9 @@ def campaign_new_post(campaign_id):
         content=request.form['content']
     )
     db.session.add(post)
+    pending_rolls = Roll.query.filter_by(character_id=character.id, post_id=None).all()
+    for roll in pending_rolls:
+        roll.post = post
     db.session.commit()
     flash('New post added')
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
@@ -119,12 +122,10 @@ def campaign_new_post(campaign_id):
 def campaign_rolls(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
-        flash('Could not find campaign with that id', 'error')
-        return redirect(url_for('.campaigns'))
+        return 'Could not find campaign with that id', 404
     character = current_user.get_character_in_campaign(campaign)
     if not character:
-        flash('You are not a member of that campaign', 'error')
-        return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
+        return 'You are not a member of that campaign', 403
     if request.method == 'POST':
         roll = request.json.get('roll')
         if not roll:
@@ -132,7 +133,7 @@ def campaign_rolls(campaign_id):
         roll = roll_dice(character, roll)
         db.session.add(roll)
         db.session.commit()
-    rolls = Roll.query.filter_by(character_id=current_user.get_character_in_campaign(campaign).id).all()
+    rolls = Roll.query.filter_by(character_id=current_user.get_character_in_campaign(campaign).id, post_id=None).all()
     return jsonify([r.to_dict() for r in rolls])
 
 

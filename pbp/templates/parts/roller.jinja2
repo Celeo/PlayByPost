@@ -1,0 +1,33 @@
+<div id="rollerApp">
+  <form action="" method="POST" @submit.prevent="">
+    <div class="form-group mb-0">
+      <label for="action">Action</label>
+      <input type="text" class="form-control" v-model="action" >
+    </div>
+    <div class="row pt-1 pb-1" v-for="(die, index) in dice" :key="index">
+      <div class="col form-group mb-0">
+        <label for="count" class="mb-0">Count</label>
+        <input type="number" v-model="die.count" min="1" class="form-control">
+      </div>
+      <div class="col form-group mb-0">
+        <label for="sides" class="mb-0">Sides</label>
+        <input type="number" v-model="die.sides" min="2" max="100" class="form-control">
+      </div>
+      <div class="col form-group mb-0">
+        <label for="mod" class="mb-0">Mod</label>
+        <input type="number" v-model="die.mod" class="form-control">
+      </div>
+      <div class="col d-flex justify-content-around">
+        <div class="btn-group align-bottom" role="group">
+          <button class="btn btn-success" @click="addRow">&plus;</button>
+          <button class="btn btn-danger" @click="removeRow(index)" :disabled="dice.length === 1">&minus;</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-outline-success w-100 mt-1" :disabled="!valid || rolling" @click="roll">Roll</button>
+    <div class="alert alert-danger" v-show="error">Some data didn't make it through</div>
+    <div class="pt-2">
+      <div v-for="roll in pending" :key="roll.id" v-text="formatRoll(roll)"></div>
+    </div>
+  </form>
+</div>

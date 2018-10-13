@@ -18,4 +18,6 @@ blockquote {
     font-size: 75%;
 }
 
-/* roll formatting */
+.roll {
+    color: rgb(67, 160, 71);
+}
