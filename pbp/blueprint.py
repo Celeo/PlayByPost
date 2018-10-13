@@ -178,8 +178,8 @@ def profile_login():
         login_user(user, remember=True)
         next_url = request.args.get('next')
         if next_url and not is_safe_url(next_url):
-            return redirect(url_for('.profile_settings'))
-        return redirect(next_url or url_for('.profile_settings'))
+            return redirect(url_for('.campaigns'))
+        return redirect(next_url or url_for('.campaigns'))
     return render_template('login.jinja2')
 
 
