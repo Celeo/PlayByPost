@@ -7,11 +7,11 @@
   <div class="clearfix">
     <h2 class="float-left">{{ campaign.name }}</h2>
     <div class="float-right">
-      {% if current_user.should_show_join_link(campaign) %}
+      {% if current_user.is_authenticated and current_user.should_show_join_link(campaign) %}
         <a href="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" class="btn btn-outline-primary">Join</a>
       {% endif %}
       <a href="{{ url_for('base.campaign_info', campaign_id=campaign.id) }}" class='btn btn-outline-primary'>Info</a>
-      {% if current_user.is_dm_to_campaign(campaign) %}
+      {% if current_user.is_authenticated and current_user.is_dm_to_campaign(campaign) %}
         <a href="#" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="bottom" title="Not yet enabled" disabled>DM controls</a>
       {% endif %}
     </div>
@@ -36,7 +36,7 @@
     <br><br>
     <h4>No posts have been made in this campaign yet.</h4>
   {% endfor %}
-  {% if current_user.get_character_in_campaign(campaign) %}
+  {% if current_user.is_authenticated and current_user.get_character_in_campaign(campaign) %}
     <br><br><br><hr>
     <h4>New post</h4>
     <div class="row" id="editorArea" style="display: none;">
@@ -51,11 +51,13 @@
 </div>
 
 <script src="{{ url_for('static', filename='roller.js') }}"></script>
-<script>
-  $(document).ready(() => {
-    window.loadRoller({{ campaign.id }})
-    $('#editorArea').show()
-  })
-</script>
+{% if current_user.is_authenticated and current_user.get_character_in_campaign %}
+  <script>
+    $(document).ready(() => {
+      window.loadRoller({{ campaign.id }})
+      $('#editorArea').show()
+    })
+  </script>
+{% endif %}
 
 {% endblock %}

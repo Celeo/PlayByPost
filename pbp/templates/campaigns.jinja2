@@ -31,11 +31,13 @@
             {% endif %}
           </td>
           <td>
-            {% with campaign_char = current_user.get_character_in_campaign(campaign) %}
-              {% if campaign_char %}
-                {{ campaign_char.name }}
-              {% endif %}
-            {% endwith %}
+            {% if current_user.is_authenticated %}
+              {% with campaign_char = current_user.get_character_in_campaign(campaign) %}
+                {% if campaign_char %}
+                  {{ campaign_char.name }}
+                {% endif %}
+              {% endwith %}
+            {% endif %}
           </td>
         </tr>
       {% endfor %}
