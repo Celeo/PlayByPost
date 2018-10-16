@@ -78,3 +78,11 @@ def roll_dice(character, s):
 
 def is_valid_email(email):
     return re.match(r'.+@(?:.+){2,}\.(?:.+){2,}', email)
+
+
+def pagination_pages(current_page, page_count):
+    return [
+        page for page in
+        [current_page - 2, current_page - 1, current_page, current_page + 1, current_page + 2]
+        if 0 < page <= page_count
+    ]

@@ -27,6 +27,7 @@ from .shared import db
 from .util import (
     is_safe_url,
     is_valid_email,
+    pagination_pages,
     roll_dice
 )
 
@@ -75,13 +76,22 @@ def campaign_create():
 @blueprint.route('/campaign/<int:campaign_id>/posts')
 @blueprint.route('/campaign/<int:campaign_id>/posts/<int:page>')
 def campaign_posts(campaign_id, page=1):
-    # TODO pagination
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
         flash('Could not find campaign with that id', 'error')
         return redirect(url_for('.campaigns'))
-    posts = Post.query.filter_by(campaign_id=campaign_id).all()
-    return render_template('campaign_posts.jinja2', campaign=campaign, posts=posts)
+    query = Post.query.filter_by(campaign_id=campaign_id)
+    if current_user.posts_newest_first:
+        query = query.order_by(Post.id.desc())
+    pagination = query.paginate(page=page, per_page=current_user.posts_per_page)
+    return render_template(
+        'campaign_posts.jinja2',
+        campaign=campaign,
+        posts=pagination.items,
+        pages=pagination.pages,
+        page=page,
+        pagination_pages=pagination_pages
+    )
 
 
 @blueprint.route('/campaign/<int:campaign_id>/info')
