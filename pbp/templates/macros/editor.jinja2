@@ -1,0 +1,34 @@
+{% macro editor(post_url, current_text='', button_text='Post') -%}
+<div id="editorApp">
+  <form action="{{ post_url }}" method="POST">
+    <input type="hidden" name="content" v-model="content">
+    <vue-editor v-model="content" :editor-toolbar="toolbar"></vue-editor>
+    <button type="submit" class="btn btn-outline-success" :disabled="!valid" style="margin-top: 5px;">{{ button_text }}</button>
+  </form>
+</div>
+
+<script>
+  $(document).ready(() => {
+    new Vue({
+      el: '#editorApp',
+      components: {
+        'vue-editor': VueEditor
+      },
+      data: {
+        content: `{{ current_text.replace('`', '\\`') }}`,
+        toolbar: [
+          ['bold', 'italic'],
+          [{ 'header': [false, 3, 6] }],
+          [{ list: 'bullet' }],
+          [{ color: ['blue', 'black'] }, 'clean']
+        ]
+      },
+      computed: {
+        valid () {
+          return this.content.length > 0 && this.content !== '<p><br></p>'
+        }
+      }
+    })
+  })
+</script>
+{%- endmacro %}

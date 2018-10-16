@@ -1,3 +1,8 @@
+from datetime import (
+    datetime,
+    timedelta
+)
+
 import bcrypt
 
 from .shared import db
@@ -138,6 +143,10 @@ class Post(db.Model):
     @property
     def user(self):
         return self.character.user
+
+    @property
+    def can_be_edited(self):
+        return (datetime.utcnow() - self.date) <= timedelta(minutes=30)
 
 
 class Roll(db.Model):

@@ -137,6 +137,27 @@ def campaign_rolls(campaign_id):
     return jsonify([r.to_dict() for r in rolls])
 
 
+@blueprint.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
+def campaign_edit_post(post_id):
+    post = Post.query.get(post_id)
+    if not post:
+        flash('Could not find a post with that id', 'error')
+        return redirect(url_for('.campaigns'))
+    if not post.character.user_id == current_user.id:
+        flash('That isn\'t your post', 'error')
+        return redirect(url_for('.campaign_posts', campaign_id=post.campaign_id))
+    if not post.can_be_edited:
+        flash('This post can no longer be edited', 'error')
+        return redirect(url_for('.campaign_posts', campaign_id=post.campaign_id))
+    if request.method == 'POST':
+        content = request.form['content']
+        post.content = content
+        db.session.commit()
+        flash('Content saved')
+        return redirect(url_for('.campaign_posts', campaign_id=post.campaign_id))
+    return render_template('campaign_edit_post.jinja2', post=post)
+
+
 @blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)

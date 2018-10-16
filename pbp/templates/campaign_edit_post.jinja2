@@ -1,0 +1,15 @@
+{% from 'macros/editor.jinja2' import editor %}
+
+{% extends 'base.jinja2' %}
+
+{% block body %}
+
+<div class="container">
+  <div class="clearfix">
+    <h2 class="float-left">Edit post</h2>
+    <a href="{{ url_for('base.campaign_posts', campaign_id=post.campaign_id) }}" class="btn btn-outline-primary float-right">Back</a>
+  </div>
+  {{ editor(url_for('base.campaign_edit_post', post_id=post.id), post.content, 'Save') }}
+</div>
+
+{% endblock %}

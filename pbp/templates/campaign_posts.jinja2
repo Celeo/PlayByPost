@@ -1,3 +1,6 @@
+{% from 'macros/editor.jinja2' import editor %}
+{% from 'macros/roller.jinja2' import roller %}
+
 {% extends 'base.jinja2' %}
 
 {% block body %}
@@ -20,9 +23,13 @@
     <div class="card rounded shadow mb-2">
       <div class="card-body">
         <div class="card-title clearfix post-title">
-          {# TODO post editing #}
           <h5 class="float-left">{{ post.character.name }}{% if post.tag %} <span class="text-75-percent">({{ post.tag }})</span>{% endif %}</h5>
-          <h5 class="float-right">{{ post.date | format_date }}</h5>
+          <h5 class="float-right">
+            {{ post.date | format_date }}
+            {% if post.character.user_id == current_user.id and post.can_be_edited %}
+              <a href="{{ url_for('base.campaign_edit_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+            {% endif %}
+          </h5>
         </div>
         {{ post.content }}
         {% for roll in post.rolls %}
@@ -41,10 +48,10 @@
     <h4>New post</h4>
     <div class="row" id="editorArea" style="display: none;">
       <div class="col-lg-8 col-md-12">
-        {% include 'parts/editor.jinja2' %}
+        {{ editor(url_for('base.campaign_new_post', campaign_id=campaign.id)) }}
       </div>
       <div class="col-lg-4 col-md-12">
-        {% include 'parts/roller.jinja2' %}
+        {{ roller() }}
       </div>
     </div>
   {% endif %}
