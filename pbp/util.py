@@ -74,3 +74,7 @@ def roll_dice(character, s):
         final_value += die_result
     roll.value = final_value
     return roll
+
+
+def is_valid_email(email):
+    return re.match(r'.+@(?:.+){2,}\.(?:.+){2,}', email)

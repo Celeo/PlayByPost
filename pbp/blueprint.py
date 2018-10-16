@@ -1,5 +1,4 @@
 from datetime import datetime
-import re
 
 from flask import (
     Blueprint,
@@ -27,6 +26,7 @@ from .models import (
 from .shared import db
 from .util import (
     is_safe_url,
+    is_valid_email,
     roll_dice
 )
 
@@ -187,6 +187,51 @@ def campaign_join(campaign_id):
     return render_template('campaign_join.jinja2', campaign=campaign)
 
 
+@blueprint.route('/campaign/<int:campaign_id>/dm_controls', methods=['GET', 'POST'])
+@login_required
+def campaign_dm_controls(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    if not campaign:
+        flash('Could not find campaign with that id', 'error')
+        return redirect(url_for('.campaigns'))
+    if not current_user.is_dm_to_campaign(campaign):
+        flash('You are not a DM of that campaign', 'error')
+        return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
+    if request.method == 'POST':
+        form_type = request.form['type']
+        if form_type == 'applicant':
+            character = Character.query.get(request.form['character_id'])
+            if not character:
+                flash('Unknown character', 'error')
+                return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
+            if not character.campaign_id == campaign_id:
+                flash('That character has not applied for this campaign', 'error')
+                return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
+            if character.campaign_approved:
+                flash('That character is already approved for this campaign', 'error')
+                return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
+            if request.form['action'] == 'accept':
+                character.campaign_approved = True
+                flash('Character accepted')
+            else:
+                db.session.delete(character)
+                flash('Character denied')
+            db.session.commit()
+            return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
+        elif form_type == 'name_description':
+            campaign.name = request.form['name']
+            campaign.description = request.form['description']
+            db.session.commit()
+            flash('Campaign name/desciption updated')
+            return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
+        else:
+            flash('Unknown form submission', 'error')
+            return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
+    applicants = Character.query.filter_by(campaign_id=campaign_id, campaign_approved=False).all()
+    members = Character.query.filter_by(campaign_id=campaign_id, campaign_approved=True).all()
+    return render_template('campaign_dm_controls.jinja2', campaign=campaign, applicants=applicants, members=members)
+
+
 @blueprint.route('/help')
 def help():
     return render_template('help.jinja2')
@@ -218,7 +263,7 @@ def profile_register():
             flash('Email already in use', 'error')
             return redirect(url_for('.profile_register'))
         password = request.form['password']
-        if not re.match(r'.+@(?:.+){2,}\.(?:.+){2,}', email):
+        if not is_valid_email(email):
             flash('Email does meet basic requirements', 'error')
             return redirect(url_for('.profile_register'))
         if len(password) < 5:
@@ -309,7 +354,7 @@ def profile_settings():
             if User.query.filter_by(email=new_email).first():
                 flash('Email already in use', 'error')
                 return redirect(url_for('base.profile_settings'))
-            if re.match(r'.+@(?:.+){2,}\.(?:.+){2,}', new_email):
+            if is_valid_email(new_email):
                 current_user.email = new_email
                 db.session.commit()
                 flash('Settings saved')

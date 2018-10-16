@@ -15,7 +15,7 @@
       {% endif %}
       <a href="{{ url_for('base.campaign_info', campaign_id=campaign.id) }}" class='btn btn-outline-primary'>Info</a>
       {% if current_user.is_authenticated and current_user.is_dm_to_campaign(campaign) %}
-        <a href="#" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="bottom" title="Not yet enabled" disabled>DM controls</a> {# TODO implement #}
+        <a href="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" class="btn btn-outline-primary">DM controls</a>
       {% endif %}
     </div>
   </div>

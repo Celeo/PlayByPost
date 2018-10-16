@@ -1,0 +1,72 @@
+{% extends 'base.jinja2' %}
+
+{% block body %}
+
+<div class="container">
+  <div class="clearfix">
+    <h2 class="float-left">DM Controls</h2>
+    <a class="float-right btn btn-outline-primary" href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}">Back to posts</a>
+  </div>
+  <hr>
+  <h3>Applications</h3>
+  {% if applicants %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for applicant in applicants %}
+          <tr>
+            <td>{{ applicant.name }}</td>
+            <td>
+              <form action="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" method="POST">
+                <input type="hidden" name="type" value="applicant">
+                <input type="hidden" name="action" value="accept">
+                <input type="hidden" name="character_id" value="{{ applicant.id }}">
+                <button type="submit" class="btn btn-outline-success">Accept</button>
+              </form>
+            </td>
+            <td>
+              <form action="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" method="POST">
+                <input type="hidden" name="type" value="applicant">
+                <input type="hidden" name="action" value="deny">
+                <input type="hidden" name="character_id" value="{{ applicant.id }}">
+                <button type="submit" class="btn btn-outline-danger">Deny</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p><strong>There are no applications at this time.</strong></p>
+  {% endif %}
+  <hr>
+  <h3>Members</h3>
+  <ul>
+    {% for member in members %}
+      <li>{{ member.name }}</li>
+      {# Eventually, this should allow kicking characters from the campaign. #}
+    {% endfor %}
+  </ul>
+  <hr>
+  <h3>Name and description</h3>
+  <form action="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" method="POST">
+    <input type="hidden" name="type" value="name_description">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" class="form-control" value="{{ campaign.name }}" name="name">
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea class="form-control" name="description">{{ campaign.description }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-outline-success">Save</button>
+  </form>
+</div>
+
+{% endblock %}

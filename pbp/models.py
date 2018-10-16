@@ -112,7 +112,7 @@ class Character(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'))
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True)
     name = db.Column(db.String(100))
     tag = db.Column(db.String(100))
     campaign_approved = db.Column(db.Boolean, default=False)
