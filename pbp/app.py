@@ -1,5 +1,6 @@
 import os
 
+import arrow
 from flask import Flask, render_template
 from flask_login import LoginManager
 
@@ -29,7 +30,7 @@ def load_user(user_id):
 
 @app.template_filter('format_date')
 def filter_format_date(dt):
-    return dt.strftime('%b %m, %y @ %I:%M:%S %p')
+    return arrow.get(dt).to('America/Los_Angeles').strftime('%b %m, %y @ %I:%M:%S %p')
 
 
 app.register_blueprint(base_blueprint)
