@@ -4,8 +4,91 @@
 
 <div class="container">
   <h1>Settings</h1>
-  <div style="padding-bottom: 5rem;"></div>
-  <h4>Nothing here yet!</h4>
+  <hr>
+  <h3>Post settings</h3>
+  <form action="{{ url_for('base.profile_settings') }}" method="POST">
+    <input type="hidden" name="settings_type" value="posts">
+    <div class="form-group">
+      <label for="posts_per_page">Posts per page</label>
+      <input type="number" class="form-control" name="posts_per_page" min="1" max="100" value="{{ current_user.posts_per_page }}">
+    </div>
+    <div class="form-check">
+      <input type="radio" class="form-check-input" name="posts_newest_first" value="newest" id="pnf_n"{% if current_user.posts_newest_first %} checked{% endif %}>
+      <label for="pnf_n" class="form-check-label">Show newest posts at the top</label>
+    </div>
+    <div class="form-check">
+      <input type="radio" class="form-check-input" name="posts_newest_first" value="oldest" id="pnf_o"{% if not current_user.posts_newest_first %} checked{% endif %}>
+      <label for="pnf_o" class="form-check-label">Show oldest posts at the top</label>
+    </div>
+    <br>
+    <button class="btn btn-outline-success">Save</button>
+  </form>
+  <hr>
+  <h3>Email</h3>
+  <form action="{{ url_for('base.profile_settings') }}" method="POST" id="form-email">
+    <input type="hidden" name="settings_type" value="email">
+    <div class="form-group">
+      <label for="email">Change account email address</label>
+      <input type="text" :class="{'form-control': true, 'is-valid': validEmail, 'is-invalid': !validEmail}" name="email" v-model="email">
+    </div>
+    <button class="btn btn-outline-success" :disabled="!validEmail">Save</button>
+  </form>
+  <hr>
+  <h3>Password</h3>
+  <form action="{{ url_for('base.profile_settings') }}" method="POST" id="form-password">
+    <input type="hidden" name="settings_type" value="password">
+    <div class="form-group">
+      <label for="old_password">Current password</label>
+      <input type="password" :class="{'form-control': true}" name="old_password" v-model="currentPassword">
+    </div>
+    <div class="form-group">
+      <label for="old_password">New password</label>
+      <input type="password" :class="{'form-control': true, 'is-valid': validNew, 'is-invalid': !validNew}" name="new_password" v-model="newPassword">
+    </div>
+    <div class="form-group">
+      <label for="old_password">New password (again)</label>
+      <input type="password" :class="{'form-control': true, 'is-valid': validConfirm, 'is-invalid': !validConfirm}" name="new_password_confirm" v-model="confirmPassword">
+    </div>
+    <button class="btn btn-outline-success" :disabled="!validInput">Save</button>
+  </form>
 </div>
+
+<script>
+  $(document).ready(() => {
+    new window.Vue({
+      el: '#form-password',
+      data: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
+      computed: {
+        validOld () {
+          return this.currentPassword.length > 0
+        },
+        validNew () {
+          return this.newPassword.length > 5
+        },
+        validConfirm () {
+          return this.confirmPassword.length > 5 && this.newPassword === this.confirmPassword
+        },
+        validInput () {
+          return this.validOld && this.validNew && this.validConfirm
+        }
+      }
+    })
+    new window.Vue({
+      el: '#form-email',
+      data: {
+        email: `{{ current_user.email }}`
+      },
+      computed: {
+        validEmail () {
+          return /.+@(?:.+){2,}\.(?:.+){2,}/.test(this.email)
+        }
+      }
+    })
+  })
+</script>
 
 {% endblock %}

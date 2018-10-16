@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template
 from flask_login import LoginManager
 
@@ -16,6 +18,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'base.profile_login'
 login_manager.login_message_category = 'error'
+
+app.jinja_env.globals['FLASK_ENV'] = os.getenv('FLASK_ENV', 'production')
 
 
 @login_manager.user_loader

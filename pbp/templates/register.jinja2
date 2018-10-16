@@ -8,13 +8,13 @@
   <form action="{{ url_for('base.profile_register') }}" method="POST" id="form-app">
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="text" :class="{'form-control': true, 'is-valid': valid_email, 'is-invalid': !valid_email}" name="email" placeholder="your_address@somewhere.com" v-model="email" required>
+      <input type="text" :class="{'form-control': true, 'is-valid': validEmail, 'is-invalid': !validEmail}" name="email" placeholder="your_address@somewhere.com" v-model="email" required>
     </div>
     <div class="form-group">
       <label for="password">Password (at least 5 characters)</label>
-      <input type="password" :class="{'form-control': true, 'is-valid': valid_password, 'is-invalid': !valid_password}" name="password" placeholder="password" v-model="password" required>
+      <input type="password" :class="{'form-control': true, 'is-valid': validPassword, 'is-invalid': !validPassword}" name="password" placeholder="password" v-model="password" required>
     </div>
-    <button type="submit" class="btn btn-outline-success" :disabled="!valid_input">Register</button>
+    <button type="submit" class="btn btn-outline-success" :disabled="!validInput">Register</button>
   </form>
 </div>
 
@@ -27,14 +27,14 @@
         password: ''
       },
       computed: {
-        valid_email() {
+        validEmail () {
           return /.+@(?:.+){2,}\.(?:.+){2,}/.test(this.email)
         },
-        valid_password() {
+        validPassword () {
           return this.password.length > 5
         },
-        valid_input() {
-          return this.valid_email && this.valid_password
+        validInput () {
+          return this.validEmail && this.validPassword
         }
       }
     })

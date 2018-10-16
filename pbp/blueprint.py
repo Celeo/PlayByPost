@@ -45,6 +45,7 @@ def campaigns():
 
 
 @blueprint.route('/campaigns/create', methods=['GET', 'POST'])
+@login_required
 def campaign_create():
     if request.method == 'POST':
         new_campaign = Campaign(
@@ -93,6 +94,7 @@ def campaign_info(campaign_id):
 
 
 @blueprint.route('/campaign/<int:campaign_id>/new_post', methods=['POST'])
+@login_required
 def campaign_new_post(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
@@ -119,6 +121,7 @@ def campaign_new_post(campaign_id):
 
 
 @blueprint.route('/campaign/<int:campaign_id>/roll', methods=['GET', 'POST'])
+@login_required
 def campaign_rolls(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
@@ -138,6 +141,7 @@ def campaign_rolls(campaign_id):
 
 
 @blueprint.route('/post/<int:post_id>/edit', methods=['GET', 'POST'])
+@login_required
 def campaign_edit_post(post_id):
     post = Post.query.get(post_id)
     if not post:
@@ -159,6 +163,7 @@ def campaign_edit_post(post_id):
 
 
 @blueprint.route('/campaign/<int:campaign_id>/join', methods=['GET', 'POST'])
+@login_required
 def campaign_join(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if not current_user.should_show_join_link(campaign):
@@ -225,11 +230,12 @@ def profile_register():
         db.session.commit()
         flash('Login successful')
         login_user(new_user, remember=True)
-        return redirect(url_for('.profile_settings'))
+        return redirect(url_for('.campaigns'))
     return render_template('register.jinja2')
 
 
 @blueprint.route('/profile/characters', methods=['GET', 'POST'])
+@login_required
 def profile_characters():
     if request.method == 'POST':
         form_field = request.form.get('field')
@@ -288,7 +294,45 @@ def profile_characters():
 @login_required
 def profile_settings():
     if request.method == 'POST':
-        return 'TODO'
+        settings_type = request.form['settings_type']
+        if settings_type == 'posts':
+            current_user.posts_per_page = request.form['posts_per_page']
+            current_user.posts_newest_first = request.form['posts_newest_first'] == 'newest'
+            db.session.commit()
+            flash('Settings saved')
+            return redirect(url_for('base.profile_settings'))
+        elif settings_type == 'email':
+            new_email = request.form['email']
+            if current_user.email == new_email:
+                flash('That\'s already your email', 'error')
+                return redirect(url_for('base.profile_settings'))
+            if User.query.filter_by(email=new_email).first():
+                flash('Email already in use', 'error')
+                return redirect(url_for('base.profile_settings'))
+            if re.match(r'.+@(?:.+){2,}\.(?:.+){2,}', new_email):
+                current_user.email = new_email
+                db.session.commit()
+                flash('Settings saved')
+            else:
+                flash('Email does meet basic requirements', 'error')
+            return redirect(url_for('base.profile_settings'))
+        elif settings_type == 'password':
+            if not current_user.check_password(request.form['old_password']):
+                flash('Incorrect current password', 'error')
+                return redirect(url_for('base.profile_settings'))
+            if not request.form['new_password'] == request.form['new_password_confirm']:
+                flash('New passwords don\'t match', 'error')
+                return redirect(url_for('base.profile_settings'))
+            if not len(request.form['new_password']) > 5:
+                flash('Password must be at least 5 characters long', 'error')
+                return redirect(url_for('base.profile_settings'))
+            current_user.set_password(request.form['new_password'])
+            db.session.commit()
+            flash('New password saved')
+            return redirect(url_for('base.profile_settings'))
+        else:
+            flash('Unknown setting value', 'error')
+            return redirect(url_for('base.profile_settings'))
     return render_template('profile_settings.jinja2')
 
 

@@ -6,7 +6,9 @@
   <div class="clearfix">
     <h1 class="float-left">Campaigns</h1>
     <div class="float-right">
-      <a href="{{ url_for('base.campaign_create') }}" class="btn btn-outline-success">Create</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('base.campaign_create') }}" class="btn btn-outline-success">Create</a>
+      {% endif %}
     </div>
   </div>
   <br>

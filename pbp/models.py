@@ -20,10 +20,12 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), unique=True)
-    password = db.Column(db.String)
+    password = db.Column(db.String(500))
     date_joined = db.Column(db.DateTime)
     is_banned = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
+    posts_per_page = db.Column(db.Integer, default=20, nullable=False)
+    posts_newest_first = db.Column(db.Boolean, default=True, nullable=False)
 
     @property
     def is_authenticated(self):
@@ -83,7 +85,7 @@ class Campaign(db.Model):
     creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     dm_character_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String)
+    description = db.Column(db.String(5000))
     date_created = db.Column(db.DateTime)
     is_locked = db.Column(db.Boolean, default=False)
     is_posts_public = db.Column(db.Boolean, default=True)
@@ -135,7 +137,7 @@ class Post(db.Model):
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False)
     date = db.Column(db.DateTime)
     tag = db.Column(db.String(100))
-    content = db.Column(db.String)
+    content = db.Column(db.String(10000))
 
     character = db.relationship('Character', backref=db.backref('posts', lazy=True))
     campaign = db.relationship('Campaign', backref=db.backref('posts', lazy=True))
