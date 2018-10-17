@@ -81,9 +81,9 @@ def campaign_posts(campaign_id, page=1):
         flash('Could not find campaign with that id', 'error')
         return redirect(url_for('.campaigns'))
     query = Post.query.filter_by(campaign_id=campaign_id)
-    if current_user.posts_newest_first:
+    if current_user.is_authenticated and current_user.posts_newest_first:
         query = query.order_by(Post.id.desc())
-    pagination = query.paginate(page=page, per_page=current_user.posts_per_page)
+    pagination = query.paginate(page=page, per_page=current_user.posts_per_page if current_user.is_authenticated else 20)
     return render_template(
         'campaign_posts.jinja2',
         campaign=campaign,

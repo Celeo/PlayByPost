@@ -13,38 +13,42 @@
   </div>
   <br>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Last post</th>
-        <th>Your character</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for campaign in campaigns %}
+  {% if campaigns %}
+    <table class="table">
+      <thead>
         <tr>
-          <td><a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}" class="btn btn-outline-primary">{{ campaign.name }}</a></td>
-          <td>
-            {% if campaign.posts %}
-              {{ campaign.posts[-1].date | format_date }}
-            {% else %}
-              Never
-            {% endif %}
-          </td>
-          <td>
-            {% if current_user.is_authenticated %}
-              {% with campaign_char = current_user.get_character_in_campaign(campaign) %}
-                {% if campaign_char %}
-                  {{ campaign_char.name }}
-                {% endif %}
-              {% endwith %}
-            {% endif %}
-          </td>
+          <th>Name</th>
+          <th>Last post</th>
+          <th>Your character</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for campaign in campaigns %}
+          <tr>
+            <td><a href="{{ url_for('base.campaign_posts', campaign_id=campaign.id) }}" class="btn btn-outline-primary">{{ campaign.name }}</a></td>
+            <td>
+              {% if campaign.posts %}
+                {{ campaign.posts[-1].date | format_date }}
+              {% else %}
+                Never
+              {% endif %}
+            </td>
+            <td>
+              {% if current_user.is_authenticated %}
+                {% with campaign_char = current_user.get_character_in_campaign(campaign) %}
+                  {% if campaign_char %}
+                    {{ campaign_char.name }}
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <h4>There aren't any campaigns!</h4>
+  {% endif %}
 </div>
 
 {% endblock %}
