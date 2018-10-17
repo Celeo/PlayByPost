@@ -3,10 +3,53 @@
 {% block body %}
 
 <div class="container">
-  <h1>Help</h1>
-  <div style="padding-bottom: 5rem;"></div>
-  {# TODO #}
-  <h4>This isn't done yet</h4>
+  <h2>Help</h2>
+
+  <hr>
+  <h3>Joining</h3>
+  <p>
+    To join the site, you need to <a href="{{ url_for('base.profile_register') }}">register</a>. This requires supplying an email address
+    and a password. For your security, you shouldn't use the same password on any two websites, so make a unique one for this site.
+    <br><br>
+    Once you've registered, that's in - you're in.
+  </p>
+
+  <hr>
+  <h3>Campaigns</h3>
+  <p>
+    The site is separated into <strong>campaigns</strong>. A campaign is a story, a collection of posts by separate people, all playing different
+    characters.
+  </p>
+  <strong>Creating a campaign</strong>
+  <p>
+    When you're logged in, you'll see a green "Create" button when looking at the <a href="{{ url_for('base.campaigns') }}">existing campaigns</a>.
+    Click this button and give the campaign a title and description. Make the title short and too the point; the description area is for you to
+    explain what the campaign is about, what kind of players you're looking for, etc.
+    <br><br>
+    When you create a campaign, you'll be the <strong>Dungeon Master</strong> for it, so don't create a campaign if you're not willing to lead it!
+  </p>
+  <strong>Joining an existing campaign</strong>
+  <p>
+    On the <a href="{{ url_for('base.campaigns') }}">existing campaigns</a> page, you'll see a list of campaigns. You can view the posts in these
+    campaigns and read along without doing aynthing.
+    <br><br>
+    If you want to join, you can <i>submit an application</i>. To do so, click on the campaign link to see the posts, and you'll see a blue
+    "Join" link in the upper-right corner of the page. Click that and finish the form to request to join. If you're accepted, you'll be able to
+    post in that campaign.
+    <br><br>
+    You'll need a character that's not in a campaign to join a new campaign, and you can only have 1 character per campaign.
+  </p>
+  <strong>Creating a character</strong>
+  <p>
+    Characters are very simple on this site - there's no space to record your stats or level up automatically, it's just a name and whatever you
+    post with it.
+    <br><br>
+    You make a new character, click the "Profile" navbar link, or click <a href="{{ url_for('base.profile_characters') }}">here</a> to go to
+    your characters screen. You'll see a list of existing characters (if any) and which campaign they're in. You can set each character's
+    <i>tag</i>, the text that appears next to their name in posts <u>from now on</u>. You can put your class, level, or whatever here.
+    <br><br>
+    Under your existing characters, there's a form to create a new character. Just set a name and you're done.
+  </p>
 </div>
 
 {% endblock %}
