@@ -2,10 +2,10 @@ const path = require('path')
 const WebpackShellPlugin = require('webpack-shell-plugin')
 
 module.exports = {
-  entry: path.resolve(__dirname, 'index.js'),
+  entry: path.resolve(__dirname, 'editor.js'),
   output: {
     path: __dirname,
-    filename: 'index.dist.js'
+    filename: 'editor.dist.js'
   },
   resolve: {
     alias: {
@@ -19,7 +19,7 @@ module.exports = {
   plugins: [
     new WebpackShellPlugin({
       onBuildEnd: [
-        'mv index.dist.js ../pbp/static'
+        'mv editor.dist.js ../pbp/static'
       ]
     })
   ]
