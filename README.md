@@ -8,10 +8,6 @@ A full-stack web app for a simple forum designed for "play by post" RPGs.
 1. Create a virtualenv
 1. Activate the virtualenv
 1. Install Python deps
-1. Navigate into './widgets'
-1. Install Node deps
-1. Run the 'build_prod' package.json target
-1. Navigate to '../pbp'
 1. Copy 'config.example.json' to 'config.json'
 1. Populate the config
 1. Navigate to the project root
@@ -29,4 +25,7 @@ database, update 'config.json' accordingly and install any required libraries.
 
 ## Deploying
 
-TBD
+Basically the same as the "Getting set up" instructions, but on whichever server you're running the app on. Then:
+
+1. Setup a Nginx (or Apache) proxy
+1. Run the app with './run.sh prod'
