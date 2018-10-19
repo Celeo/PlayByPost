@@ -6,3 +6,4 @@ config.json
 .vscode
 widgets/dist
 .pytest_cache
+.coverage

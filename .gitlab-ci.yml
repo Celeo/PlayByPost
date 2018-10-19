@@ -13,7 +13,7 @@ test:
   - rm -rf Python-3.7.0
   - pip3.7 install -r requirements.txt
   - cp pbp/config.example.json pbp/config.json
-  - pytest
+  - pytest --cov=pbp pbp/tests
 
 production:
   type: deploy

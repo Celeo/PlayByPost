@@ -1,5 +1,8 @@
 # Play by post
 
+[![pipeline status](https://gitlab.com/Celeo/PlayByPost/badges/master/pipeline.svg)](https://gitlab.com/Celeo/PlayByPost/commits/master)
+[![coverage report](https://gitlab.com/Celeo/PlayByPost/badges/master/coverage.svg)](https://gitlab.com/Celeo/PlayByPost/commits/master)
+
 A full-stack web app for a simple forum designed for "play by post" RPGs.
 
 ## Getting set up

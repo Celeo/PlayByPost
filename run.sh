@@ -6,7 +6,7 @@ export FLASK_APP=pbp/app.py
 if [ "$1" == "shell" ]; then
     flask shell
 elif [ "$1" == "tests" ]; then
-    pytest
+    pytest --cov=pbp pbp/tests
 elif [ "$1" == "prod" ]; then
     gunicorn -w 5 -b 127.0.0.1:5000 pbp:app
 elif [ "$1" == "" ]; then
