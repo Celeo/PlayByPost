@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import (
     Blueprint,
+    current_app,
     flash,
     jsonify,
     redirect,
@@ -25,10 +26,13 @@ from .models import (
 )
 from .shared import db
 from .util import (
+    create_password_reset_key,
+    get_password_reset_key,
     is_safe_url,
     is_valid_email,
     pagination_pages,
-    roll_dice
+    roll_dice,
+    send_email
 )
 
 blueprint = Blueprint('base', __name__, template_folder='templates')
@@ -287,6 +291,51 @@ def profile_register():
         login_user(new_user, remember=True)
         return redirect(url_for('.campaigns'))
     return render_template('register.jinja2')
+
+
+@blueprint.route('/profile/reset_password', methods=['GET', 'POST'])
+def profile_reset_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash('Password reset link sent')
+            return redirect(url_for('.profile_login'))
+        if user:
+            key = create_password_reset_key(user.email)
+            link = url_for('.profile_reset_password_confirm', email=user.email, key=key, _external=True)
+            send_email(
+                current_app.config,
+                [user.email],
+                'Password reset link',
+                link
+            )
+            flash('Password reset link sent')
+            return redirect(url_for('.profile_login'))
+    return render_template('reset_password.jinja2')
+
+
+@blueprint.route('/profile/reset_password/<email>/<key>', methods=['GET', 'POST'])
+def profile_reset_password_confirm(email, key):
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return redirect(url_for('.profile_login'))
+    actual_key = get_password_reset_key(user.email)
+    if not key == actual_key:
+        flash('Wrong reset key', 'error')
+        return redirect(url_for('.profile_login'))
+    if request.method == 'POST':
+        if not request.form['new_password'] == request.form['new_password_confirm']:
+            flash('New passwords don\'t match', 'error')
+            return redirect(url_for('.profile_reset_password_confirm', email=email, key=key))
+        if not len(request.form['new_password']) > 5:
+            flash('Password must be at least 5 characters long', 'error')
+            return redirect(url_for('.profile_reset_password_confirm', email=email, key=key))
+        user.set_password(request.form['new_password'])
+        db.session.commit()
+        flash('New password saved, please log in')
+        return redirect(url_for('.profile_login'))
+    return render_template('reset_password_confirm.jinja2', email=email, key=key)
 
 
 @blueprint.route('/profile/characters', methods=['GET', 'POST'])

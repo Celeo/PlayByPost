@@ -1,5 +1,6 @@
 from random import randint
 import re
+from uuid import uuid4
 
 from flask import request
 from urllib.parse import (
@@ -9,6 +10,7 @@ from urllib.parse import (
 import requests
 
 from .models import Roll
+from .shared import redis
 
 
 regex_dice = re.compile(r'([+-]?\d+)d([+-]?\d+)')
@@ -89,7 +91,7 @@ def pagination_pages(current_page, page_count):
     ]
 
 
-def send_simple_message(config, recipients, subject, body):
+def send_email(config, recipients, subject, body):
     return requests.post(
         'https://api.mailgun.net/v3/{}/messages'.format(config['EMAIL_DOMAIN']),
         auth=('api', config['EMAIL_API_KEY']),
@@ -100,3 +102,14 @@ def send_simple_message(config, recipients, subject, body):
             'text': body
         }
     )
+
+
+def create_password_reset_key(email):
+    key = str(uuid4())
+    redis.set(f'password_reset:{email}', key, ex=1 * 60 * 60)
+    return key
+
+
+def get_password_reset_key(email):
+    key = redis.get(f'password_reset:{email}')
+    return key.decode('UTF-8') if key else None

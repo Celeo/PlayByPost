@@ -4,7 +4,7 @@ import arrow
 from flask import Flask, render_template
 from flask_login import LoginManager
 
-from .shared import db
+from .shared import db, redis
 from .models import User
 from .blueprint import blueprint as base_blueprint
 
@@ -14,6 +14,8 @@ app.config.from_json('config.json')
 
 db.app = app
 db.init_app(app)
+
+redis.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

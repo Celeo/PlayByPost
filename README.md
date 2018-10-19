@@ -5,6 +5,11 @@
 
 A full-stack web app for a simple forum designed for "play by post" RPGs.
 
+## System requirements
+
+1. Python 3.7
+1. Redis
+
 ## Getting set up
 
 1. Clone the repo
