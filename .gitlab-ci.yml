@@ -26,4 +26,4 @@ production:
   - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
   - chmod 644 ~/.ssh/known_hosts
   - chmod 700 ~/.ssh
-  - ssh remote /srv/update.sh
+  - ssh $REMOTE_SERVER /srv/update.sh
