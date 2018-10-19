@@ -1,5 +1,8 @@
 {
   "SQLALCHEMY_DATABASE_URI": "sqlite:///../data.db",
   "SQLALCHEMY_TRACK_MODIFICATIONS": false,
-  "SECRET_KEY": ""
+  "SECRET_KEY": "",
+  "EMAIL_DOMAIN": "",
+  "EMAIL_FROM": "",
+  "EMAIL_API_KEY": ""
 }

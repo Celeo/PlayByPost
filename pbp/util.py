@@ -6,6 +6,7 @@ from urllib.parse import (
     urlparse,
     urljoin
 )
+import requests
 
 from .models import Roll
 
@@ -86,3 +87,16 @@ def pagination_pages(current_page, page_count):
         [current_page - 2, current_page - 1, current_page, current_page + 1, current_page + 2]
         if 0 < page <= page_count
     ]
+
+
+def send_simple_message(config, recipients, subject, body):
+    return requests.post(
+        'https://api.mailgun.net/v3/{}/messages'.format(config['EMAIL_DOMAIN']),
+        auth=('api', config['EMAIL_API_KEY']),
+        data={
+            'from': config['EMAIL_FROM'],
+            'to': recipients,
+            'subject': subject,
+            'text': body
+        }
+    )
