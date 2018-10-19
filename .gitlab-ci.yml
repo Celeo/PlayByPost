@@ -1,8 +1,16 @@
+before_script:
+- apt-get update -qy
+
 test:
   script:
-  - apt-get update -qy
-  - apt-get install -y python-dev python-pip
-  - pip install -r requirements.txt
+  - apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev
+  - wget https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tgz
+  - tar -xzf Python-3.7.0.tgz
+  - cd Python-3.7.0
+  - ./configure
+  - make altinstall
+  - cd ..
+  - pip3.7 install -r requirements.txt
   - pytest
 
 production:
@@ -10,7 +18,7 @@ production:
   only:
   - master
   script:
-  - 'which ssh-agent || ( apt-get update -qy && apt-get install -y openssh-client )'
+  - 'which ssh-agent || ( apt-get install -y openssh-client )'
   - eval $(ssh-agent -s)
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
   - mkdir -p ~/.ssh
