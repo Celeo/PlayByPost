@@ -1,7 +1,7 @@
 test:
   script:
   - apt-get update -qy
-  - apt-get instlal python3-dev python3-pip
+  - apt-get instlal python-dev python-pip
   - pip install -r requirements.txt
   - pytest
 
