@@ -2,6 +2,7 @@ from random import randint
 import re
 from uuid import uuid4
 
+from celery import Celery
 from flask import request
 from urllib.parse import (
     urlparse,
@@ -16,9 +17,7 @@ from .shared import redis
 regex_dice = re.compile(r'([+-]?\d+)d([+-]?\d+)')
 regex_mod = re.compile(r'([+-])(\d+)')
 
-
-class DiceException(Exception):
-    pass
+celery = Celery('pbp', broker='redis://localhost:6379/0')
 
 
 def is_safe_url(target):
@@ -33,6 +32,10 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+
+class DiceException(Exception):
+    pass
 
 
 def roll_dice(character, s):
@@ -91,19 +94,6 @@ def pagination_pages(current_page, page_count):
     ]
 
 
-def send_email(config, recipients, subject, body):
-    return requests.post(
-        'https://api.mailgun.net/v3/{}/messages'.format(config['EMAIL_DOMAIN']),
-        auth=('api', config['EMAIL_API_KEY']),
-        data={
-            'from': config['EMAIL_FROM'],
-            'to': recipients,
-            'subject': subject,
-            'text': body
-        }
-    )
-
-
 def create_password_reset_key(email):
     key = str(uuid4())
     redis.set(f'password_reset:{email}', key, ex=1 * 60 * 60)
@@ -113,3 +103,17 @@ def create_password_reset_key(email):
 def get_password_reset_key(email):
     key = redis.get(f'password_reset:{email}')
     return key.decode('UTF-8') if key else None
+
+
+@celery.task()
+def send_email(api_key, domain, from_, recipients, subject, body):
+    return requests.post(
+        'https://api.mailgun.net/v3/{}/messages'.format(domain),
+        auth=('api', api_key),
+        data={
+            'from': from_,
+            'to': recipients,
+            'subject': subject,
+            'text': body
+        }
+    )

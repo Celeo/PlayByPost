@@ -25,7 +25,10 @@ database, update 'config.json' accordingly and install any required libraries.
 
 ## Running
 
-1. Run './run.sh' for local development and './run.sh prod' for production.
+Run './run.sh' for local development and './run.sh prod' for production.
+
+If you're using any of the emailing, you'll need a provider (I'm using Mailgun) and to run the celery
+worker alongside your app (both in development and producton).
 
 ### Running tests
 

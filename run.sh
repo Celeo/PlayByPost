@@ -9,6 +9,8 @@ elif [ "$1" == "tests" ]; then
     pytest --cov=pbp pbp/tests
 elif [ "$1" == "prod" ]; then
     gunicorn -w 5 -b 127.0.0.1:5000 pbp:app
+elif [ "$1" == "celery" ]; then
+    celery worker -A pbp.util.celery --loglevel=info
 elif [ "$1" == "" ]; then
     export FLASK_ENV=development
     flask run --port 5000
