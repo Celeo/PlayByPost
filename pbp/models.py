@@ -88,7 +88,7 @@ class Campaign(db.Model):
     creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     dm_character_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(5000))
+    description = db.Column(db.String(10000))
     date_created = db.Column(db.DateTime)
     is_locked = db.Column(db.Boolean, default=False)
     is_posts_public = db.Column(db.Boolean, default=True)
@@ -118,6 +118,7 @@ class Character(db.Model):
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True)
     name = db.Column(db.String(100))
     tag = db.Column(db.String(100))
+    campaign_join_note = db.Column(db.String(5000))
     campaign_approved = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('characters', lazy=True))

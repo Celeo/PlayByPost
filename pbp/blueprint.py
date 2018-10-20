@@ -214,6 +214,7 @@ def campaign_join(campaign_id):
                 flash('There is already a character in that campaign with that name', 'error')
                 return redirect(url_for('.campaign_join', campaign_id=campaign_id))
         character.campaign_id = campaign_id
+        character.campaign_join_note = request.form['notes']
         db.session.commit()
         flash('Membership request submitted')
         return redirect(url_for('.campaign_join', campaign_id=campaign_id))
