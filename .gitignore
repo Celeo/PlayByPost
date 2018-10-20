@@ -7,3 +7,4 @@ config.json
 widgets/dist
 .pytest_cache
 .coverage
+*.log

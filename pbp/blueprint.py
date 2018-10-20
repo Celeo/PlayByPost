@@ -24,9 +24,13 @@ from .models import (
     User,
     Roll
 )
-from .shared import db
+from .shared import (
+    csrf,
+    db
+)
 from .util import (
     create_password_reset_key,
+    clear_password_reset_keys,
     get_password_reset_key,
     is_safe_url,
     is_valid_email,
@@ -53,6 +57,7 @@ def campaigns():
 @login_required
 def campaign_create():
     if request.method == 'POST':
+        # TODO check if name is unique
         new_campaign = Campaign(
             creator_user_id=current_user.id,
             name=request.form['name'],
@@ -71,6 +76,7 @@ def campaign_create():
         db.session.commit()
         new_dm.campaign_id = new_campaign.id
         db.session.commit()
+        current_app.logger.info(f'User {current_user.id} created new campaign with name "{new_campaign.name}"')
         flash('New campaign created')
         return redirect(url_for('.campaigns'))
     campaigns = Campaign.query.all()
@@ -130,6 +136,7 @@ def campaign_new_post(campaign_id):
     for roll in pending_rolls:
         roll.post = post
     db.session.commit()
+    current_app.logger.info(f'User {current_user.id} made new post in campaign {campaign.id}')
     flash('New post added')
     is_dm_post = character.campaign.dm_character_id == character.id
     for other_character in campaign.characters:
@@ -137,24 +144,25 @@ def campaign_new_post(campaign_id):
             continue
         link = url_for('.campaign_posts', campaign_id=campaign.id, _external=True)
         if is_dm_post and other_character.user.email_for_dm_post:
+            current_app.logger.info(f'Send DM post notify email to {other_character.user.id} for campaign {campaign.id}')
             send_email(
                 [other_character.user.email],
                 f'New DM post in "{campaign.name}"',
                 f'The DM has made a new post in the campaign.\n\nCampaign link: {link}'
             )
-            pass
         elif not is_dm_post and other_character.user.email_for_any_post:
+            current_app.logger.info(f'Send generic post notify email to {other_character.user.id} for campaign {campaign.id}')
             send_email(
                 [other_character.user.email],
                 f'New post in "{campaign.name}"',
                 f'{character.name} has made a new post in the campaign.\n\nCampaign link: {link}'
             )
-            pass
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
 
 
 @blueprint.route('/campaign/<int:campaign_id>/roll', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def campaign_rolls(campaign_id):
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
@@ -163,11 +171,12 @@ def campaign_rolls(campaign_id):
     if not character:
         return 'You are not a member of that campaign', 403
     if request.method == 'POST':
-        roll = request.json.get('roll')
-        if not roll:
+        roll_str = request.json.get('roll')
+        if not roll_str:
             return '', 400
-        roll = roll_dice(character, roll)
+        roll = roll_dice(character, roll_str)
         db.session.add(roll)
+        current_app.logger.info(f'User {current_user.id} as character {character.id} rolled str "{roll_str}"')
         db.session.commit()
     rolls = Roll.query.filter_by(character_id=current_user.get_character_in_campaign(campaign).id, post_id=None).all()
     return jsonify([r.to_dict() for r in rolls])
@@ -191,6 +200,7 @@ def campaign_edit_post(post_id):
         post.content = content
         db.session.commit()
         flash('Content saved')
+        current_app.logger.info(f'User {current_user.id} edited post {post.id}')
         return redirect(url_for('.campaign_posts', campaign_id=post.campaign_id))
     return render_template('campaign_edit_post.jinja2', post=post)
 
@@ -216,6 +226,7 @@ def campaign_join(campaign_id):
         character.campaign_id = campaign_id
         character.campaign_join_note = request.form['notes']
         db.session.commit()
+        current_app.logger.info(f'User {current_user.id} as character {character.id} requested to join campaign {campaign.id}')
         flash('Membership request submitted')
         return redirect(url_for('.campaign_join', campaign_id=campaign_id))
     return render_template('campaign_join.jinja2', campaign=campaign)
@@ -252,8 +263,10 @@ def campaign_dm_controls(campaign_id):
                         'Your campaign join request has been approved',
                         f'Your request to join "{campaign.name}" has been approved for your character {character.name}'
                     )
+                current_app.logger.info(f'User {current_user.id} accepted {character.id} to campaign {campaign.id}')
                 flash('Character accepted')
             else:
+                current_app.logger.info(f'User {current_user.id} denied {character.id} to campaign {campaign.id}')
                 db.session.delete(character)
                 flash('Character denied')
             db.session.commit()
@@ -263,6 +276,7 @@ def campaign_dm_controls(campaign_id):
             campaign.description = request.form['description']
             db.session.commit()
             flash('Campaign name/desciption updated')
+            current_app.logger.info(f'User {current_user.id} updated campaign {campaign.id} name or description')
             return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
         else:
             flash('Unknown form submission', 'error')
@@ -284,10 +298,12 @@ def profile_login():
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
         if not user or not user.check_password(password):
+            current_app.logger.warning(f'Incorrect login for "{email}"')
             flash('Login failed', 'error')
             return redirect(url_for('.profile_login'))
         flash('Login successful')
         login_user(user, remember=True)
+        current_app.logger.info(f'User {current_user.id} logged in')
         next_url = request.args.get('next')
         if next_url and not is_safe_url(next_url):
             return redirect(url_for('.campaigns'))
@@ -313,8 +329,9 @@ def profile_register():
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        flash('Login successful')
         login_user(new_user, remember=True)
+        current_app.logger.info(f'User {current_user.id} registered')
+        flash('Login successful')
         return redirect(url_for('.campaigns'))
     return render_template('register.jinja2')
 
@@ -332,6 +349,7 @@ def profile_reset_password():
             link = url_for('.profile_reset_password_confirm', email=user.email, key=key, _external=True)
             send_email([user.email], 'Password reset link', link)
             flash('Password reset link sent')
+            current_app.logger.info(f'User {current_user.id} requested password reset link')
             return redirect(url_for('.profile_login'))
     return render_template('reset_password.jinja2')
 
@@ -341,7 +359,7 @@ def profile_reset_password_confirm(email, key):
     user = User.query.filter_by(email=email).first()
     if not user:
         return redirect(url_for('.profile_login'))
-    actual_key = get_password_reset_key(user.email)
+    actual_key = get_password_reset_key(email)
     if not key == actual_key:
         flash('Wrong reset key', 'error')
         return redirect(url_for('.profile_login'))
@@ -354,6 +372,8 @@ def profile_reset_password_confirm(email, key):
             return redirect(url_for('.profile_reset_password_confirm', email=email, key=key))
         user.set_password(request.form['new_password'])
         db.session.commit()
+        clear_password_reset_keys(email)
+        current_app.logger.info(f'User {current_user.id} updated password via reset link')
         flash('New password saved, please log in')
         return redirect(url_for('.profile_login'))
     return render_template('reset_password_confirm.jinja2', email=email, key=key)
@@ -371,6 +391,7 @@ def profile_characters():
             db.session.add(character)
             db.session.commit()
             flash('New character created')
+            current_app.logger.info(f'User {current_user.id} created new character with name "{character.name}"')
             return redirect(url_for('.profile_characters'))
         elif form_field == 'delete':
             character = Character.query.get(character_id)
@@ -383,6 +404,7 @@ def profile_characters():
             if character.campaign_approved:
                 flash('You cannot delete a character that\'s part of a campaign', 'error')
                 return redirect(url_for('.profile_characters'))
+            current_app.logger.info(f'User {current_user.id} deleted character {character.id}')
             db.session.delete(character)
             db.session.commit()
             flash('Character deleted')
@@ -404,8 +426,10 @@ def profile_characters():
                         if other_character.character.name == new_value:
                             flash('A character with that name is already in the same campaign', 'error')
                             return redirect(url_for('.profile_characters'))
+                current_app.logger.info(f'User {current_user.id} set character {character.id} name to "{new_value}"')
                 character.name = new_value
             elif form_field == 'tag':
+                current_app.logger.info(f'User {current_user.id} set character {character.id} tag to "{new_value}"')
                 character.tag = new_value
             else:
                 flash('An error occurred', 'error')
@@ -424,6 +448,7 @@ def profile_settings():
             current_user.posts_per_page = request.form['posts_per_page']
             current_user.posts_newest_first = request.form['posts_newest_first'] == 'newest'
             db.session.commit()
+            current_app.logger.info(f'User {current_user.id} updated post settings')
             flash('Post settings saved')
             return redirect(url_for('base.profile_settings'))
         elif settings_type == 'email':
@@ -437,6 +462,7 @@ def profile_settings():
             if is_valid_email(new_email):
                 current_user.email = new_email
                 db.session.commit()
+                current_app.logger.info(f'User {current_user.id} updated email settings')
                 flash('Email settings saved')
             else:
                 flash('Email does meet basic requirements', 'error')
@@ -453,6 +479,7 @@ def profile_settings():
                 return redirect(url_for('base.profile_settings'))
             current_user.set_password(request.form['new_password'])
             db.session.commit()
+            current_app.logger.info(f'User {current_user.id} updated password')
             flash('New password saved')
             return redirect(url_for('base.profile_settings'))
         elif settings_type == 'email_notifications':
@@ -460,6 +487,7 @@ def profile_settings():
             current_user.email_for_dm_post = 'email_for_dm_post' in request.form
             current_user.email_for_any_post = 'email_for_any_post' in request.form
             db.session.commit()
+            current_app.logger.info(f'User {current_user.id} updated email notification settings')
             flash('Email settings saved')
             return redirect(url_for('base.profile_settings'))
         else:
@@ -470,11 +498,16 @@ def profile_settings():
 
 @blueprint.route('/profile/logout')
 def profile_logout():
+    current_app.logger.info(f'User {current_user.id} logged out')
     logout_user()
     return redirect(url_for('.profile_login'))
 
 
 def send_email(recipients, subject, body):
+    current_app.logger.info('Sending email to "{}" with subject "{}"'.format(
+        ', '.join(recipients),
+        subject
+    ))
     return _send_email.apply_async(args=[
         current_app.config['EMAIL_API_KEY'],
         current_app.config['EMAIL_DOMAIN'],

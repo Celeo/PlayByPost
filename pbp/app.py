@@ -1,11 +1,11 @@
+import logging
 import os
 
 import arrow
 from flask import Flask, render_template
-from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 
-from .shared import db, redis
+from .shared import db, redis, csrf
 from .models import User
 from .blueprint import blueprint as base_blueprint
 
@@ -16,7 +16,7 @@ app.config.from_json('config.json')
 db.app = app
 db.init_app(app)
 
-csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 redis.init_app(app)
 
@@ -26,6 +26,11 @@ login_manager.login_view = 'base.profile_login'
 login_manager.login_message_category = 'error'
 
 app.jinja_env.globals['FLASK_ENV'] = os.getenv('FLASK_ENV', 'production')
+
+logging_file_handler = logging.handlers.RotatingFileHandler('app.log', maxBytes=1024 * 1024 * 1024, backupCount=20)
+logging_file_handler.setLevel(logging.INFO)
+logging_file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+app.logger.addHandler(logging_file_handler)
 
 
 @login_manager.user_loader
