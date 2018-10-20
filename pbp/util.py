@@ -105,6 +105,10 @@ def get_password_reset_key(email):
     return key.decode('UTF-8') if key else None
 
 
+def clear_password_reset_keys(email):
+    redis.delete(f'password_reset:{email}')
+
+
 @celery.task()
 def send_email(api_key, domain, from_, recipients, subject, body):
     return requests.post(
