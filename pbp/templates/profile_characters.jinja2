@@ -46,6 +46,7 @@
               <td>
                 {% if not character.campaign_approved %}
                   <form action="{{ url_for('base.profile_characters') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="field" value="delete">
                     <input type="hidden" name="character_id" value="{{ character.id }}">
                     <button type="submit" class="btn btn-outline-danger">Delete</button>
@@ -65,6 +66,7 @@
     <hr>
     <h3>Create a new character</h3>
     <form action="{{ url_for('base.profile_characters') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="hidden" name="field" value="new_character">
       <div class="form-group">
         <label for="name">Name</label>
@@ -78,6 +80,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form action="{{ url_for('base.profile_characters') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="modal-header">
             <h5 class="modal-title">Rename character</h5>
             <button class="close" type="button" data-dismiss="modal">
@@ -104,6 +107,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form action="{{ url_for('base.profile_characters') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="modal-header">
             <h5 class="modal-title">Set character tag</h5>
             <button class="close" type="button" data-dismiss="modal">

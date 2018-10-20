@@ -1,6 +1,7 @@
 {% macro editor(post_url, current_text='', button_text='Post') -%}
 <div id="editorApp">
   <form action="{{ post_url }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="content" v-model="content">
     <vue-editor v-model="content" :editor-toolbar="toolbar"></vue-editor>
     <button type="submit" class="btn btn-outline-success" :disabled="!valid" style="margin-top: 5px;">{{ button_text }}</button>

@@ -7,6 +7,7 @@
   <hr>
   <h3>Post settings</h3>
   <form action="{{ url_for('base.profile_settings') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="settings_type" value="posts">
     <div class="form-group">
       <label for="posts_per_page">Posts per page</label>
@@ -26,6 +27,7 @@
   <hr>
   <h3>Email</h3>
   <form action="{{ url_for('base.profile_settings') }}" method="POST" id="form-email">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="settings_type" value="email">
     <div class="form-group">
       <label for="email">Change account email address</label>
@@ -36,6 +38,7 @@
   <hr>
   <h3>Password</h3>
   <form action="{{ url_for('base.profile_settings') }}" method="POST" id="form-password">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="settings_type" value="password">
     <div class="form-group">
       <label for="old_password">Current password</label>
@@ -54,6 +57,7 @@
   <hr>
   <h3>Email notifications</h3>
   <form action="{{ url_for('base.profile_settings') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="settings_type" value="email_notifications">
     <div class="form-check">
       <input type="checkbox" class="form-check-input" value="" name="email_for_accepted"{% if current_user.email_for_accepted %} checked{% endif %}>

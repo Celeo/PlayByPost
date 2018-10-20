@@ -11,6 +11,7 @@
   <br>
   {% if current_user.characters %}
     <form action="{{ url_for('base.campaign_join', campaign_id=campaign.id) }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">
         <label for="character">Character to join with</label>
         <select name="character" class="form-control" required>

@@ -5,6 +5,7 @@
 <div class="container">
   <h3>Create a new campaign</h3>
   <form action="{{ url_for('base.campaign_create') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
       <label for="name">Name</label>
       <input type="text" class="form-control" name="name" placeholder="Name of campaign" required>

@@ -19,6 +19,7 @@
               <td>{% if applicant.campaign_join_note %}<button type="button" class="btn btn-outline-secondary" @click="viewNote(`{{ applicant.campaign_join_note }}`)">Note</button>{% endif %}</td>
               <td>
                 <form action="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" method="POST">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="type" value="applicant">
                   <input type="hidden" name="action" value="accept">
                   <input type="hidden" name="character_id" value="{{ applicant.id }}">
@@ -27,6 +28,7 @@
               </td>
               <td>
                 <form action="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" method="POST">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="type" value="applicant">
                   <input type="hidden" name="action" value="deny">
                   <input type="hidden" name="character_id" value="{{ applicant.id }}">
@@ -51,6 +53,7 @@
     <hr>
     <h3>Name and description</h3>
     <form action="{{ url_for('base.campaign_dm_controls', campaign_id=campaign.id) }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="hidden" name="type" value="name_description">
       <div class="form-group">
         <label for="name">Name</label>

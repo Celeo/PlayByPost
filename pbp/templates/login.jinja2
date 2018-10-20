@@ -6,6 +6,7 @@
   <h1>Log in</h1>
   <br>
   <form action="{{ url_for('base.profile_login') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
       <label for="email">Email</label>
       <input type="text" class="form-control" name="email" placeholder="your_address@somewhere.com" required>

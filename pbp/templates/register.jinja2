@@ -6,6 +6,7 @@
   <h1>Register</h1>
   <br>
   <form action="{{ url_for('base.profile_register') }}" method="POST" id="form-app">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
       <label for="email">Email</label>
       <input type="text" :class="{'form-control': true, 'is-valid': validEmail, 'is-invalid': !validEmail}" name="email" placeholder="your_address@somewhere.com" v-model="email" required>

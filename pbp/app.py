@@ -2,6 +2,7 @@ import os
 
 import arrow
 from flask import Flask, render_template
+from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 
 from .shared import db, redis
@@ -14,6 +15,8 @@ app.config.from_json('config.json')
 
 db.app = app
 db.init_app(app)
+
+csrf = CSRFProtect(app)
 
 redis.init_app(app)
 

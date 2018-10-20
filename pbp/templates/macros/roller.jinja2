@@ -1,6 +1,7 @@
 {% macro roller() -%}
 <div id="rollerApp">
   <form action="" method="POST" @submit.prevent="">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group mb-0">
       <label for="action">Action</label>
       <input type="text" class="form-control" v-model="action" >
