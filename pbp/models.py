@@ -26,6 +26,9 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     posts_per_page = db.Column(db.Integer, default=20, nullable=False)
     posts_newest_first = db.Column(db.Boolean, default=True, nullable=False)
+    email_for_accepted = db.Column(db.Boolean, default=False, nullable=False)
+    email_for_dm_post = db.Column(db.Boolean, default=False, nullable=False)
+    email_for_any_post = db.Column(db.Boolean, default=False, nullable=False)
 
     @property
     def is_authenticated(self):

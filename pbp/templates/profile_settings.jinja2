@@ -51,6 +51,25 @@
     </div>
     <button class="btn btn-outline-success" :disabled="!validInput">Save</button>
   </form>
+  <hr>
+  <h3>Email notifications</h3>
+  <form action="{{ url_for('base.profile_settings') }}" method="POST">
+    <input type="hidden" name="settings_type" value="email_notifications">
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" value="" name="email_for_accepted"{% if current_user.email_for_accepted %} checked{% endif %}>
+      <label for="email_for_accepted" class="form-check-label">Email when I'm accepted to a campaign</label>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" value="" name="email_for_dm_post"{% if current_user.email_for_dm_post %} checked{% endif %}>
+      <label for="email_for_dm_post" class="form-check-label">Email when there's a DM post in one of the campaigns I'm in</label>
+    </div>
+    <div class="form-check">
+      <input type="checkbox" class="form-check-input" value="" name="email_for_any_post"{% if current_user.email_for_any_post %} checked{% endif %}>
+      <label for="email_for_any_post" class="form-check-label">Email when there's any post in one of the campaigns I'm in</label>
+    </div>
+    <br>
+    <button class="btn btn-outline-success">Save</button>
+  </form>
 </div>
 
 <script>

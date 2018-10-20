@@ -32,7 +32,7 @@ from .util import (
     is_valid_email,
     pagination_pages,
     roll_dice,
-    send_email
+    send_email as _send_email
 )
 
 blueprint = Blueprint('base', __name__, template_folder='templates')
@@ -131,6 +131,25 @@ def campaign_new_post(campaign_id):
         roll.post = post
     db.session.commit()
     flash('New post added')
+    is_dm_post = character.campaign.dm_character_id == character.id
+    for other_character in campaign.characters:
+        if other_character.id == character.id:
+            continue
+        link = url_for('.campaign_posts', campaign_id=campaign.id, _external=True)
+        if is_dm_post and other_character.user.email_for_dm_post:
+            send_email(
+                [other_character.user.email],
+                f'New DM post in "{campaign.name}"',
+                f'The DM has made a new post in the campaign.\n\nCampaign link: {link}'
+            )
+            pass
+        elif not is_dm_post and other_character.user.email_for_any_post:
+            send_email(
+                [other_character.user.email],
+                f'New post in "{campaign.name}"',
+                f'{character.name} has made a new post in the campaign.\n\nCampaign link: {link}'
+            )
+            pass
     return redirect(url_for('.campaign_posts', campaign_id=campaign_id))
 
 
@@ -226,6 +245,12 @@ def campaign_dm_controls(campaign_id):
                 return redirect(url_for('.campaign_dm_controls', campaign_id=campaign_id))
             if request.form['action'] == 'accept':
                 character.campaign_approved = True
+                if character.user.email_for_accepted:
+                    send_email(
+                        [character.user.email],
+                        'Your campaign join request has been approved',
+                        f'Your request to join "{campaign.name}" has been approved for your character {character.name}'
+                    )
                 flash('Character accepted')
             else:
                 db.session.delete(character)
@@ -304,12 +329,7 @@ def profile_reset_password():
         if user:
             key = create_password_reset_key(user.email)
             link = url_for('.profile_reset_password_confirm', email=user.email, key=key, _external=True)
-            send_email(
-                current_app.config,
-                [user.email],
-                'Password reset link',
-                link
-            )
+            send_email([user.email], 'Password reset link', link)
             flash('Password reset link sent')
             return redirect(url_for('.profile_login'))
     return render_template('reset_password.jinja2')
@@ -403,7 +423,7 @@ def profile_settings():
             current_user.posts_per_page = request.form['posts_per_page']
             current_user.posts_newest_first = request.form['posts_newest_first'] == 'newest'
             db.session.commit()
-            flash('Settings saved')
+            flash('Post settings saved')
             return redirect(url_for('base.profile_settings'))
         elif settings_type == 'email':
             new_email = request.form['email']
@@ -416,7 +436,7 @@ def profile_settings():
             if is_valid_email(new_email):
                 current_user.email = new_email
                 db.session.commit()
-                flash('Settings saved')
+                flash('Email settings saved')
             else:
                 flash('Email does meet basic requirements', 'error')
             return redirect(url_for('base.profile_settings'))
@@ -434,6 +454,13 @@ def profile_settings():
             db.session.commit()
             flash('New password saved')
             return redirect(url_for('base.profile_settings'))
+        elif settings_type == 'email_notifications':
+            current_user.email_for_accepted = 'email_for_accepted' in request.form
+            current_user.email_for_dm_post = 'email_for_dm_post' in request.form
+            current_user.email_for_any_post = 'email_for_any_post' in request.form
+            db.session.commit()
+            flash('Email settings saved')
+            return redirect(url_for('base.profile_settings'))
         else:
             flash('Unknown setting value', 'error')
             return redirect(url_for('base.profile_settings'))
@@ -444,3 +471,14 @@ def profile_settings():
 def profile_logout():
     logout_user()
     return redirect(url_for('.profile_login'))
+
+
+def send_email(recipients, subject, body):
+    return _send_email.apply_async(args=[
+        current_app.config['EMAIL_API_KEY'],
+        current_app.config['EMAIL_DOMAIN'],
+        current_app.config['EMAIL_FROM'],
+        recipients,
+        subject,
+        body
+    ])
